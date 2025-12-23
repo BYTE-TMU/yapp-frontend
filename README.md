@@ -23,8 +23,8 @@ React-based web application for the Yap social platform - a social network for T
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR_ORG/yap-frontend.git
-   cd yap-frontend
+   git clone https://github.com/BYTE-TMU/yapp-frontend.git
+   cd yapp-frontend
    ```
 
 2. **Install dependencies**
