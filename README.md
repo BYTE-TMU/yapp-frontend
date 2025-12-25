@@ -2,6 +2,21 @@
 
 React-based web application for the Yap social platform - a social network for Toronto Metropolitan University (TMU) students.
 
+## 📚 Documentation
+
+**New Engineer Onboarding:** Start here to understand the codebase
+
+1. **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture, design patterns, and technical decisions
+2. **[API_INTEGRATION.md](./API_INTEGRATION.md)** - Backend integration, endpoints, and authentication
+3. **Component Documentation** - Detailed README files in each major folder:
+   - [src/components/authentication/](./src/components/authentication/) - Authentication system
+   - [src/components/messages/](./src/components/messages/) - Real-time messaging
+   - [src/components/pages/](./src/components/pages/) - Main application pages
+   - [src/components/sidebar/](./src/components/sidebar/) - Navigation sidebar
+   - [src/services/](./src/services/) - API and Socket.IO services
+   - [src/utils/](./src/utils/) - Utility functions
+   - [src/contexts/](./src/contexts/) - React contexts
+
 ## Tech Stack
 
 - **Framework**: React 19
@@ -133,11 +148,19 @@ npm run build
 
 ## Contributing
 
+For detailed development guidelines, coding standards, and best practices, refer to:
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Understand the system design first
+- **[API_INTEGRATION.md](./API_INTEGRATION.md)** - Learn API patterns
+- **Component READMEs** - Check folder-specific documentation
+
+### Quick Contribution Steps
+
 1. Create a feature branch: `git checkout -b feature/my-feature`
-2. Make your changes
-3. Run linting: `npm run lint`
-4. Test locally with backend running
-5. Submit a pull request
+2. Read relevant component documentation in the folder you're working on
+3. Make your changes following existing patterns
+4. Run linting: `npm run lint`
+5. Test locally with backend running
+6. Submit a pull request
 
 ### Code Standards
 
