@@ -33,6 +33,7 @@ React-based web application for the Yap social platform - a social network for T
 
 - Node.js 18+
 - npm or yarn
+- **Backend running** - See [yapp-backend](https://github.com/BYTE-TMU/yapp-backend) setup first
 
 ### Setup
 
@@ -59,6 +60,31 @@ React-based web application for the Yap social platform - a social network for T
    ```
 
 The app will be available at `http://localhost:5173`
+
+## Full Stack Development
+
+To run the complete stack locally:
+
+1. **Start the backend** (in a separate terminal):
+   ```bash
+   cd yapp-backend
+   python app.py
+   # Backend runs at http://localhost:5001
+   ```
+
+2. **Start the frontend**:
+   ```bash
+   cd yapp-frontend
+   npm run dev
+   # Frontend runs at http://localhost:5173
+   ```
+
+3. **Verify connection**: Check browser console for `✅ Socket connected` message
+
+**Troubleshooting:**
+- If you see `ERR_CONNECTION_REFUSED`, ensure the backend is running on port 5001
+- If WebSocket fails after changing `.env`, restart the frontend dev server
+- Check `VITE_API_URL` matches the backend port (5001, not 5000)
 
 ## Scripts
 
@@ -100,10 +126,12 @@ The app will be available at `http://localhost:5173`
 
 ## Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `VITE_API_URL` | Backend API URL | ✅ |
-| `VITE_BASE_PATH` | Base path for routing | Optional |
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `VITE_API_URL` | Backend API URL | `http://localhost:5001` | ✅ |
+| `VITE_BASE_PATH` | Base path for routing | `/` | Optional |
+
+**Note:** The backend runs on port `5001` locally. Make sure to restart the dev server after changing `.env` (Vite caches environment variables).
 
 ## Features
 
