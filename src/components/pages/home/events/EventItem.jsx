@@ -6,6 +6,7 @@ import { API_BASE_URL } from '../../../../services/config';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import { formatEventDate, formatEventTime } from '../../../../utils/dateTimeUtils';
 import { getProfilePictureUrl, getDefaultProfilePicture } from '../../../../utils/profileUtils';
+import { showDeleteConfirmation, showEventDeletedSuccess, showEventDeleteError, showLoginRequired, showNetworkError } from '../../../../utils/toastNotifications';
 
 function EventItem() {
     const [events, setEvents] = useState([]);
@@ -151,12 +152,13 @@ function EventItem() {
     };
 
     const handleDeleteEvent = async (eventId) => {
-        if (!window.confirm('Are you sure you want to delete this event?')) {
+        const confirmed = await showDeleteConfirmation('event');
+        if (!confirmed) {
             return;
         }
 
         if (!currentUserId) {
-            alert('You must be logged in to delete events');
+            showLoginRequired('delete events');
             return;
         }
 
@@ -178,13 +180,13 @@ function EventItem() {
                     setIsModalOpen(false);
                     setSelectedEvent(null);
                 }
-                alert('Event cancelled successfully');
+                showEventDeletedSuccess();
             } else {
-                alert(data.error || 'Failed to cancel event');
+                showEventDeleteError(data.error);
             }
         } catch (err) {
             console.error('Error cancelling event:', err);
-            alert('Network error. Please try again.');
+            showNetworkError();
         } finally {
             setDeletingEvent(null);
         }

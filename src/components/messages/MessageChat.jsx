@@ -6,6 +6,7 @@ import { getCurrentUserIdentifier, getProfilePictureUrl, fetchUserInfo } from '.
 import ChatHeader from './ChatHeader';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
+import { showOfflineError, showSendMessageError } from '../../utils/toastNotifications';
 
 function MessageChat({ conversation, onNewMessage }) {
     const [messages, setMessages] = useState([]);
@@ -733,9 +734,9 @@ function MessageChat({ conversation, onNewMessage }) {
             
             // Show error to user based on connection status
             if (connectionStatus === 'disconnected') {
-                alert('You are offline. Please check your connection and try again.');
+                showOfflineError();
             } else {
-                alert('Failed to send message. Please try again.');
+                showSendMessageError();
             }
             
             // Return the message content so it can be restored in the input

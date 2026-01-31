@@ -7,6 +7,7 @@ import ETInput from './thread/ETInput';
 import ETPostsFeed from './thread/ETPostsFeed';
 import { API_BASE_URL } from '../../../../services/config';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { showLeaveEventError, showNetworkError, showPostMessageError, showDeleteConfirmation } from '../../../../utils/toastNotifications';
 
 const EventThread = () => {
   const { eventId } = useParams();
@@ -123,17 +124,17 @@ const EventThread = () => {
           return true; // Success
         } else {
           console.error('Unexpected response when leaving event:', data);
-          alert('Error leaving event. Please try again.');
+          showLeaveEventError();
           return false;
         }
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to leave event');
+        showLeaveEventError();
         return false;
       }
     } catch (err) {
       console.error('Error leaving event:', err);
-      alert('Network error. Please try again.');
+      showNetworkError();
       return false;
     }
   };
@@ -198,11 +199,11 @@ const EventThread = () => {
         setReplyingTo(null);
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to post message');
+        showPostMessageError();
       }
     } catch (err) {
       console.error('Error posting message:', err);
-      alert('Network error. Please try again.');
+      showNetworkError();
     } finally {
       setPosting(false);
     }
@@ -257,7 +258,8 @@ const EventThread = () => {
   };
 
   const handleDeletePost = async (postId, isReply = false, parentPostId = null) => {
-    if (!window.confirm('Are you sure you want to delete this post?')) return;
+    const confirmed = await showDeleteConfirmation('post');
+    if (!confirmed) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/eventthreads/posts/${postId}`, {

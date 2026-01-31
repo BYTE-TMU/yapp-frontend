@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import EmojiPicker from './EmojiPicker';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../services/config';
+import { showMessageImageFileTypeError, showMessageImageSizeError, showImageUploadError } from '../../utils/toastNotifications';
 
 function MessageInput({ 
     conversation, 
@@ -120,13 +121,13 @@ function MessageInput({
         // Validate file type
         const allowedTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
-            alert('Please select a valid image file (PNG, JPG, JPEG, GIF, WEBP)');
+            showMessageImageFileTypeError();
             return;
         }
 
         // Validate file size (5MB limit)
         if (file.size > 5 * 1024 * 1024) {
-            alert('File size must be less than 5MB');
+            showMessageImageSizeError();
             return;
         }
 
@@ -153,11 +154,11 @@ function MessageInput({
                     filename: data.filename
                 });
             } else {
-                alert(data.error || 'Failed to upload image');
+                showImageUploadError();
             }
         } catch (error) {
             console.error('Error uploading image:', error);
-            alert('Failed to upload image');
+            showImageUploadError();
         } finally {
             setUploadingImage(false);
             // Reset file input
