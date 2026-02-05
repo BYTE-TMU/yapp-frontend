@@ -84,13 +84,13 @@ function Users() {
     const skeletonElementBg = isDarkMode ? '#374151' : '#d1d5db';
 
     return (
-        <div className="min-h-screen font-bold" style={{
+        <div className="min-h-screen font-bold w-screen" style={{
             backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
             fontFamily: 'Albert Sans'
         }}>
             <Header />
             <Sidebar />
-            <div className="ml-64 p-6">
+            <div className="md:ml-64 p-6">
                 <div className="max-w-6xl mx-auto">
                     <h1 className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                         Search Users
@@ -274,7 +274,7 @@ function Users() {
                                                 </p>
                                             </div>
                                             
-                                            <div>
+                                            <div className='hidden md:block'>
                                                 <button 
                                                     onClick={(e) => {
                                                         e.stopPropagation();
