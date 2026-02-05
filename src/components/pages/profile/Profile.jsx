@@ -367,7 +367,7 @@ const Profile = () => {
   );
 
   return (
-    <div className="h-screen overflow-hidden font-bold" style={{
+    <div className="w-screen h-screen overflow-hidden font-bold" style={{
       backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
       fontFamily: 'Albert Sans'
     }}>
@@ -375,7 +375,7 @@ const Profile = () => {
       <Sidebar />
       <div 
         ref={mainContentRef}
-        className="ml-64 h-full overflow-y-auto p-6"
+        className="md:ml-64 h-full overflow-y-auto p-6"
       >
         <div className="max-w-7xl mx-auto">
           {/* Profile Header */}
@@ -383,7 +383,7 @@ const Profile = () => {
             className={`rounded-lg p-6 mb-6 ${isDarkMode ? '' : 'border border-gray-200'}`}
             style={{ backgroundColor: headerBgColor }}
           >
-            <div className="flex flex-col md:flex-row items-start space-y-6 md:space-y-0 md:space-x-6">
+            <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-6">
               {/* Profile Picture */}
               <div className="relative">
                 <img 
@@ -430,8 +430,8 @@ const Profile = () => {
               {/* Profile Info */}
               <div className="flex-1">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                  <div>
-                    <h1 className={`text-2xl font-bold flex items-center space-x-2 ${
+                  <div className='text-center md:text-left'>
+                    <h1 className={`text-2xl font-bold flex items-center gap-2 justify-center md:justify-start ${
                       isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
                       <span>@{profile.username}</span>
@@ -446,7 +446,7 @@ const Profile = () => {
                     )}
                     {/* Always show email if available */}
                     {profile.email && (
-                      <p className={`text-sm ${
+                      <p className={`text-sm text-center md:text-left ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
                       }`}>
                         {profile.email}
@@ -488,7 +488,7 @@ const Profile = () => {
                   {isOwnProfile && !isEditing && (
                     <button 
                       onClick={() => setIsEditing(true)}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-colors mt-4 md:mt-0 ${
+                      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-bold transition-colors mt-4 md:mt-0 ${
                         isDarkMode
                           ? 'bg-gray-600 hover:bg-gray-500 text-white'
                           : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
@@ -502,7 +502,7 @@ const Profile = () => {
 
                 {/* Stats */}
                 <div className="flex space-x-6 mb-4">
-                  <span className={isDarkMode ? 'text-white' : 'text-gray-900'}>
+                  <span className={` ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     <strong>{profile.posts_count || 0}</strong> 
                     <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}> posts</span>
                   </span>
@@ -530,37 +530,37 @@ const Profile = () => {
 
                 {/* Profile Details */}
                 {!isEditing ? (
-                  <div className="space-y-2">
+                  <div className="space-y-2 gap-2 flex flex-col items-center justify-center md:items-start md:justify-start md:flex-row">
                     {profile.bio && (
                       <p className={isDarkMode ? 'text-white' : 'text-gray-900'}>
                         {profile.bio}
                       </p>
                     )}
                     
-                    <div className={`flex flex-wrap gap-4 text-sm ${
+                    <div className={`flex flex-wrap gap-4 text-sm items-center ${
                       isDarkMode ? 'text-gray-400' : 'text-gray-600'
                     }`}>
                       {profile.program && (
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center w-full md:w-auto justify-center gap-1">
                           <GraduationCap className="w-4 h-4" />
                           <span>{profile.program}</span>
                         </div>
                       )}
                       {profile.location && (
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center w-full md:w-auto justify-center gap-1">
                           <MapPin className="w-4 h-4" />
                           <span>{profile.location}</span>
                         </div>
                       )}
                       {profile.website && (
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center w-full md:w-auto justify-center gap-1">
                           <Globe className="w-4 h-4" />
                           <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
                             {profile.website}
                           </a>
                         </div>
                       )}
-                      <div className="flex items-center space-x-1">
+                      <div className="flex gap-2 items-center w-full md:w-auto justify-center gap-1">
                         <Calendar className="w-4 h-4" />
                         <span>Joined {new Date(profile.created_at).toLocaleDateString()}</span>
                       </div>
@@ -656,7 +656,7 @@ const Profile = () => {
                     <div className="flex space-x-3 pt-4">
                       <button 
                         onClick={handleSave}
-                        className={`px-6 py-2 rounded-lg font-bold transition-colors ${
+                        className={` px-2 py-1 md:px-6 md:py-2 rounded-lg text-sm md:text-base font-bold transition-colors ${
                           isDarkMode
                             ? 'bg-orange-600 hover:bg-orange-500 text-white'
                             : 'bg-orange-500 hover:bg-orange-600 text-white'
@@ -690,7 +690,7 @@ const Profile = () => {
             <div className="flex-1 lg:w-3/5">
               {/* Posts Section Header with Liked Posts Button */}
               <div className="flex items-center justify-between mb-6">
-                <h3 className={`text-xl font-bold ${
+                <h3 className={`text-lg md:text-xl font-bold ${
                   isDarkMode ? 'text-white' : 'text-gray-900'
                 }`}>
                   Recent Posts {profile.recent_posts && profile.recent_posts.length > 0 && `(${profile.recent_posts.length})`}
@@ -700,7 +700,7 @@ const Profile = () => {
                 {isOwnProfile && (
                   <button 
                     onClick={handleViewLikedPosts}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-colors ${
+                    className={`flex items-center space-x-2 px-2 py-1 md:px-4 md:py-2 rounded-lg font-bold transition-colors ${
                       isDarkMode 
                         ? 'bg-gray-700 hover:bg-gray-600 text-white'
                         : 'bg-white hover:bg-gray-50 text-gray-900 border border-gray-200'
@@ -737,9 +737,7 @@ const Profile = () => {
             </div>
 
             {/* Events Section - 40% width on large screens */}
-            <div className="lg:w-2/5">
-              <ProfileEvents userId={userId} isOwnProfile={isOwnProfile} />
-            </div>
+            <ProfileEvents userId={userId} isOwnProfile={isOwnProfile} />
           </div>
         </div>
       </div>

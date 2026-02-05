@@ -179,9 +179,9 @@ function Home() {
             <Sidebar />
             <div 
                 ref={mainContentRef}
-                className="ml-64 h-full overflow-y-auto p-6 scrollbar-custom"
+                className="h-full w-screen md:ml-64 overflow-y-auto p-6 scrollbar-custom"
             >
-                <h1 className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Home Feed</h1>
+                <h1 className={`text-xl md:text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Home Feed</h1>
                 
                 {/* Events Section */}
                 <div className="mb-8">
@@ -204,11 +204,11 @@ function Home() {
                 </div>
 
                 {/* Main Content Section - Posts and Activities */}
-                <div className="flex gap-6">
+                <div className="flex flex-col md:flex-row gap-6">
                     {/* Posts Section - 60% width */}
-                    <div className="w-3/5">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center gap-3">
+                    <div className="w-full md:w-3/5">
+                        <div className="flex items-center justify-between w-full mb-6">
+                            <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-3">
                                 <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Posts</h2>
                                 <div className="flex items-center gap-2 text-sm">
                                     <button
@@ -285,7 +285,7 @@ function Home() {
                     </div>
 
                     {/* Activities Section - 40% width */}
-                    <div className="w-2/5">
+                    <div className="w-full md:w-2/5">
                         <h2 className={`text-xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Activities</h2>
                         <HomepageActivities />
                     </div>

@@ -265,7 +265,7 @@ function PostItem({ post, onPostDeleted }) {
 
     return (
         <div 
-            className={`rounded-lg p-6 font-bold mb-4 transition-all duration-200 hover:shadow-sm hover:scale-101 cursor-pointer relative ${
+            className={`rounded-lg p-4 md:p-6 font-bold mb-4 transition-all duration-200 hover:shadow-sm hover:scale-101 cursor-pointer relative ${
                 isDarkMode 
                     ? 'hover:bg-zinc-800' 
                     : 'hover:bg-gray-50'
@@ -290,7 +290,7 @@ function PostItem({ post, onPostDeleted }) {
                 
                 <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-col md:flex-row items-start md:items-center space-x-2">
                             <strong 
                                 onClick={handleUsernameClick}
                                 className={`cursor-pointer transition-colors ${
@@ -301,7 +301,7 @@ function PostItem({ post, onPostDeleted }) {
                             >
                                 @{post.username}
                             </strong>
-                            <div className={`text-sm ${
+                            <div className={`text-xs md:text-sm font-extralight ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
                             }`}>
                                 {formatDate(post.created_at)}
@@ -353,7 +353,7 @@ function PostItem({ post, onPostDeleted }) {
                     
                     {/* Post Content */}
                     {post.content && (
-                        <p className={`mb-3 leading-relaxed ${
+                        <p className={`leading-relaxed ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
                             {post.content}
