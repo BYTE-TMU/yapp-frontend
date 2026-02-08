@@ -15,7 +15,7 @@ function Sidebar() {
 
     return (
         <nav 
-            className="fixed left-0 top-0 h-screen w-64 p-3 sm:p-4 md:p-6 font-bold z-50 flex flex-col" 
+            className="hidden md:fixed left-0 top-0 h-screen w-64 p-3 sm:p-4 md:p-6 font-bold z-50 md:flex flex-col" 
             style={{
                 backgroundColor: isDarkMode ? '#121212' : '#ffffff', // Dynamic background
                 fontFamily: 'Albert Sans',
