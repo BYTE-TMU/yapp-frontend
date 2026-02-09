@@ -54,7 +54,7 @@ export default function LoginForm() {
       if (res.ok) {
         // store the token in localStorage
         localStorage.setItem("token", data.token);
-        
+
         // Force messageService to reconnect with new token to prevent sender ID issues
         try {
           const { messageService } = await import('../../services/messageService');
@@ -62,10 +62,18 @@ export default function LoginForm() {
         } catch (error) {
           console.warn('Could not force messageService reconnect:', error);
         }
-        
+
         setMsg("Login success");
-        // navigate to homepage
-        navigate('/home');
+
+        // Check if user has completed onboarding
+        const onboardingComplete = localStorage.getItem('onboarding_complete');
+        if (onboardingComplete) {
+          // Returning user - go to home
+          navigate('/home');
+        } else {
+          // New user - go to onboarding
+          navigate('/onboarding');
+        }
       } else if (res.status === 403 && data.requires_verification) {
         // User exists but email is not verified
         setUnverifiedUsername(data.username || formData.username);
