@@ -110,10 +110,10 @@ export default function WYRItem({ question, onVote, onDelete, userVote, canDelet
           }`}>
             Would You Rather
           </h3>
-          <div className={`flex items-center gap-2 text-sm ${
+          <div className={`flex items-center gap-2 text-xs font-light md:text-sm ${
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           }`}>
-            <span>by {getCreatorName()}</span>
+            <span>@{getCreatorName()}</span>
             {question.created_at && (
               <>
                 <span>•</span>
@@ -193,7 +193,7 @@ export default function WYRItem({ question, onVote, onDelete, userVote, canDelet
         <div className="flex gap-3 mb-4">
           {/* Vote A Button */}
           <button
-            className={`flex-1 min-w-0 px-4 py-3 rounded-lg font-bold transition-all duration-300 ease-out transform hover:scale-105 shadow-md relative ${
+            className={`flex-1 min-w-0 px-0 md:px-4 py-0 md:py-3 rounded-lg font-bold transition-all duration-300 ease-out transform hover:scale-105 shadow-md relative ${
               isDarkMode
                 ? 'bg-green-700 border-2 border-green-900 text-green-100 hover:bg-green-600 hover:border-green-800'
                 : 'bg-green-600 border-2 border-green-700 text-white hover:bg-green-500 hover:border-green-600'
@@ -204,7 +204,7 @@ export default function WYRItem({ question, onVote, onDelete, userVote, canDelet
             onClick={() => handleVote('A')}
           >
             <div className="text-center">
-              <div className="text-xl font-bold">1</div>
+              <div className="text-md md:text-xl font-bold">1</div>
               {voting && votingOption === 'A' && (
                 <div className={`absolute inset-0 flex items-center justify-center bg-opacity-50 rounded-lg ${
                   isDarkMode ? 'bg-green-800' : 'bg-green-700'
@@ -219,7 +219,7 @@ export default function WYRItem({ question, onVote, onDelete, userVote, canDelet
 
           {/* Vote B Button */}
           <button
-            className={`flex-1 min-w-0 px-4 py-3 rounded-lg font-bold transition-all duration-300 ease-out transform hover:scale-105 shadow-md relative ${
+            className={`flex-1 min-w-0 px-0 md:px-4 py-0 md:py-3 rounded-lg font-bold transition-all duration-300 ease-out transform hover:scale-105 shadow-md relative ${
               isDarkMode
                 ? 'bg-red-700 border-2 border-red-900 text-red-100 hover:bg-red-600 hover:border-red-800'
                 : 'bg-red-600 border-2 border-red-700 text-white hover:bg-red-500 hover:border-red-600'
