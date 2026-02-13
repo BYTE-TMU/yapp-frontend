@@ -359,7 +359,7 @@ function Settings() {
                                             ? 'bg-red-900/50 border border-red-700 text-red-300' 
                                             : 'bg-red-50 border border-red-200 text-red-700'
                                     }`}>
-                                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                        <AlertCircle className="w-4 h-4 shrink-0" />
                                         <span className="text-sm">{passwordError}</span>
                                     </div>
                                 )}
