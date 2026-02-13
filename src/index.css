@@ -1,6 +1,6 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @import 'leaflet/dist/leaflet.css';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -127,7 +127,8 @@
 
 /* Landing page animations */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -140,7 +141,8 @@
 }
 
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
   }
   50% {
@@ -154,7 +156,8 @@
 
 /* Gradient text animation */
 @keyframes gradient-shift {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {

@@ -951,7 +951,7 @@ function Waypoint() {
             fontFamily: 'Albert Sans'
         }}>
             <Sidebar />
-            <div className="ml-64 h-full overflow-y-auto p-6">
+            <div className="md:ml-64 h-full overflow-y-auto p-6">
                 <div className="max-w-full mx-auto h-full flex flex-col">
 
 
