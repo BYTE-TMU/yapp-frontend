@@ -162,7 +162,7 @@ function Home() {
                 fontFamily: 'Albert Sans'
             }}>
                 <Header />
-                <Sidebar />
+                {/* <Sidebar /> */}
                 <div className="ml-64 h-full overflow-y-auto p-6">
                     <p className={isDarkMode ? 'text-white' : 'text-gray-900'}>Loading posts...</p>
                 </div>
@@ -179,7 +179,7 @@ function Home() {
             <Sidebar />
             <div 
                 ref={mainContentRef}
-                className="h-full w-screen md:ml-64 overflow-y-auto p-6 scrollbar-custom"
+                className="h-full w-fill md:ml-64 overflow-y-auto  p-6 scrollbar-custom"
             >
                 <h1 className={`text-xl md:text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Home Feed</h1>
                 
@@ -194,7 +194,7 @@ function Home() {
                             View All Events
                         </button>
                     </div>
-                    <div className="rounded-lg p-4" style={{
+                    <div className="rounded-lg p-2" style={{
                         backgroundColor: isDarkMode ? '#171717' : '#f8f9fa',
                         border: isDarkMode ? 'none' : '1px solid #e5e7eb'
                     }}>
@@ -204,9 +204,9 @@ function Home() {
                 </div>
 
                 {/* Main Content Section - Posts and Activities */}
-                <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex flex-col lg:flex-row gap-6">
                     {/* Posts Section - 60% width */}
-                    <div className="w-full md:w-3/5">
+                    <div className="w-full lg:w-3/5">
                         <div className="flex items-center justify-between w-full mb-6">
                             <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-3">
                                 <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Posts</h2>
@@ -285,7 +285,7 @@ function Home() {
                     </div>
 
                     {/* Activities Section - 40% width */}
-                    <div className="w-full md:w-2/5">
+                    <div className="w-full lg:w-2/5 mb-20">
                         <h2 className={`text-xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Activities</h2>
                         <HomepageActivities />
                     </div>

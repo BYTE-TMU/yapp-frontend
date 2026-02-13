@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, Clock, MapPin, Users, Heart, X } from 'lucide-react';
 import EventModal from './EventModal';
-import { API_BASE_URL } from '../../../../services/config';
-import { useTheme } from '../../../../contexts/ThemeContext';
-import { formatEventDate, formatEventTime } from '../../../../utils/dateTimeUtils';
-import { getProfilePictureUrl, getDefaultProfilePicture } from '../../../../utils/profileUtils';
-import { showDeleteConfirmation, showEventDeletedSuccess, showEventDeleteError, showLoginRequired, showNetworkError } from '../../../../utils/toastNotifications';
+import { API_BASE_URL } from '@/services/config';
+import { useTheme } from '@/contexts/ThemeContext';
+import { formatEventDate, formatEventTime } from '@/utils/dateTimeUtils';
+import { getProfilePictureUrl, getDefaultProfilePicture } from '@/utils/profileUtils';
+import { showDeleteConfirmation, showEventDeletedSuccess, showEventDeleteError, showLoginRequired, showNetworkError } from '@/utils/toastNotifications';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 function EventItem() {
     const [events, setEvents] = useState([]);
@@ -270,7 +273,7 @@ function EventItem() {
         <>
             <div className="relative w-full p-4">
                 {/* Navigation Arrows */}
-                {events.length > 3 && (
+                {/* {events.length > 3 && (
                     <>
                         <button
                             onClick={prevSlide}
@@ -308,252 +311,145 @@ function EventItem() {
                             </svg>
                         </button>
                     </>
-                )}
+                )} */}
 
                 {/* Events Container */}
-                <div className="overflow-hidden mx-12">
-                    <div className="flex gap-2 transition-all duration-500 ease-in-out w-full">
+                <Carousel opts={{align: "start", loop: true}}>
+                    <CarouselContent>
                         {getVisibleEvents().map((event, visibleIndex) => {
                             const originalIndex = events.findIndex(e => e._id === event._id);
                             const isExpanded = originalIndex >= currentIndex && originalIndex < currentIndex + 3;
                             
                             return (
-                                <div
+                                <CarouselItem className="sm:basis-1/2 lg:basis-1/3">
+                                <Card
                                     key={event._id}
-                                    className={`transition-all duration-500 ease-in-out cursor-pointer ${
-                                        isExpanded 
-                                            ? 'flex-1 min-w-0' 
-                                            : 'w-20 flex-shrink-0'
-                                    }`}
+                                    className={`transition-all duration-500 ease-in-out cursor-pointer p-0`}
                                     onClick={() => handleEventClick(event, isExpanded)}
                                 >
-                                    <div 
-                                        className={`rounded-2xl overflow-hidden h-80 flex flex-col transition-all duration-500 hover:shadow-xl relative ${
-                                            isDarkMode 
-                                                ? 'bg-[#1c1c1c] border border-gray-400' 
-                                                : 'bg-white border border-gray-200'
-                                        } ${isExpanded ? 'transform hover:scale-101 shadow-lg' : 'items-center justify-center'}`}
-                                    >
-                                        {isExpanded ? (
-                                            // Full expanded view
-                                            <>
-                                                {/* Event Image */}
-                                                <div className="relative h-40 overflow-hidden">
-                                                    <img 
-                                                        src={getEventImage(event, originalIndex)}
-                                                        alt={event.title}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => {
-                                                            e.target.src = `https://picsum.photos/400/300?random=${originalIndex}`;
-                                                        }}
-                                                    />
-                                                    
-                                                    {/* Gradient Overlay */}
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
-                                                    
-                                                    {/* Delete Button for Event Owner */}
-                                                    {canDeleteEvent(event) && (
-                                                        <div className="absolute top-3 right-3 z-10">
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleDeleteEvent(event._id);
-                                                                }}
-                                                                disabled={deletingEvent === event._id}
-                                                                className="bg-black/50 hover:bg-red-500 disabled:bg-gray-500 text-white p-2 rounded-full transition-all duration-200 backdrop-blur-sm hover:scale-110"
-                                                                title="Delete Event"
-                                                            >
-                                                                {deletingEvent === event._id ? (
-                                                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                                ) : (
-                                                                    <X className="w-4 h-4" />
-                                                                )}
-                                                            </button>
-                                                        </div>
+                                    {/* Event Image */}
+                                    <CardContent className="relative h-40 overflow-hidden w-full rounded-lg p-0">
+                                        <img 
+                                            src={getEventImage(event, originalIndex)}
+                                            alt={event.title}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                e.target.src = `https://picsum.photos/400/300?random=${originalIndex}`;
+                                            }}
+                                        />
+                                        
+                                        {/* Gradient Overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                                        
+                                        {/* Delete Button for Event Owner */}
+                                        {canDeleteEvent(event) && (
+                                            // <div className="absolute top-3 right-3 z-10">
+                                                <Button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteEvent(event._id);
+                                                    }}
+                                                    variant='default'
+                                                    size='icon'
+                                                    disabled={deletingEvent === event._id}
+                                                    className="hover:bg-destructive disabled:bg-gray-500 text-white p-2 rounded-full transition-all duration-200 backdrop-blur-sm hover:scale-110 absolute top-3 right-3 z-10 cursor-pointer"
+                                                    title="Delete Event"
+                                                >
+                                                    {deletingEvent === event._id ? (
+                                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                    ) : (
+                                                        <X className="w-4 h-4" />
                                                     )}
+                                                </Button>
+                                            // </div>
+                                        )}
 
-                                                    {/* Date Badge */}
-                                                    <div className="absolute top-3 left-3">
-                                                        <div className="bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1 rounded-full text-sm font-bold">
-                                                            {formatEventDate(event.event_datetime)}
-                                                        </div>
-                                                    </div>
+                                        {/* Date Badge */}
+                                        <div className="absolute top-3 left-3">
+                                            <div className="bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1 rounded-full text-sm font-bold">
+                                                {formatEventDate(event.event_datetime)}
+                                            </div>
+                                        </div>
 
-                                                    {/* Attendees Count */}
-                                                    <div className="absolute bottom-3 right-3">
-                                                        <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full text-sm flex items-center space-x-1">
-                                                            <Users className="w-3 h-3" />
-                                                            <span>{event.attendees_count || 0}</span>
-                                                        </div>
-                                                    </div>
+                                        {/* Attendees Count */}
+                                        <div className="absolute bottom-3 right-3">
+                                            <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full text-sm flex items-center space-x-1">
+                                                <Users className="w-3 h-3" />
+                                                <span>{event.attendees_count || 0}</span>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+
+                                    {/* Event Content */}
+                                    <CardHeader>
+                                        <CardTitle className="text-lg font-bold">
+                                            {event.title}
+                                        </CardTitle>
+                                        <CardDescription className="flex flex-col gap-1">
+                                            {event.description}
+                                            <div className="flex gap-2">
+                                                {/* Time */}
+                                                <div className={`flex gap-2 items-center text-xs`}>
+                                                    <Clock className="size-3" />
+                                                    <span>{formatEventTime(event.event_datetime)}</span>
                                                 </div>
 
-                                                {/* Event Content */}
-                                                <div className={`p-4 flex-1 flex flex-col justify-between ${
-                                                    isDarkMode ? 'bg-[#1c1c1c]' : 'bg-gray-100'
-                                                }`}>
-                                                    <div className="space-y-2">
-                                                        {/* Event Title */}
-                                                        <h3 className={`text-base font-bold line-clamp-1 ${
-                                                            isDarkMode ? 'text-white' : 'text-gray-900'
-                                                        }`}>
-                                                            {event.title}
-                                                        </h3>
-
-                                                        {/* Event Description */}
-                                                        <p className={`text-xs line-clamp-2 ${
-                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                        }`}>
-                                                            {event.description}
-                                                        </p>
-
-                                                        {/* Event Details */}
-                                                        <div className="space-y-1">
-                                                            {/* Time */}
-                                                            <div className={`flex items-center text-xs ${
-                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                            }`}>
-                                                                <Clock className="w-3 h-3 mr-1" />
-                                                                <span>{formatEventTime(event.event_datetime)}</span>
-                                                            </div>
-
-                                                            {/* Location */}
-                                                            {event.location && (
-                                                                <div className={`flex items-center text-xs ${
-                                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                                }`}>
-                                                                    <MapPin className="w-3 h-3 mr-1" />
-                                                                    <span className="truncate">{event.location}</span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Event Footer */}
-                                                    <div className={`flex items-center justify-between pt-2 border-t ${
-                                                        isDarkMode ? 'border-gray-800' : 'border-gray-300'
+                                                {/* Location */}
+                                                {event.location && (
+                                                    <div className={`flex gap-2 items-center text-xs ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                                     }`}>
-                                                        <div className="flex items-center space-x-1">
-                                                            <img
-                                                                src={getProfilePictureUrl(event.profile_picture)}
-                                                                alt={`${event.username}'s profile`}
-                                                                onError={(e) => {
-                                                                    e.target.src = getDefaultProfilePicture();
-                                                                }}
-                                                                className="w-5 h-5 rounded-full object-cover border border-gray-300"
-                                                            />
-                                                            <span className={`text-xs font-medium ${
-                                                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                                            }`}>
-                                                                {event.username || 'Unknown'}
-                                                            </span>
-                                                        </div>
-
-                                                        {/* Like Button */}
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                // Add like functionality here
-                                                            }}
-                                                            className={`flex items-center space-x-1 px-2 py-1 rounded-full transition-all duration-200 ${
-                                                                isDarkMode
-                                                                    ? 'text-gray-400 hover:text-red-400 hover:bg-red-400/10'
-                                                                    : 'text-gray-500 hover:text-red-500 hover:bg-red-50'
-                                                            }`}
-                                                        >
-                                                            <Heart className="w-3 h-3" />
-                                                            <span className="text-xs">{event.likes_count || 0}</span>
-                                                        </button>
-                                                    </div>
-
-                                                    {/* Click to view more indicator */}
-                                                    <div className="flex justify-center mt-1">
-                                                        <div className={`px-2 py-1 rounded-full text-xs transition-all duration-200 ${
-                                                            isDarkMode 
-                                                                ? 'bg-[#1c1c1c]/50 hover:bg-[#1f1f1f] text-gray-400' 
-                                                                : 'bg-gray-200/50 hover:bg-gray-200 text-gray-600'
-                                                        }`}>
-                                                            Click to view details
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            // Compressed view
-                                            <div className="flex flex-col items-center justify-center h-full text-center relative p-2">
-                                                {/* Delete Button for Event Owner (Compressed View) */}
-                                                {canDeleteEvent(event) && (
-                                                    <div className="absolute top-2 right-1 z-10">
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleDeleteEvent(event._id);
-                                                            }}
-                                                            disabled={deletingEvent === event._id}
-                                                            className={`p-1 rounded-full transition-colors duration-200 shadow-sm ${
-                                                                isDarkMode
-                                                                    ? 'bg-gray-700 hover:bg-red-600 text-gray-300 hover:text-white'
-                                                                    : 'bg-gray-200 hover:bg-red-500 text-gray-600 hover:text-white'
-                                                            }`}
-                                                            title="Delete Event"
-                                                        >
-                                                            {deletingEvent === event._id ? (
-                                                                <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
-                                                            ) : (
-                                                                <X className="w-3 h-3" />
-                                                            )}
-                                                        </button>
+                                                        <MapPin className="size-3 " />
+                                                        <span className="truncate">{event.location}</span>
                                                     </div>
                                                 )}
-
-                                                {/* Compressed Event Image */}
-                                                <div className="w-12 h-12 rounded-full overflow-hidden mb-2 border-2 border-blue-500">
-                                                    <img 
-                                                        src={getEventImage(event, originalIndex)}
-                                                        alt={event.title}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => {
-                                                            e.target.src = `https://picsum.photos/50/50?random=${originalIndex}`;
-                                                        }}
-                                                    />
-                                                </div>
-                                                
-                                                <div className="writing-mode-vertical-lr text-orientation-mixed">
-                                                    <h4 className={`text-sm font-bold transform rotate-90 whitespace-nowrap ${
-                                                        isDarkMode ? 'text-white' : 'text-gray-800'
-                                                    }`}>
-                                                        {event.title.length > 15 ? event.title.substring(0, 15) + '...' : event.title}
-                                                    </h4>
-                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
+                                            <div className="flex items-center  w-full justify-between">
+
+                                            <div className="flex items-center gap-2">
+                                                <img
+                                                src={getProfilePictureUrl(event.profile_picture)}
+                                                alt={`${event.username}'s profile`}
+                                                onError={(e) => {
+                                                    e.target.src = getDefaultProfilePicture();
+                                                }}
+                                                className="w-5 h-5 rounded-full object-cover border border-gray-300"
+                                                />
+                                                <span className={`text-xs font-medium ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}>
+                                                {event.username || 'Unknown'}
+                                            </span>
+                                            </div>
+                                            <Button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        // Add like functionality here
+                                                    }}
+                                                    className={`flex items-center gap-2 px-1 py-1 rounded-full transition-all duration-200 hover:text-red-400 `} variant='ghost'
+                                                    >
+                                                    <Heart className="size-3" />
+                                                    <span className="text-xs">{event.likes_count || 0}</span>
+                                                </Button>
+                                            </div>
+                                            </CardDescription>
+                                        </CardHeader>
+                                    <CardFooter className="items-center justify-center">
+                                            <Button className={`px-2 py-1 rounded-full text-xs transition-all duration-200`} variant='ghost'>
+                                                Click to view details
+                                            </Button>
+                                    </CardFooter>
+                                </Card>
+                            </CarouselItem>
                             );
                         })}
+                    </CarouselContent>
+                    <div className='flex justify-center mt-6 p-0'>
+                        <CarouselPrevious className='relative' />
+                        <CarouselNext className='relative' />
                     </div>
-                </div>
-
-                {/* Dots Indicator */}
-                {events.length > 3 && (
-                    <div className="flex justify-center mt-6 space-x-2">
-                                                        {Array.from({ length: Math.max(0, events.length - 2) }).map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentIndex(index)}
-                                className={`h-2 rounded-full transition-all duration-200 ${
-                                    currentIndex === index 
-                                        ? isDarkMode
-                                            ? 'bg-orange-500 w-4'
-                                            : 'bg-orange-500 w-4'
-                                        : isDarkMode
-                                            ? 'bg-gray-600 hover:bg-gray-500 w-2'
-                                            : 'bg-gray-400 hover:bg-gray-500 w-2'
-                                }`}
-                            />
-                        ))}
-                    </div>
-                )}
+                </Carousel>
+               
             </div>
 
             {/* Event Modal */}
