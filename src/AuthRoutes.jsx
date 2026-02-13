@@ -16,6 +16,7 @@ import CommentsPage from './components/pages/CommentsPage.jsx';
 import Waypoint from './components/pages/waypoint/Waypoint.jsx';
 import EventThread from './components/pages/home/events/EventThread.jsx';
 import PageTransition from './components/common/PageTransition.jsx';
+import Sidebar from './components/sidebar/Sidebar.jsx';
 
 const PrivateRoute = ({ children }) => {
     const token = localStorage.getItem('token');
@@ -61,6 +62,7 @@ function AuthRoutes() {
                 element={
                     <PrivateRoute>
                         <PageTransition>
+                            {/* <Sidebar /> */}
                             <Home />
                         </PageTransition>
                     </PrivateRoute>
@@ -71,6 +73,7 @@ function AuthRoutes() {
                 element={
                     <PrivateRoute>
                         <PageTransition>
+                        <Sidebar />
                             <Create />
                         </PageTransition>
                     </PrivateRoute>
