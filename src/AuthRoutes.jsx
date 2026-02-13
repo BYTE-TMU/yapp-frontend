@@ -15,6 +15,7 @@ import Feedback from './components/pages/Feedback.jsx';
 import CommentsPage from './components/pages/CommentsPage.jsx';
 import Waypoint from './components/pages/waypoint/Waypoint.jsx';
 import EventThread from './components/pages/home/events/EventThread.jsx';
+import Onboarding from './components/onboarding/Onboarding.jsx';
 import PageTransition from './components/common/PageTransition.jsx';
 
 const PrivateRoute = ({ children }) => {
@@ -56,6 +57,16 @@ function AuthRoutes() {
                     <ResetPassword />
                 </PageTransition>
             } />
+            <Route
+                path="/onboarding"
+                element={
+                    <PrivateRoute>
+                        <PageTransition>
+                            <Onboarding />
+                        </PageTransition>
+                    </PrivateRoute>
+                }
+            />
             <Route
                 path="/home"
                 element={
