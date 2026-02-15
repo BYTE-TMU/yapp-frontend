@@ -55,8 +55,10 @@ class MessageService {
             }
             
             // Create socket connection with auth
+            // Use polling first, then upgrade to websocket — more reliable behind proxies (Railway/Vercel)
             this.socket = io(SOCKET_URL_VAR, {
-                transports: ['websocket', 'polling'],
+                transports: ['polling', 'websocket'],
+                upgrade: true,
                 auth: {
                     token: this.token
                 },
