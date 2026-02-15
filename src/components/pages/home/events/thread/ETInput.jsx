@@ -128,7 +128,7 @@ const ETInput = ({
   };
 
   return (
-    <div className={`rounded-lg p-4 mb-6 ${
+    <div className={`rounded-lg p-3 md:p-4 mb-4 md:mb-6 ${
       isDarkMode ? 'bg-[#1c1c1c]' : 'bg-gray-100'
     }`}>
       {replyingTo && (
@@ -156,19 +156,19 @@ const ETInput = ({
       )}
       
       <div onSubmit={handleSubmit}>
-        <div className="flex space-x-3">
+        <div className="flex space-x-2 md:space-x-3">
           <img
             src={getProfilePictureUrl(currentUser?.profile_picture)}
             alt="Your profile"
-            className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+            className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover flex-shrink-0"
           />
           <div className="flex-1">
             <textarea
               ref={textareaRef}
               value={newPostContent}
               onChange={(e) => setNewPostContent(e.target.value)}
-              placeholder={replyingTo ? "Write a reply..." : selectedImages.length > 0 ? "Add a caption (optional)..." : "Share your thoughts about this event..."}
-              className={`w-full border rounded-lg px-4 py-3 resize-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
+              placeholder={replyingTo ? "Write a reply..." : selectedImages.length > 0 ? "Add a caption..." : "Share your thoughts..."}
+              className={`w-full border rounded-lg px-3 md:px-4 py-2 md:py-3 resize-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm md:text-base ${
                 isDarkMode 
                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                   : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
@@ -226,8 +226,8 @@ const ETInput = ({
               </div>
             )}
             
-            <div className="flex items-center justify-between mt-3">
-              <div className="flex space-x-2">
+            <div className="flex items-center justify-between mt-2 md:mt-3">
+              <div className="flex space-x-1 md:space-x-2">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -272,7 +272,7 @@ const ETInput = ({
                   type="submit"
                   onClick={handleSubmit}
                   disabled={(!newPostContent.trim() && selectedImages.length === 0) || posting}
-                  className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 font-bold transition-colors"
+                  className="bg-orange-500 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 md:space-x-2 font-bold transition-colors text-sm md:text-base"
                 >
                   {posting ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
