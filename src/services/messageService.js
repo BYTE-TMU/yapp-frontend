@@ -62,10 +62,15 @@ class MessageService {
                 auth: {
                     token: this.token
                 },
-                autoConnect: false, // We'll connect manually
-                reconnection: false, // Handle reconnection manually
+                autoConnect: false,
+                reconnection: false,
                 timeout: 20000,
-                forceNew: true
+                forceNew: true,
+                rejectUnauthorized: false,  // For self-signed certs
+                secure: true,               // Use HTTPS
+                withCredentials: true,      // Send cookies/auth headers
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000
             });
 
             this.setupEventListeners();
