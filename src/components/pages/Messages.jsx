@@ -239,21 +239,30 @@ function Messages() {
     const showMobileChat = selectedConversation !== null;
 
     return (
-        <div className="min-h-screen font-bold" style={{
+        <div className="font-bold" style={{
             backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
-            fontFamily: 'Albert Sans'
+            fontFamily: 'Albert Sans',
+            height: '100dvh',
+            minHeight: '-webkit-fill-available',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
         }}>
             <Header />
-            <div className="flex h-screen">
+            <div className="flex flex-1" style={{ overflow: 'hidden' }}>
                 <Sidebar />
-                <div className="flex flex-1 h-full md:ml-64">
+                <div className="flex flex-1 md:ml-64" style={{ overflow: 'hidden' }}>
                     {/* Left side - Conversations/Events list */}
                     <div className={`${
                         showMobileChat ? 'hidden md:flex' : 'flex'
-                    } w-full md:w-80 border-r flex-col h-full ${
+                    } w-full md:w-80 border-r flex-col ${
                         isDarkMode ? 'border-gray-600' : 'border-gray-300'
                     }`} style={{
-                        backgroundColor: isDarkMode ? '#121212' : '#ffffff'
+                        backgroundColor: isDarkMode ? '#121212' : '#ffffff',
+                        height: '100%',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column'
                     }}>
                         {/* Tab Navigation */}
                         <div className={`flex items-center justify-center gap-4 p-4 border-b ${
@@ -302,8 +311,10 @@ function Messages() {
                     {/* Right side - Chat interface or Events placeholder */}
                     <div className={`${
                         showMobileChat ? 'flex' : 'hidden md:flex'
-                    } flex-1 flex-col h-full`} style={{
-                        backgroundColor: isDarkMode ? '#121212' : '#ffffff'
+                    } flex-1 flex-col`} style={{
+                        backgroundColor: isDarkMode ? '#121212' : '#ffffff',
+                        height: '100%',
+                        overflow: 'hidden'
                     }}>
                         {activeTab === 'messages' ? (
                             selectedConversation ? (
