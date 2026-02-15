@@ -116,7 +116,7 @@ function HomepageActivities() {
                         <div
                             key={activity.key}
                             data-activity={idx}
-                            className="w-full flex-shrink-0"
+                            className="w-full shrink-0 h-fit"
                         >
                             {activity.component}
                         </div>
