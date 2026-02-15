@@ -170,12 +170,15 @@ function Messages() {
     };
 
     const handleConversationSelect = (conversation) => {
+        console.log('🎯 handleConversationSelect called');
         console.log('Selecting conversation:', conversation);
+        console.log('Setting selectedConversation to:', conversation._id);
         setSelectedConversation(conversation);
         // Update URL without causing a page reload
         const newSearchParams = new URLSearchParams(searchParams);
         newSearchParams.set('conversation', conversation._id);
         window.history.replaceState({}, '', `${window.location.pathname}?${newSearchParams}`);
+        console.log('✅ Conversation selected, URL updated');
     };
 
     const handleNewMessage = (conversationId, message) => {
@@ -237,6 +240,14 @@ function Messages() {
 
     // On mobile, when a conversation is selected, show the chat; otherwise show the list
     const showMobileChat = selectedConversation !== null;
+    
+    useEffect(() => {
+        console.log('📱 Mobile view state:', {
+            selectedConversation: selectedConversation?._id || 'none',
+            showMobileChat,
+            isMobile: window.innerWidth < 768
+        });
+    }, [selectedConversation, showMobileChat]);
 
     return (
         <div className="font-bold" style={{
@@ -262,34 +273,47 @@ function Messages() {
                         height: '100%',
                         overflow: 'hidden',
                         display: 'flex',
-                        flexDirection: 'column'
+                        flexDirection: 'column',
+                        position: 'relative',
+                        zIndex: 1
                     }}>
                         {/* Tab Navigation */}
                         <div className={`flex items-center justify-center gap-4 p-4 border-b ${
                             isDarkMode ? 'border-gray-600' : 'border-gray-300'
-                        }`}>
+                        }`} style={{
+                            position: 'relative',
+                            zIndex: 2
+                        }}>
                             <button
                                 onClick={() => setActiveTab('messages')}
-                                className={`transition-colors font-semibold ${
+                                className={`transition-colors font-semibold touch-manipulation ${
                                     activeTab === 'messages'
                                         ? 'text-orange-500'
                                         : isDarkMode
                                             ? 'text-gray-400 hover:text-gray-200'
                                             : 'text-gray-500 hover:text-gray-700'
                                 }`}
+                                style={{
+                                    WebkitTapHighlightColor: 'transparent',
+                                    touchAction: 'manipulation'
+                                }}
                             >
                                 Messages
                             </button>
                             <span className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}>|</span>
                             <button
                                 onClick={() => setActiveTab('events')}
-                                className={`transition-colors font-semibold ${
+                                className={`transition-colors font-semibold touch-manipulation ${
                                     activeTab === 'events'
                                         ? 'text-orange-500'
                                         : isDarkMode
                                             ? 'text-gray-400 hover:text-gray-200'
                                             : 'text-gray-500 hover:text-gray-700'
                                 }`}
+                                style={{
+                                    WebkitTapHighlightColor: 'transparent',
+                                    touchAction: 'manipulation'
+                                }}
                             >
                                 Events
                             </button>

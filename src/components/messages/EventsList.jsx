@@ -100,7 +100,7 @@ function EventsList({ loading: externalLoading }) {
     if (isLoading) {
         return (
             <div className="h-full flex flex-col">
-                <div className="flex-1 flex items-center justify-center">
+                <div className="flex-1 flex items-center justify-center pb-20 md:pb-0">
                     <div className="flex flex-col items-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mb-4"></div>
                         <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
@@ -115,7 +115,7 @@ function EventsList({ loading: externalLoading }) {
     if (error) {
         return (
             <div className="h-full flex flex-col">
-                <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
+                <div className="flex-1 flex flex-col items-center justify-center p-4 pb-20 md:pb-4 text-center">
                     <p className={`mb-4 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
                         Error: {error}
                     </p>
@@ -133,7 +133,7 @@ function EventsList({ loading: externalLoading }) {
     if (!events || events.length === 0) {
         return (
             <div className="h-full flex flex-col">
-                <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
+                <div className="flex-1 flex flex-col items-center justify-center p-4 pb-20 md:pb-4 text-center">
                     <div className="mb-4">
                         <Calendar className={`w-16 h-16 mx-auto ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
                     </div>
@@ -150,7 +150,10 @@ function EventsList({ loading: externalLoading }) {
 
     return (
         <div className="h-full flex flex-col">
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto pb-20 md:pb-0" style={{
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain'
+            }}>
                 {events.map((event) => (
                     <div
                         key={event._id}
