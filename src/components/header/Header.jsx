@@ -53,6 +53,7 @@ function Header() {
                 style={{
                     backgroundColor: isDarkMode ? '#121212' : '#ffffff',
                     borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                    paddingBottom: 'max(0.25rem, env(safe-area-inset-bottom))',
                 }}
             >
                 {bottomNavItems.map(({ path, label, icon: Icon, isCreate }) => (
