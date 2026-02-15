@@ -163,7 +163,7 @@ function Home() {
             }}>
                 <Header />
                 {/* <Sidebar /> */}
-                <div className="ml-64 h-full overflow-y-auto p-6">
+                <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6">
                     <p className={isDarkMode ? 'text-white' : 'text-gray-900'}>Loading posts...</p>
                 </div>
             </div>
@@ -179,7 +179,7 @@ function Home() {
             <Sidebar />
             <div 
                 ref={mainContentRef}
-                className="h-full w-fill md:ml-64 overflow-y-auto  p-6 scrollbar-custom"
+                className="h-full w-fill md:ml-64 overflow-y-auto p-6 pb-20 md:pb-6 scrollbar-custom"
             >
                 <h1 className={`text-xl md:text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Home Feed</h1>
                 

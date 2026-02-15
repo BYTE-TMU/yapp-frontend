@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '../../sidebar/Sidebar.jsx';
+import Header from '../../header/Header';
 import WaypointModal from './WaypointModal.jsx';
 import WaypointHeader from './WaypointHeader.jsx';
 import WaypointMap from './WaypointMap.jsx';
@@ -931,6 +932,7 @@ function Waypoint() {
                 backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
                 fontFamily: 'Albert Sans'
             }}>
+                <Header />
                 <Sidebar />
                 <div className="ml-64 h-full overflow-y-auto p-6">
                     <div className="max-w-full mx-auto h-full flex items-center justify-center">
@@ -950,6 +952,7 @@ function Waypoint() {
             backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
             fontFamily: 'Albert Sans'
         }}>
+            <Header />
             <Sidebar />
             <div className="md:ml-64 h-full overflow-y-auto p-6">
                 <div className="max-w-full mx-auto h-full flex flex-col">
