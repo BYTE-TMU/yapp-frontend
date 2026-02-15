@@ -8,11 +8,11 @@ const getBackendUrl = () => {
     // Check if we're accessing via network IP (not localhost)
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         // If accessing via network IP, use same host with backend port
-        return `${window.location.protocol}//${window.location.hostname}:5000`;
+        return `${window.location.protocol}//${window.location.hostname}:5001`;
     }
     
-    // Default to localhost for development
-    return 'http://localhost:5000';
+    // Default to localhost:5001 for development
+    return 'http://localhost:5001';
 };
 
 export const API_BASE_URL = getBackendUrl();
