@@ -23,7 +23,7 @@ function Sidebar() {
             }}
         >
             {/* Yapp Logo Section */}
-            <div className={`mb-4 sm:mb-6 md:mb-8 pb-3 sm:pb-4 md:pb-6 flex-shrink-0 ${
+            <div className={`mb-4 sm:mb-6 md:mb-8 pb-3 sm:pb-4 md:pb-6 shrink-0 ${
                 isDarkMode ? 'border-b border-gray-700' : 'border-b border-gray-200'
             }`}>
                 <Link to="/home" className="flex items-center justify-center">

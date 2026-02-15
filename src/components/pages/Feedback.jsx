@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Send, Star, MessageSquare, CheckCircle, ArrowLeft } from 'lucide-react';
 import Sidebar from '../sidebar/Sidebar';
+import Header from '../header/Header';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../services/config';
 
@@ -66,7 +67,8 @@ function Feedback() {
     // Show success animation first
     if (submitSuccess && !submitted) {
         return (
-            <div className="min-h-screen bg-black text-white flex">
+            <div className="min-h-screen bg-black text-white flex flex-col md:flex-row">
+                <Header />
                 <Sidebar />
                 <div className="flex-1 p-8 flex justify-center items-center">
                     <div className="text-center">
@@ -83,7 +85,8 @@ function Feedback() {
 
     if (submitted) {
         return (
-            <div className="min-h-screen bg-black text-white flex">
+            <div className="min-h-screen bg-black text-white flex flex-col md:flex-row">
+                <Header />
                 <Sidebar />
                 <div className="flex-1 p-8 flex justify-center">
                     <div className="max-w-2xl w-full text-center">
@@ -138,10 +141,11 @@ function Feedback() {
     }
 
     return (
-        <div className="min-h-screen flex" style={{
+        <div className="min-h-screen flex flex-col md:flex-row" style={{
             backgroundColor: isDarkMode ? '#000000' : '#ffffff',
             color: isDarkMode ? '#ffffff' : '#000000'
         }}>
+            <Header />
             <Sidebar />
             <div className="flex-1 p-8 flex justify-center">
                 <div className="max-w-2xl w-full">

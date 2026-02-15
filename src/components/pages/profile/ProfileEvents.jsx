@@ -100,7 +100,7 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
 
   if (loading) {
     return (
-      <>
+    <div className="lg:w-2/5 mb-10">
         {/* Header outside the container */}
         <div className="flex items-center justify-between mb-6">
           <h3 className={`text-xl font-bold flex items-center ${
@@ -125,13 +125,14 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
             </div>
           </div>
         </div>
-      </>
+    </div>
+
     );
   }
 
   if (error) {
     return (
-      <>
+    <div className="lg:w-2/5 mb-10">
         {/* Header outside the container */}
         <div className="flex items-center justify-between mb-6">
           <h3 className={`text-xl font-bold flex items-center ${
@@ -161,12 +162,12 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
             </button>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="lg:w-2/5 mb-10">
       {/* Header outside the container */}
       <div className="flex items-center justify-between mb-6">
         <h3 className={`text-xl font-bold flex items-center ${
@@ -191,7 +192,7 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
 
       {/* Content container */}
       <div 
-        className={`rounded-lg p-6 mb-6 ${isDarkMode ? '' : 'border border-gray-200'}`}
+        className={`rounded-lg mb-6 ${events.length > 0 ? '' : 'p-6 border border-gray-200'}`}
         style={{ backgroundColor: cardBgColor }}
       >
         {events.length > 0 ? (
@@ -255,7 +256,7 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
         </div>,
         document.body
       )}
-    </>
+    </div>
   );
 };
 

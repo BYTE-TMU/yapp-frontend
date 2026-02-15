@@ -1,5 +1,7 @@
 import { MapPin, X, Target, RefreshCw, AlertCircle, Bookmark, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTheme } from '../../../contexts/ThemeContext';
+import { cn } from '@/utils/cnUtils';
+import { Button } from '@/components/ui/button';
 
 function WaypointHeader({ 
     placementMode, 
@@ -20,20 +22,20 @@ function WaypointHeader({
     const { isDarkMode } = useTheme();
     
     return (
-        <div className="mb-6 flex-shrink-0">
-            <div className="flex items-center justify-between">
+        <div className="mb-6 shrink-0">
+            <div className="flex flex-col md:flex-row items-center justify-between">
                 <div className="flex items-center space-x-3">
                     <MapPin className="w-8 h-8 text-orange-400" />
                     <div>
-                        <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <h1 className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
                             Waypoint
                         </h1>
-                        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                        <p className={cn(isDarkMode ? 'text-gray-400' : 'text-gray-600', 'text-xs md:text-sm font-normal')}>
                             Real-time campus community map
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-col md:flex-row items-center gap-2 mt-6 md:mt-0">
                     {/* Saved Navigation Controls (shown when navigating) */}
                     {isNavigatingSaved ? (
                         <>
@@ -55,29 +57,45 @@ function WaypointHeader({
                     ) : (
                         <>
                             {/* Saved Waypoints Button */}
-                            <button
-                                onClick={onOpenSavedWaypoints}
-                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105 ${
-                                    isDarkMode 
+                            <div className="flex items-center space-x-2">
+                                <Button
+                                    onClick={onOpenSavedWaypoints}
+                                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105 ${
+                                        isDarkMode 
                                         ? 'text-white hover:bg-[#1f1f1f] bg-[#1c1c1c]'
                                         : 'text-gray-900 hover:bg-gray-300 bg-gray-200'
-                                }`}
-                                title="View saved waypoints"
-                            >
-                                <Bookmark className="w-4 h-4 text-purple-400" />
-                                <span>Saved</span>
-                            </button>
+                                    }`}
+                                    title="View saved waypoints"                                
+                                    >
+                                    <>
+                                        <Bookmark className="w-4 h-4 text-purple-400" />
+                                        <span>Saved</span>
+                                    </>
+                                </Button>
 
+                                <Button
+                                    onClick={onRefresh}
+                                    disabled={refreshing}
+                                    className={cn('flex items-center space-x-2 px-3 py-2 disabled:opacity-50 rounded-lg transition-colors',
+                                        isDarkMode 
+                                        ? 'text-white hover:bg-[#1f1f1f] bg-[#1c1c1c]'
+                                        : 'text-gray-900 hover:bg-gray-300 bg-gray-200'
+                                    )}
+                                    >
+                                    <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                                    <span>Refresh</span>
+                                </Button>
+                            </div>
                             {/* Placement Mode Toggle */}
-                            <button
+                            <Button
                                 onClick={onTogglePlacementMode}
-                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105 ${
+                                className={cn('flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105', 
                                     placementMode 
                                         ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/25' 
                                         : isDarkMode
                                             ? 'text-white hover:bg-[#1f1f1f] bg-[#1c1c1c]'
                                             : 'text-gray-900 hover:bg-gray-300 bg-gray-200'
-                                }`}
+                                )}
                             >
                                 {placementMode ? (
                                     <>
@@ -90,24 +108,12 @@ function WaypointHeader({
                                         <span>Place Waypoint</span>
                                     </>
                                 )}
-                            </button>
+                            </Button>
 
-                            <button
-                                onClick={onRefresh}
-                                disabled={refreshing}
-                                className={`flex items-center space-x-2 px-3 py-2 disabled:opacity-50 rounded-lg transition-colors ${
-                                    isDarkMode 
-                                        ? 'text-white hover:bg-[#1f1f1f] bg-[#1c1c1c]'
-                                        : 'text-gray-900 hover:bg-gray-300 bg-gray-200'
-                                }`}
-                            >
-                                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                                <span>Refresh</span>
-                            </button>
                         </>
                     )}
                     
-                    <div className={`text-right text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <div className={`text-center md:text-right text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         <div>
                             {isNavigatingSaved ? (
                                 <span className="text-purple-400 font-semibold">🔖 Navigating saved waypoints</span>
