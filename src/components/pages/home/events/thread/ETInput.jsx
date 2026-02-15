@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Send, Image, Link, X } from 'lucide-react';
 import { useTheme } from '../../../../../contexts/ThemeContext';
+import { showMaxImagesError, showInvalidFileTypeError, showFileSizeError } from '../../../../../utils/toastNotifications';
 
 const ETInput = ({ 
   newPostContent, 
@@ -45,7 +46,7 @@ const ETInput = ({
 
     // Check if adding these files would exceed the limit (4 images max)
     if (selectedImages.length + files.length > 4) {
-      alert('You can only upload up to 4 images per post.');
+      showMaxImagesError();
       return;
     }
 
@@ -56,14 +57,14 @@ const ETInput = ({
       // Validate file type
       const allowedTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
-        alert(`Invalid file type for ${file.name}. Only PNG, JPG, JPEG, GIF, and WEBP are allowed.`);
+        showInvalidFileTypeError(file.name);
         return;
       }
 
       // Validate file size (10MB per file)
       const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
-        alert(`File ${file.name} is too large. Maximum size is 10MB per image.`);
+        showFileSizeError(file.name, '10MB');
         return;
       }
 
