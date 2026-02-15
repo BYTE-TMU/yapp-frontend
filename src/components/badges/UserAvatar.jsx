@@ -25,7 +25,6 @@ const avatarVariants = cva(
 );
 
 function UserAvatar({ user, size, className }) {
-  console.log(user);
   return (
     <Avatar className={cn(avatarVariants({ size }), className)}>
       <AvatarImage

@@ -73,7 +73,7 @@ function AuthRoutes() {
                 element={
                     <PrivateRoute>
                         <PageTransition>
-                            {/* <Sidebar /> */}
+                            <Sidebar />
                             <Home />
                         </PageTransition>
                     </PrivateRoute>

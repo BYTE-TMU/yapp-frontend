@@ -3,7 +3,6 @@ import UserAvatar from './UserAvatar';
 import { Badge } from '../ui/badge';
 
 function UserBadge({ user, username, isDarkMode, withImage = true }) {
-  console.log(user);
   return (
     <Badge className="px-1" variant="secondary">
       {withImage && <UserAvatar user={user} size="xs" />}
