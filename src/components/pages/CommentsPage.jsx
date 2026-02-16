@@ -59,14 +59,10 @@ function CommentsPage() {
             return;
         }
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-            setError('Please login to comment');
-            return;
-        }
-
         setSubmitting(true);
         setError('');
+
+        const token = localStorage.getItem('token');
 
         try {
             const response = await fetch(`${API_BASE_URL}/comments/create`, {
@@ -74,6 +70,7 @@ function CommentsPage() {
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     post_id: postId,
@@ -110,6 +107,7 @@ function CommentsPage() {
         try {
             const response = await fetch(`${API_BASE_URL}/comments/${commentId}`, {
                 method: 'DELETE',
+                credentials: 'include',
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
