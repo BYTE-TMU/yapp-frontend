@@ -178,8 +178,12 @@ const MessageList = forwardRef(({
     return (
         <div 
             ref={ref}
-            className="flex-1 overflow-y-auto p-4 space-y-3"
+            className="flex-1 overflow-y-auto p-4 pb-20 md:pb-4 space-y-3"
             onScroll={handleScroll}
+            style={{
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain'
+            }}
         >
             {/* Loading indicator for older messages */}
             {loadingOlderMessages && (

@@ -94,13 +94,22 @@ function MessagePerson({ conversation, isSelected, onClick, formatTime }) {
 
     const isUnseen = hasUnreadMessages();
 
+    const handleClick = (e) => {
+        console.log('MessagePerson clicked:', conversation);
+        if (onClick) {
+            onClick(conversation);
+        }
+    };
+
     return (
         <div 
-            onClick={onClick}
-            className={`flex items-center p-3 cursor-pointer transition-all duration-200 ${
+            onClick={handleClick}
+            role="button"
+            tabIndex={0}
+            className={`flex items-center p-3 cursor-pointer transition-all duration-200 relative ${
                 isSelected 
                     ? isDarkMode ? 'bg-gray-600' : 'bg-gray-100' 
-                    : isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-50'
+                    : isDarkMode ? 'hover:bg-gray-600 active:bg-gray-700' : 'hover:bg-gray-50 active:bg-gray-100'
             } ${
                 isUnseen && !isSelected  // Added !isSelected check here too
                     ? isDarkMode 
@@ -108,8 +117,13 @@ function MessagePerson({ conversation, isSelected, onClick, formatTime }) {
                         : 'bg-gradient-to-r from-orange-100 to-transparent border-l-4 border-orange-500 shadow-md'
                     : ''
             }`}
+            style={{ 
+                minHeight: '60px',
+                WebkitTapHighlightColor: 'rgba(251, 146, 60, 0.3)',
+                cursor: 'pointer'
+            }}
         >
-            <div className="relative">
+            <div className="relative" style={{ pointerEvents: 'none' }}>
                 <img 
                     src={getProfilePictureUrl(other_participant?.profile_picture)} 
                     alt={participantName}
@@ -139,7 +153,7 @@ function MessagePerson({ conversation, isSelected, onClick, formatTime }) {
                 )}
             </div>
             
-            <div className="ml-3 flex-1 min-w-0">
+            <div className="ml-3 flex-1 min-w-0" style={{ pointerEvents: 'none' }}>
                 <div className="flex items-center justify-between">
                     <h3 className={`font-medium truncate ${
                         isUnseen && !isSelected

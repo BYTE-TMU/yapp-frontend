@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, User, Lock, Sparkles, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, User, Lock, Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE_URL } from "../../services/config";
 import EmailVerification from './EmailVerification'; 
@@ -133,6 +133,15 @@ export default function LoginForm() {
 
       <div className={`w-full max-w-md relative z-10 transform transition-all duration-700 ease-out ${animationClass}`}>
         
+        {/* Back to Landing Page */}
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-gray-400 hover:text-orange-400 transition-colors duration-200 mb-6 group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />
+          <span className="text-sm font-medium">Back to home</span>
+        </Link>
+
         {/* Header with Animation */}
         <div className="text-center mb-10">
           <h1 className={`text-4xl font-bold mb-3 bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>

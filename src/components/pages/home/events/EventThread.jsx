@@ -7,6 +7,7 @@ import ETInput from './thread/ETInput';
 import ETPostsFeed from './thread/ETPostsFeed';
 import { API_BASE_URL } from '../../../../services/config';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { showLeaveEventError, showNetworkError, showPostMessageError, showDeleteConfirmation } from '../../../../utils/toastNotifications';
 
 const EventThread = () => {
   const { eventId } = useParams();
@@ -123,17 +124,17 @@ const EventThread = () => {
           return true; // Success
         } else {
           console.error('Unexpected response when leaving event:', data);
-          alert('Error leaving event. Please try again.');
+          showLeaveEventError();
           return false;
         }
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to leave event');
+        showLeaveEventError();
         return false;
       }
     } catch (err) {
       console.error('Error leaving event:', err);
-      alert('Network error. Please try again.');
+      showNetworkError();
       return false;
     }
   };
@@ -198,11 +199,11 @@ const EventThread = () => {
         setReplyingTo(null);
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to post message');
+        showPostMessageError();
       }
     } catch (err) {
       console.error('Error posting message:', err);
-      alert('Network error. Please try again.');
+      showNetworkError();
     } finally {
       setPosting(false);
     }
@@ -257,7 +258,8 @@ const EventThread = () => {
   };
 
   const handleDeletePost = async (postId, isReply = false, parentPostId = null) => {
-    if (!window.confirm('Are you sure you want to delete this post?')) return;
+    const confirmed = await showDeleteConfirmation('post');
+    if (!confirmed) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/eventthreads/posts/${postId}`, {
@@ -369,7 +371,7 @@ const EventThread = () => {
       }}>
         <Header />
         <Sidebar />
-        <div className="ml-64 h-full overflow-y-auto p-6">
+        <div className="ml-0 md:ml-64 h-full overflow-y-auto p-4 md:p-6">
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className={`text-lg mb-4 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>{error}</div>
@@ -394,7 +396,7 @@ const EventThread = () => {
       }}>
         <Header />
         <Sidebar />
-        <div className="ml-64 h-full overflow-y-auto p-6">
+        <div className="ml-0 md:ml-64 h-full overflow-y-auto p-4 md:p-6">
           <div className="flex items-center justify-center h-full">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
           </div>
@@ -410,14 +412,14 @@ const EventThread = () => {
     }}>
       <Header />
       <Sidebar />
-      <div className="ml-64 h-full flex flex-col">
+      <div className="ml-0 md:ml-64 h-full flex flex-col pt-0 md:pt-0 pb-20 md:pb-0">
         {/* Fixed Header with Leave Button */}
-        <div className="flex-shrink-0 p-6 pb-0">
+        <div className="flex-shrink-0 p-3 md:p-6 pb-0">
           <ETHeader threadInfo={threadInfo} onLeaveEvent={handleLeaveEvent} />
         </div>
         
         {/* Fixed Input */}
-        <div className="flex-shrink-0 px-6 pb-4">
+        <div className="flex-shrink-0 px-3 md:px-6 pb-4">
           <ETInput
             newPostContent={newPostContent}
             setNewPostContent={setNewPostContent}
@@ -433,7 +435,7 @@ const EventThread = () => {
         {/* Scrollable Posts Feed */}
         <div 
           ref={mainContentRef}
-          className="flex-1 overflow-y-auto px-6 pb-6 scrollbar-custom"
+          className="flex-1 overflow-y-auto px-3 md:px-6 pb-6 scrollbar-custom"
         >
           <ETPostsFeed
             posts={posts}

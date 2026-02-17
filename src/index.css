@@ -4,6 +4,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Hide scrollbar but keep scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 .scrollbar-custom {
   scrollbar-width: thin;
   scrollbar-color: #4b5563 transparent;
@@ -286,5 +295,44 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Mobile viewport height fixes - prevents content from being cut off */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific fixes */
+  .h-screen {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Support for dynamic viewport height units (dvh) */
+@supports (height: 100dvh) {
+  .h-screen {
+    height: 100dvh;
+  }
+}
+
+/* Ensure smooth scrolling on iOS */
+html {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Add safe area insets support for mobile devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .pl-safe {
+    padding-left: env(safe-area-inset-left);
+  }
+  
+  .pr-safe {
+    padding-right: env(safe-area-inset-right);
   }
 }

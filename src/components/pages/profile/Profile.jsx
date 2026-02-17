@@ -411,15 +411,25 @@ const Profile = () => {
 
   return (
     <div
-      className="w-screen h-screen overflow-hidden font-bold"
+      className="font-bold"
       style={{
         backgroundColor: isDarkMode ? '#121212' : '#ffffff',
         fontFamily: 'Albert Sans',
+        height: '100dvh',
+        minHeight: '-webkit-fill-available',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%'
       }}
     >
       <Header />
       <Sidebar />
-      <div ref={mainContentRef} className="md:ml-64 h-full overflow-y-auto p-6">
+      <div ref={mainContentRef} className="md:ml-64 flex-1 p-6" style={{
+        overflow: 'auto',
+        WebkitOverflowScrolling: 'touch',
+        paddingBottom: 'env(safe-area-inset-bottom)'
+      }}>
         <div className="max-w-7xl mx-auto">
           {/* Profile Header */}
           <div

@@ -8,6 +8,13 @@ import {
   getDefaultProfilePicture,
 } from '../../../../utils/profileUtils';
 import UserAvatar from '@/components/badges/UserAvatar';
+import {
+  showLoginRequired,
+  showPostDeletedSuccess,
+  showPostDeleteError,
+  showPostLikeError,
+  showNetworkError,
+} from '@/utils/toastNotifications';
 
 function PostItem({ post, onPostDeleted }) {
   const [liked, setLiked] = useState(false);
@@ -80,7 +87,7 @@ function PostItem({ post, onPostDeleted }) {
     const token = localStorage.getItem('token');
 
     if (!token) {
-      alert('Please login to like posts');
+      showLoginRequired('like posts');
       return;
     }
 
@@ -100,11 +107,11 @@ function PostItem({ post, onPostDeleted }) {
         setLiked(data.liked);
         setLikesCount((prev) => (data.liked ? prev + 1 : prev - 1));
       } else {
-        alert(data.error || 'Failed to like post');
+        showPostLikeError();
       }
     } catch (error) {
       console.error('Network error:', error);
-      alert('Network error. Please try again.');
+      showNetworkError();
     } finally {
       setLoading(false);
     }
@@ -114,7 +121,7 @@ function PostItem({ post, onPostDeleted }) {
     const token = localStorage.getItem('token');
 
     if (!token) {
-      alert('Please login to delete posts');
+      showLoginRequired('delete posts');
       return;
     }
 
@@ -135,13 +142,13 @@ function PostItem({ post, onPostDeleted }) {
         if (onPostDeleted) {
           onPostDeleted(post._id);
         }
-        alert('Post deleted successfully');
+        showPostDeletedSuccess();
       } else {
-        alert(data.error || 'Failed to delete post');
+        showPostDeleteError(data.error);
       }
     } catch (error) {
       console.error('Error deleting post:', error);
-      alert('Network error. Please try again.');
+      showNetworkError();
     } finally {
       setDeleting(false);
       setShowDeleteConfirm(false);

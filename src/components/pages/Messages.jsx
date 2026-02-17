@@ -170,12 +170,15 @@ function Messages() {
     };
 
     const handleConversationSelect = (conversation) => {
+        console.log('🎯 handleConversationSelect called');
         console.log('Selecting conversation:', conversation);
+        console.log('Setting selectedConversation to:', conversation._id);
         setSelectedConversation(conversation);
         // Update URL without causing a page reload
         const newSearchParams = new URLSearchParams(searchParams);
         newSearchParams.set('conversation', conversation._id);
         window.history.replaceState({}, '', `${window.location.pathname}?${newSearchParams}`);
+        console.log('✅ Conversation selected, URL updated');
     };
 
     const handleNewMessage = (conversationId, message) => {
@@ -235,47 +238,82 @@ function Messages() {
         console.log('- URL conversation param:', searchParams.get('conversation'));
     }, [loading, conversations, selectedConversation, searchParams]);
 
+    // On mobile, when a conversation is selected, show the chat; otherwise show the list
+    const showMobileChat = selectedConversation !== null;
+    
+    useEffect(() => {
+        console.log('📱 Mobile view state:', {
+            selectedConversation: selectedConversation?._id || 'none',
+            showMobileChat,
+            isMobile: window.innerWidth < 768
+        });
+    }, [selectedConversation, showMobileChat]);
+
     return (
-        <div className="min-h-screen font-bold" style={{
+        <div className="font-bold" style={{
             backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
-            fontFamily: 'Albert Sans'
+            fontFamily: 'Albert Sans',
+            height: '100dvh',
+            minHeight: '-webkit-fill-available',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
         }}>
             <Header />
-            <div className="flex h-screen">
+            <div className="flex flex-1" style={{ overflow: 'hidden' }}>
                 <Sidebar />
-                <div className="flex flex-1 h-full ml-64">
+                <div className="flex flex-1 md:ml-64" style={{ overflow: 'hidden' }}>
                     {/* Left side - Conversations/Events list */}
-                    <div className={`w-80 border-r flex flex-col h-full ${
+                    <div className={`${
+                        showMobileChat ? 'hidden md:flex' : 'flex'
+                    } w-full md:w-80 border-r flex-col ${
                         isDarkMode ? 'border-gray-600' : 'border-gray-300'
                     }`} style={{
-                        backgroundColor: isDarkMode ? '#121212' : '#ffffff'
+                        backgroundColor: isDarkMode ? '#121212' : '#ffffff',
+                        height: '100%',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        position: 'relative',
+                        zIndex: 1
                     }}>
                         {/* Tab Navigation */}
                         <div className={`flex items-center justify-center gap-4 p-4 border-b ${
                             isDarkMode ? 'border-gray-600' : 'border-gray-300'
-                        }`}>
+                        }`} style={{
+                            position: 'relative',
+                            zIndex: 2
+                        }}>
                             <button
                                 onClick={() => setActiveTab('messages')}
-                                className={`transition-colors font-semibold ${
+                                className={`transition-colors font-semibold touch-manipulation ${
                                     activeTab === 'messages'
                                         ? 'text-orange-500'
                                         : isDarkMode
                                             ? 'text-gray-400 hover:text-gray-200'
                                             : 'text-gray-500 hover:text-gray-700'
                                 }`}
+                                style={{
+                                    WebkitTapHighlightColor: 'transparent',
+                                    touchAction: 'manipulation'
+                                }}
                             >
                                 Messages
                             </button>
                             <span className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}>|</span>
                             <button
                                 onClick={() => setActiveTab('events')}
-                                className={`transition-colors font-semibold ${
+                                className={`transition-colors font-semibold touch-manipulation ${
                                     activeTab === 'events'
                                         ? 'text-orange-500'
                                         : isDarkMode
                                             ? 'text-gray-400 hover:text-gray-200'
                                             : 'text-gray-500 hover:text-gray-700'
                                 }`}
+                                style={{
+                                    WebkitTapHighlightColor: 'transparent',
+                                    touchAction: 'manipulation'
+                                }}
                             >
                                 Events
                             </button>
@@ -295,15 +333,37 @@ function Messages() {
                     </div>
                     
                     {/* Right side - Chat interface or Events placeholder */}
-                    <div className="flex-1 flex flex-col h-full" style={{
-                        backgroundColor: isDarkMode ? '#121212' : '#ffffff'
+                    <div className={`${
+                        showMobileChat ? 'flex' : 'hidden md:flex'
+                    } flex-1 flex-col`} style={{
+                        backgroundColor: isDarkMode ? '#121212' : '#ffffff',
+                        height: '100%',
+                        overflow: 'hidden'
                     }}>
                         {activeTab === 'messages' ? (
                             selectedConversation ? (
-                                <MessageChat
-                                    conversation={selectedConversation}
-                                    onNewMessage={handleNewMessage}
-                                />
+                                <div className="flex flex-col h-full">
+                                    {/* Mobile back button */}
+                                    <div className="md:hidden flex items-center px-3 py-2 border-b"
+                                        style={{ borderColor: isDarkMode ? '#374151' : '#e5e7eb' }}
+                                    >
+                                        <button
+                                            onClick={() => setSelectedConversation(null)}
+                                            className={`flex items-center gap-2 text-sm font-semibold ${
+                                                isDarkMode ? 'text-orange-400' : 'text-orange-500'
+                                            }`}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M15 18l-6-6 6-6" />
+                                            </svg>
+                                            Back
+                                        </button>
+                                    </div>
+                                    <MessageChat
+                                        conversation={selectedConversation}
+                                        onNewMessage={handleNewMessage}
+                                    />
+                                </div>
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full text-center p-8">
                                     <div className="rounded-lg p-8 mb-6" style={{

@@ -15,6 +15,12 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../../../services/config';
 import { formatEventDateTime } from '../../../../utils/dateTimeUtils';
 import UserBadge from '@/components/badges/UserBadge';
+import {
+  showAttendanceUpdateError,
+  showEventLikeError,
+  showNetworkError,
+  showLocationNotAvailableError,
+} from '@/utils/toastNotifications';
 
 const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   const [eventDetails, setEventDetails] = useState(null);
@@ -177,11 +183,11 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         }
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to update attendance');
+        showAttendanceUpdateError();
       }
     } catch (error) {
       console.error('Error toggling attendance:', error);
-      alert('Network error. Please try again.');
+      showNetworkError();
     } finally {
       setActionLoading((prev) => ({ ...prev, attend: false }));
     }
@@ -206,11 +212,11 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         );
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to update like');
+        showEventLikeError();
       }
     } catch (error) {
       console.error('Error toggling like:', error);
-      alert('Network error. Please try again.');
+      showNetworkError();
     } finally {
       setActionLoading((prev) => ({ ...prev, like: false }));
     }
@@ -226,7 +232,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
     const coordinates = getEventCoordinates();
 
     if (!coordinates) {
-      alert('Location coordinates not available for this event');
+      showLocationNotAvailableError();
       return;
     }
 

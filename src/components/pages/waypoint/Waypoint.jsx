@@ -1,10 +1,27 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '../../sidebar/Sidebar.jsx';
+import Header from '../../header/Header';
 import WaypointModal from './WaypointModal.jsx';
 import WaypointHeader from './WaypointHeader.jsx';
 import WaypointMap from './WaypointMap.jsx';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../../services/config.js';
+import { 
+    showLoginRequired, 
+    showNoSavedWaypoints, 
+    showWaypointError, 
+    showNotEventWaypoint,
+    showEventJoinedSuccess,
+    showEventLeftSuccess,
+    showEventMatchConfirmation,
+    showEventNotFoundError,
+    showDeleteConfirmation,
+    showJoinEventError,
+    showWaypointDeletedSuccess,
+    showCancelEventPermissionError,
+    showCancelEventError,
+    showEventDeletedSuccess
+} from '../../../utils/toastNotifications';
 
 // Import Leaflet CSS - make sure this is in your main CSS file
 import 'leaflet/dist/leaflet.css';
@@ -228,7 +245,7 @@ function Waypoint() {
         try {
             const currentUserId = getCurrentUserId();
             if (!currentUserId) {
-                alert('Please log in to view saved waypoints');
+                showLoginRequired('view saved waypoints');
                 return;
             }
 
@@ -249,11 +266,11 @@ function Waypoint() {
                 setIsNavigatingSaved(true);
                 navigateToSavedWaypoint(data.waypoints[0]);
             } else {
-                alert('No saved waypoints found');
+                showNoSavedWaypoints();
             }
         } catch (err) {
             console.error('Error fetching saved waypoints:', err);
-            alert(err.message);
+            showWaypointError(err.message);
         }
     };
 
@@ -355,7 +372,7 @@ function Waypoint() {
 
         } catch (err) {
             console.error('Error joining waypoint:', err);
-            alert(err.message);
+            showWaypointError(err.message);
         }
     };
 
@@ -363,7 +380,7 @@ function Waypoint() {
     const joinEventFromWaypoint = async (waypoint) => {
         try {
             if (!waypoint || waypoint.type !== 'event') {
-                alert('This is not an event waypoint');
+                showNotEventWaypoint();
                 return;
             }
 
@@ -468,9 +485,9 @@ function Waypoint() {
                     fetchWaypoints();
 
                     if (joinData.attending) {
-                        alert('Successfully joined the event! 🎉\n\nYou can now see the "✅ Joined" status on the waypoint.');
+                        showEventJoinedSuccess();
                     } else {
-                        alert('You have left the event.\n\nThe waypoint will now show "🎫 Join Event" again.');
+                        showEventLeftSuccess();
                     }
                     return;
                 }
@@ -486,7 +503,7 @@ function Waypoint() {
                 if (partialMatch) {
                     console.log('✅ Found event by partial title match:', partialMatch);
                     // Ask user for confirmation since this is a partial match
-                    const confirmed = window.confirm(`Found a potential match: "${partialMatch.title}"\n\nIs this the event you want to join?`);
+                    const confirmed = await showEventMatchConfirmation(partialMatch.title);
                     if (!confirmed) return;
                     
                     // Use the partial match
@@ -506,15 +523,15 @@ function Waypoint() {
                     fetchWaypoints();
 
                     if (joinData.attending) {
-                        alert('Successfully joined the event! 🎉\n\nYou can now see the "✅ Joined" status on the waypoint.');
+                        showEventJoinedSuccess();
                     } else {
-                        alert('You have left the event.\n\nThe waypoint will now show "🎫 Join Event" again.');
+                        showEventLeftSuccess();
                     }
                     return;
                 }
                 
                 console.log('❌ No matching event found even with fallback methods');
-                alert('Could not find the corresponding event. It may have been cancelled or expired.');
+                showEventNotFoundError();
                 return;
             }
 
@@ -539,14 +556,14 @@ function Waypoint() {
             fetchWaypoints();
 
             if (joinData.attending) {
-                alert('Successfully joined the event! 🎉\n\nYou can now see the "✅ Joined" status on the waypoint.');
+                showEventJoinedSuccess();
             } else {
-                alert('You have left the event.\n\nThe waypoint will now show "🎫 Join Event" again.');
+                showEventLeftSuccess();
             }
 
         } catch (err) {
             console.error('Error joining event from waypoint:', err);
-            alert(err.message || 'Failed to join event');
+            showJoinEventError();
         }
     };
 
@@ -556,7 +573,7 @@ function Waypoint() {
             const currentUserId = getCurrentUserId();
             
             if (!currentUserId) {
-                alert('Please log in to like waypoints');
+                showLoginRequired('like waypoints');
                 return;
             }
 
@@ -577,7 +594,7 @@ function Waypoint() {
 
         } catch (err) {
             console.error('Error liking waypoint:', err);
-            alert(err.message);
+            showWaypointError(err.message);
         }
     };
 
@@ -587,7 +604,7 @@ function Waypoint() {
             const currentUserId = getCurrentUserId();
             
             if (!currentUserId) {
-                alert('Please log in to bookmark waypoints');
+                showLoginRequired('bookmark waypoints');
                 return;
             }
 
@@ -608,7 +625,7 @@ function Waypoint() {
 
         } catch (err) {
             console.error('Error bookmarking waypoint:', err);
-            alert(err.message);
+            showWaypointError(err.message);
         }
     };
 
@@ -625,7 +642,7 @@ function Waypoint() {
             }
 
             // For regular waypoints, proceed with normal deletion
-            const confirmed = window.confirm(`Are you sure you want to delete "${waypointTitle}"?\n\nThis action cannot be undone.`);
+            const confirmed = await showDeleteConfirmation('waypoint');
             if (!confirmed) return;
 
             const response = await fetch(`${API_BASE_URL}/waypoint/${waypointId}`, {
@@ -645,7 +662,7 @@ function Waypoint() {
 
         } catch (err) {
             console.error('Error deleting waypoint:', err);
-            alert(err.message);
+            showWaypointError(err.message);
         }
     };
 
@@ -653,7 +670,7 @@ function Waypoint() {
     const deleteEventFromWaypoint = async (waypoint, waypointTitle) => {
         try {
             // Confirm deletion - make it clear this will cancel the event
-            const confirmed = window.confirm(`Are you sure you want to cancel the event "${waypointTitle}"?\n\nThis will remove both the event and its waypoint from the map.\n\nThis action cannot be undone.`);
+            const confirmed = await showDeleteConfirmation('event');
             if (!confirmed) return;
 
             // First, we need to find the corresponding event in the events system
@@ -714,7 +731,7 @@ function Waypoint() {
                 }
 
                 fetchWaypoints();
-                alert('Waypoint deleted successfully');
+                showWaypointDeletedSuccess();
                 return;
             }
 
@@ -726,7 +743,7 @@ function Waypoint() {
             const currentUserIdStr = String(currentUserId || '');
             
             if (currentUserIdStr !== eventUserId || currentUserIdStr === '') {
-                alert('You can only cancel your own events');
+                showCancelEventPermissionError();
                 return;
             }
 
@@ -760,11 +777,11 @@ function Waypoint() {
             // Refresh waypoints to remove the deleted waypoint
             fetchWaypoints();
 
-            alert('Event cancelled successfully');
+            showEventDeletedSuccess();
 
         } catch (err) {
             console.error('Error cancelling event from waypoint:', err);
-            alert(err.message || 'Failed to cancel event');
+            showCancelEventError();
         }
     };
 
@@ -863,8 +880,8 @@ function Waypoint() {
                 coords: w.coords
             })));
             
-            // Alert user that the waypoint doesn't exist or has expired
-            alert('This event waypoint is not currently available on the map. The event waypoint may have expired or was not created.');
+            // Show notification that the waypoint doesn't exist or has expired
+            showWaypointError('This event waypoint is not currently available on the map. The event waypoint may have expired or was not created.');
         }
     };
 
@@ -931,6 +948,7 @@ function Waypoint() {
                 backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
                 fontFamily: 'Albert Sans'
             }}>
+                <Header />
                 <Sidebar />
                 <div className="ml-64 h-full overflow-y-auto p-6">
                     <div className="max-w-full mx-auto h-full flex items-center justify-center">
@@ -950,6 +968,7 @@ function Waypoint() {
             backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
             fontFamily: 'Albert Sans'
         }}>
+            <Header />
             <Sidebar />
             <div className="md:ml-64 h-full overflow-y-auto p-6">
                 <div className="max-w-full mx-auto h-full flex flex-col">

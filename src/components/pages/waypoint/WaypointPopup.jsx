@@ -1,3 +1,5 @@
+import { showLoginRequired, showEventLeaveConfirmation } from '../../../utils/toastNotifications';
+
 function WaypointPopup({ waypoint, isOwner, onLike, onBookmark, onDelete, onJoinEvent, currentUserId }) {
     // Check if this is an event waypoint
     const isEventWaypoint = waypoint.type === 'event' || waypoint.title.startsWith('📅');
@@ -54,7 +56,7 @@ function WaypointPopup({ waypoint, isOwner, onLike, onBookmark, onDelete, onJoin
 
     const handleLike = () => {
         if (!currentUserId) {
-            alert('Please log in to like waypoints');
+            showLoginRequired('like waypoints');
             return;
         }
         
@@ -65,7 +67,7 @@ function WaypointPopup({ waypoint, isOwner, onLike, onBookmark, onDelete, onJoin
 
     const handleBookmark = () => {
         if (!currentUserId) {
-            alert('Please log in to bookmark waypoints');
+            showLoginRequired('bookmark waypoints');
             return;
         }
         
@@ -74,16 +76,16 @@ function WaypointPopup({ waypoint, isOwner, onLike, onBookmark, onDelete, onJoin
         }
     };
 
-    const handleJoinEvent = () => {
+    const handleJoinEvent = async () => {
         if (!currentUserId) {
-            alert('Please log in to join events');
+            showLoginRequired('join events');
             return;
         }
         
         if (onJoinEvent && isEventWaypoint) {
             // Add some user feedback for better UX
             if (isAttending) {
-                const confirmed = window.confirm('Are you sure you want to leave this event?');
+                const confirmed = await showEventLeaveConfirmation();
                 if (!confirmed) return;
             }
             onJoinEvent(waypoint);
