@@ -129,6 +129,7 @@ function CreateEvent() {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },
+                credentials: 'include',
                 body: formData
             });
 
@@ -172,12 +173,7 @@ function CreateEvent() {
 
         try {
             const token = localStorage.getItem('token');
-            
-            if (!token) {
-                setEventError('You must be logged in to create an event');
-                setIsSubmittingEvent(false);
-                return;
-            }
+            const authHeaders = { 'Authorization': `Bearer ${token}` };
 
             // Upload image if selected
             let imageUrl = null;
@@ -200,6 +196,7 @@ function CreateEvent() {
 
             const response = await fetch(`${API_BASE_URL}/events/create`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -224,6 +221,7 @@ function CreateEvent() {
 
                         await fetch(`${API_BASE_URL}/waypoint/create`, {
                             method: 'POST',
+                            credentials: 'include',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${token}`

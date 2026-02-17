@@ -38,7 +38,8 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
 
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/events/${event._id}/details`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
       });
 
       if (response.ok) {
@@ -82,7 +83,8 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/events/${event._id}/attend-status`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
@@ -97,7 +99,8 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/events/${event._id}/like-status`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
@@ -112,7 +115,8 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/events/${event._id}/details`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
@@ -131,7 +135,8 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/events/${event._id}/attend`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
       });
       
       if (response.ok) {
@@ -169,7 +174,8 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/events/${event._id}/like`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
       });
       
       if (response.ok) {

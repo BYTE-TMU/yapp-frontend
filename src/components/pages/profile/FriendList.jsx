@@ -32,6 +32,7 @@ const FriendList = ({ userId, isOwnProfile }) => {
       
       const response = await fetch(url, {
         method: 'GET',
+        credentials: 'include',
         headers: getAuthHeaders(),
       });
       
