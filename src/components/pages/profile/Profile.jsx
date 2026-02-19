@@ -83,6 +83,7 @@ const Profile = () => {
         `${API_BASE_URL}/users/${userId}/start-conversation`,
         {
           method: 'POST',
+          credentials: 'include',
           headers: getAuthHeaders(),
         },
       );
@@ -112,6 +113,7 @@ const Profile = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/users/${userId}/follow`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAuthHeaders(),
       });
 
@@ -152,6 +154,7 @@ const Profile = () => {
 
       const response = await fetch(url, {
         method: 'GET',
+        credentials: 'include',
         headers: getAuthHeaders(),
       });
 
@@ -221,6 +224,7 @@ const Profile = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/users/me`, {
         method: 'PUT',
+        credentials: 'include',
         headers: getAuthHeaders(),
         body: JSON.stringify(editForm),
       });

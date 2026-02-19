@@ -37,6 +37,7 @@ function PostItem({ post, onPostDeleted }) {
 
     try {
       const response = await fetch(`${API_BASE_URL}/users/me`, {
+        credentials: 'include',
         headers: {
           Authorization: `Bearer ${token}`,
         },

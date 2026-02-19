@@ -129,6 +129,7 @@ function CreateEvent() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: formData,
       });
 
@@ -200,6 +201,7 @@ function CreateEvent() {
 
       const response = await fetch(`${API_BASE_URL}/events/create`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -224,6 +226,7 @@ function CreateEvent() {
 
             await fetch(`${API_BASE_URL}/waypoint/create`, {
               method: 'POST',
+              credentials: 'include',
               headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,

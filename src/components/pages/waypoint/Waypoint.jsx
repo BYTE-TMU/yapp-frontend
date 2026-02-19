@@ -195,6 +195,7 @@ function Waypoint() {
                 const attendanceResponse = await fetch(
                   `${API_BASE_URL}/events/${matchingEvent._id}/attend-status`,
                   {
+                    credentials: 'include',
                     headers: getAuthHeaders(),
                   },
                 );
@@ -283,6 +284,7 @@ function Waypoint() {
 
       const response = await fetch(`${API_BASE_URL}/waypoint/my-bookmarks`, {
         method: 'GET',
+        credentials: 'include',
         headers: getAuthHeaders(),
       });
 
@@ -355,6 +357,7 @@ function Waypoint() {
     try {
       const response = await fetch(`${API_BASE_URL}/waypoint/create`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAuthHeaders(),
         body: JSON.stringify({
           title: waypointData.title,
@@ -392,6 +395,7 @@ function Waypoint() {
         `${API_BASE_URL}/waypoint/${waypointId}/join`,
         {
           method: 'POST',
+          credentials: 'include',
           headers: getAuthHeaders(),
         },
       );
@@ -429,6 +433,7 @@ function Waypoint() {
       const eventsResponse = await fetch(
         `${API_BASE_URL}/events/feed?limit=100&include_past=false`,
         {
+          credentials: 'include',
           headers: getAuthHeaders(),
         },
       );
@@ -518,6 +523,7 @@ function Waypoint() {
             `${API_BASE_URL}/events/${titleOnlyMatch._id}/attend`,
             {
               method: 'POST',
+              credentials: 'include',
               headers: getAuthHeaders(),
             },
           );
@@ -563,6 +569,7 @@ function Waypoint() {
             `${API_BASE_URL}/events/${partialMatch._id}/attend`,
             {
               method: 'POST',
+              credentials: 'include',
               headers: getAuthHeaders(),
             },
           );
@@ -597,6 +604,7 @@ function Waypoint() {
         `${API_BASE_URL}/events/${matchingEvent._id}/attend`,
         {
           method: 'POST',
+          credentials: 'include',
           headers: getAuthHeaders(),
         },
       );
@@ -638,6 +646,7 @@ function Waypoint() {
         `${API_BASE_URL}/waypoint/${waypointId}/like`,
         {
           method: 'POST',
+          credentials: 'include',
           headers: getAuthHeaders(),
         },
       );
@@ -671,6 +680,7 @@ function Waypoint() {
         `${API_BASE_URL}/waypoint/${waypointId}/bookmark`,
         {
           method: 'POST',
+          credentials: 'include',
           headers: getAuthHeaders(),
         },
       );
@@ -710,6 +720,7 @@ function Waypoint() {
 
       const response = await fetch(`${API_BASE_URL}/waypoint/${waypointId}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: getAuthHeaders(),
       });
 
@@ -746,6 +757,7 @@ function Waypoint() {
       const eventsResponse = await fetch(
         `${API_BASE_URL}/events/feed?limit=100&include_past=true`,
         {
+          credentials: 'include',
           headers: getAuthHeaders(),
         },
       );
@@ -827,6 +839,7 @@ function Waypoint() {
         `${API_BASE_URL}/events/${matchingEvent._id}/cancel`,
         {
           method: 'POST',
+          credentials: 'include',
           headers: getAuthHeaders(),
         },
       );
