@@ -90,7 +90,6 @@ function Users() {
     <div
       className="min-h-screen font-bold w-screen"
       style={{
-        backgroundColor: isDarkMode ? '#121212' : '#ffffff',
         fontFamily: 'Albert Sans',
       }}
     >
@@ -98,21 +97,13 @@ function Users() {
       <Sidebar />
       <div className="md:ml-64 p-6">
         <div className="max-w-6xl mx-auto">
-          <h1
-            className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-          >
-            Search Users
-          </h1>
+          <h1 className="text-2xl font-bold mb-6">Search Users</h1>
 
           {/* Search bar */}
           <div className="mb-6">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search
-                  className={`h-5 w-5 ${
-                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                  }`}
-                />
+                <Search className="h-5 w-5 text-gray-400" />
               </div>
               <input
                 type="text"
@@ -122,8 +113,8 @@ function Users() {
                 autoComplete="off"
                 className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none transition-colors ${
                   isDarkMode
-                    ? 'border-gray-600 text-white placeholder-gray-400 focus:border-gray-400'
-                    : 'border-gray-300 text-gray-900 placeholder-gray-500 focus:border-gray-500'
+                    ? ' text-white placeholder-gray-400 focus:border-gray-400'
+                    : ' text-gray-900 placeholder-gray-500 focus:border-gray-500'
                 }`}
                 style={{
                   backgroundColor: isDarkMode ? '#171717' : '#ffffff',

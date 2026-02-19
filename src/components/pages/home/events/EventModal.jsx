@@ -411,26 +411,26 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-2xl relative"
+        className="bg-card rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-2xl relative border border-border"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-2xl z-10">
+        <div className="sticky top-0 bg-card border-b border-border p-6 flex items-center justify-between rounded-t-2xl z-10">
           <div className="flex items-center space-x-3">
             <div className="text-4xl">{getEventIcon(0)}</div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-foreground">
                   {event.title}
                 </h2>
                 {isPastEvent && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                     <Clock className="w-3 h-3 mr-1" />
                     Past Event
                   </span>
                 )}
               </div>
-              <p className="flex gap-2 text-gray-600 items-center">
+              <p className="flex gap-2 text-muted-foreground items-center">
                 Hosted by{' '}
                 <UserBadge
                   user={event}
@@ -440,11 +440,8 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full"
-          >
-            <X className="w-6 h-6 text-gray-500" />
+          <button onClick={onClose} className="p-2 hover:bg-muted rounded-full">
+            <X className="w-6 h-6 text-muted-foreground" />
           </button>
         </div>
 
@@ -452,21 +449,21 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         <div className="p-6 space-y-6">
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : (
             <>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
-                  <Calendar className="w-5 h-5 text-gray-500 mt-1" />
+                  <Calendar className="w-5 h-5 text-muted-foreground mt-1" />
                   <div>
                     <p
-                      className={`font-semibold ${isPastEvent ? 'text-gray-500' : 'text-gray-900'}`}
+                      className={`font-semibold ${isPastEvent ? 'text-muted-foreground' : 'text-foreground'}`}
                     >
                       {dateTime.date}
                     </p>
                     <p
-                      className={`${isPastEvent ? 'text-gray-400' : 'text-gray-600'}`}
+                      className={`${isPastEvent ? 'text-muted-foreground' : 'text-muted-foreground'}`}
                     >
                       {dateTime.time}
                     </p>
@@ -475,15 +472,17 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
 
                 {event.location && (
                   <div className="flex items-start space-x-3">
-                    <MapPin className="w-5 h-5 text-gray-500 mt-1" />
+                    <MapPin className="w-5 h-5 text-muted-foreground mt-1" />
                     <div className="flex-1">
-                      <p className="font-semibold text-gray-900">Location</p>
+                      <p className="font-semibold text-foreground">Location</p>
                       <div className="flex items-center justify-between">
-                        <p className="text-gray-600">{event.location}</p>
+                        <p className="text-muted-foreground">
+                          {event.location}
+                        </p>
                         {hasLocationCoordinates() && (
                           <button
                             onClick={handleViewOnMap}
-                            className="flex items-center space-x-1 px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-medium transition-colors"
+                            className="flex items-center space-x-1 px-3 py-1 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-sm font-medium transition-colors"
                           >
                             <Map className="w-4 h-4" />
                             <span>View on Map</span>
@@ -495,9 +494,9 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                 )}
 
                 <div className="flex items-start space-x-3">
-                  <Users className="w-5 h-5 text-gray-500 mt-1" />
+                  <Users className="w-5 h-5 text-muted-foreground mt-1" />
                   <div>
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold text-foreground">
                       {totalAttendees}{' '}
                       {totalAttendees === 1 ? 'person' : 'people'}{' '}
                       {isPastEvent ? 'attended' : 'attending'}
@@ -508,10 +507,10 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
 
               {event.description && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
                     About this event
                   </h3>
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed">
                     {event.description}
                   </p>
                 </div>
@@ -519,7 +518,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
 
               {attendingFriends.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  <h3 className="text-lg font-semibold text-foreground mb-3">
                     Friends {isPastEvent ? 'who attended' : 'attending'} (
                     {attendingFriends.length})
                   </h3>
@@ -527,21 +526,21 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                     {attendingFriends.slice(0, 8).map((friend) => (
                       <div
                         key={friend._id}
-                        className="flex items-center space-x-2 bg-gray-50 rounded-full pr-3 py-1"
+                        className="flex items-center space-x-2 bg-muted rounded-full pr-3 py-1"
                       >
                         <img
                           src={getProfilePictureUrl(friend.profile_picture)}
                           alt={friend.username}
                           className="w-8 h-8 rounded-full object-cover"
                         />
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-sm font-medium text-foreground">
                           {friend.full_name || friend.username}
                         </span>
                       </div>
                     ))}
                     {attendingFriends.length > 8 && (
-                      <div className="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full">
-                        <span className="text-xs font-medium text-gray-600">
+                      <div className="flex items-center justify-center w-8 h-8 bg-muted rounded-full">
+                        <span className="text-xs font-medium text-muted-foreground">
                           +{attendingFriends.length - 8}
                         </span>
                       </div>
@@ -552,7 +551,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
 
               {/* Action buttons - only show if user is logged in */}
               {currentUser && (
-                <div className="space-y-3 pt-4 border-t border-gray-200">
+                <div className="space-y-3 pt-4 border-t border-border">
                   {/* Main action button - Join/Attending (disabled for past events) */}
                   {!isPastEvent ? (
                     <button
@@ -560,8 +559,8 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                       disabled={actionLoading.attend}
                       className={`w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
                         isAttending
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                          ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20'
+                          : 'bg-primary text-primary-foreground hover:bg-primary/90'
                       }`}
                     >
                       {actionLoading.attend ? (
@@ -572,7 +571,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                       <span>{isAttending ? 'Attending' : 'Join Event'}</span>
                     </button>
                   ) : (
-                    <div className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-gray-100 text-gray-500 rounded-lg font-semibold">
+                    <div className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-muted text-muted-foreground rounded-lg font-semibold">
                       <Clock className="w-5 h-5" />
                       <span>Event has ended</span>
                     </div>
@@ -582,7 +581,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                   {isAttending && (
                     <button
                       onClick={handleViewThread}
-                      className="w-full flex items-center justify-center space-x-2 py-2 px-4 bg-orange-100 text-orange-700 hover:bg-orange-200 rounded-lg font-medium transition-colors"
+                      className="w-full flex items-center justify-center space-x-2 py-2 px-4 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg font-medium transition-colors"
                     >
                       <MessageCircle className="w-5 h-5" />
                       <span>View Event Discussion</span>
@@ -596,8 +595,8 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                       disabled={actionLoading.like}
                       className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
                         isLiked
-                          ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? 'bg-destructive/10 text-destructive hover:bg-destructive/20'
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
                       }`}
                     >
                       {actionLoading.like ? (
@@ -610,7 +609,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                       <span>{likesCount}</span>
                     </button>
 
-                    <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg font-semibold transition-colors">
+                    <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-muted text-muted-foreground hover:bg-muted/80 rounded-lg font-semibold transition-colors">
                       <Share2 className="w-5 h-5" />
                       <span>Share</span>
                     </button>
@@ -618,27 +617,27 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                 </div>
               )}
 
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-muted/50 rounded-lg p-4">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-2xl font-bold text-foreground">
                       {totalAttendees}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       {isPastEvent ? 'Attended' : 'Attending'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-2xl font-bold text-foreground">
                       {likesCount}
                     </p>
-                    <p className="text-sm text-gray-600">Likes</p>
+                    <p className="text-sm text-muted-foreground">Likes</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-2xl font-bold text-foreground">
                       {attendingFriends.length}
                     </p>
-                    <p className="text-sm text-gray-600">Friends</p>
+                    <p className="text-sm text-muted-foreground">Friends</p>
                   </div>
                 </div>
               </div>
