@@ -4,6 +4,7 @@ import MindPost from './MindPost';
 import { API_BASE_URL } from '../../../../../services/config';
 import { useTheme } from '../../../../../contexts/ThemeContext';
 import { getProfilePictureUrl, getDefaultProfilePicture } from '../../../../../utils/profileUtils';
+import { showDeleteConfirmation } from '../../../../../utils/toastNotifications';
 
 // Utility: Fisher-Yates shuffle
 function shuffleArray(array) {
@@ -179,7 +180,8 @@ export default function WhatsOnYourMind() {
   };
 
   const handleDeletePost = async (postId) => {
-    if (!window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+    const confirmed = await showDeleteConfirmation('post');
+    if (!confirmed) {
       return;
     }
 

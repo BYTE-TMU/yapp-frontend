@@ -15,7 +15,7 @@ function Sidebar() {
 
     return (
         <nav 
-            className="fixed left-0 top-0 h-screen w-64 p-3 sm:p-4 md:p-6 font-bold z-50 flex flex-col" 
+            className="hidden md:fixed left-0 top-0 h-screen w-64 p-3 sm:p-4 md:p-6 font-bold z-50 md:flex flex-col" 
             style={{
                 backgroundColor: isDarkMode ? '#121212' : '#ffffff', // Dynamic background
                 fontFamily: 'Albert Sans',
@@ -23,7 +23,7 @@ function Sidebar() {
             }}
         >
             {/* Yapp Logo Section */}
-            <div className={`mb-4 sm:mb-6 md:mb-8 pb-3 sm:pb-4 md:pb-6 flex-shrink-0 ${
+            <div className={`mb-4 sm:mb-6 md:mb-8 pb-3 sm:pb-4 md:pb-6 shrink-0 ${
                 isDarkMode ? 'border-b border-gray-700' : 'border-b border-gray-200'
             }`}>
                 <Link to="/home" className="flex items-center justify-center">

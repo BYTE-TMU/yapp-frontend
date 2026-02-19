@@ -1,8 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, MapPin, Users, Heart, Share2, UserPlus, Map, MessageCircle, Clock } from 'lucide-react';
+import {
+  X,
+  Calendar,
+  MapPin,
+  Users,
+  Heart,
+  Share2,
+  UserPlus,
+  Map,
+  MessageCircle,
+  Clock,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../../../services/config';
 import { formatEventDateTime } from '../../../../utils/dateTimeUtils';
+import UserBadge from '@/components/badges/UserBadge';
+import {
+  showAttendanceUpdateError,
+  showEventLikeError,
+  showNetworkError,
+  showLocationNotAvailableError,
+} from '@/utils/toastNotifications';
 
 const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   const [eventDetails, setEventDetails] = useState(null);
@@ -12,24 +30,27 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   const [attendingFriends, setAttendingFriends] = useState([]);
   const [totalAttendees, setTotalAttendees] = useState(0);
   const [likesCount, setLikesCount] = useState(0);
-  const [actionLoading, setActionLoading] = useState({ like: false, attend: false });
+  const [actionLoading, setActionLoading] = useState({
+    like: false,
+    attend: false,
+  });
   const [isPastEvent, setIsPastEvent] = useState(false);
-  
+
   const navigate = useNavigate();
 
   // Check if event is in the past
   const checkIfEventPast = (eventDateTime) => {
     if (!eventDateTime) return false;
-    
+
     const eventDate = new Date(eventDateTime);
     const now = new Date();
-    
+
     return eventDate <= now;
   };
 
   const fetchEventDetails = async () => {
     if (!event || !isOpen || !currentUser) return;
-    
+
     setLoading(true);
     try {
       // Check if event is past
@@ -37,10 +58,13 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
       setIsPastEvent(pastCheck);
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/events/${event._id}/details`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/events/${event._id}/details`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
+        },
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -55,12 +79,9 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         setEventDetails(event);
         setTotalAttendees(event.attendees_count || 0);
         setLikesCount(event.likes_count || 0);
-        
+
         // Fetch attendance and like status separately
-        await Promise.all([
-          fetchAttendanceStatus(),
-          fetchLikeStatus()
-        ]);
+        await Promise.all([fetchAttendanceStatus(), fetchLikeStatus()]);
       }
     } catch (error) {
       console.error('Error fetching event details:', error);
@@ -68,12 +89,9 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
       setEventDetails(event);
       setTotalAttendees(event.attendees_count || 0);
       setLikesCount(event.likes_count || 0);
-      
+
       // Try to fetch attendance and like status separately
-      await Promise.all([
-        fetchAttendanceStatus(),
-        fetchLikeStatus()
-      ]);
+      await Promise.all([fetchAttendanceStatus(), fetchLikeStatus()]);
     } finally {
       setLoading(false);
     }
@@ -82,10 +100,13 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   const fetchAttendanceStatus = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/events/${event._id}/attend-status`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/events/${event._id}/attend-status`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
+        },
+      );
       if (response.ok) {
         const data = await response.json();
         setIsAttending(data.attending || false);
@@ -98,10 +119,13 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   const fetchLikeStatus = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/events/${event._id}/like-status`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/events/${event._id}/like-status`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
+        },
+      );
       if (response.ok) {
         const data = await response.json();
         setIsLiked(data.liked || false);
@@ -114,10 +138,13 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   const refreshFriendsAttending = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/events/${event._id}/details`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/events/${event._id}/details`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
+        },
+      );
       if (response.ok) {
         const data = await response.json();
         setAttendingFriends(data.attending_friends || []);
@@ -129,21 +156,26 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
 
   const toggleAttendance = async () => {
     if (actionLoading.attend || isPastEvent) return;
-    
-    setActionLoading(prev => ({ ...prev, attend: true }));
+
+    setActionLoading((prev) => ({ ...prev, attend: true }));
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/events/${event._id}/attend`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        credentials: 'include',
-      });
-      
+      const response = await fetch(
+        `${API_BASE_URL}/events/${event._id}/attend`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
+        },
+      );
+
       if (response.ok) {
         const data = await response.json();
         setIsAttending(data.attending);
-        setTotalAttendees(prev => data.attending ? prev + 1 : Math.max(0, prev - 1));
-        
+        setTotalAttendees((prev) =>
+          data.attending ? prev + 1 : Math.max(0, prev - 1),
+        );
+
         // Refresh friends attending list since attendance changed
         await refreshFriendsAttending();
 
@@ -156,41 +188,43 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         }
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to update attendance');
+        showAttendanceUpdateError();
       }
     } catch (error) {
       console.error('Error toggling attendance:', error);
-      alert('Network error. Please try again.');
+      showNetworkError();
     } finally {
-      setActionLoading(prev => ({ ...prev, attend: false }));
+      setActionLoading((prev) => ({ ...prev, attend: false }));
     }
   };
 
   const toggleLike = async () => {
     if (actionLoading.like) return;
-    
-    setActionLoading(prev => ({ ...prev, like: true }));
+
+    setActionLoading((prev) => ({ ...prev, like: true }));
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/events/${event._id}/like`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` },
         credentials: 'include',
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setIsLiked(data.liked);
-        setLikesCount(prev => data.liked ? prev + 1 : Math.max(0, prev - 1));
+        setLikesCount((prev) =>
+          data.liked ? prev + 1 : Math.max(0, prev - 1),
+        );
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to update like');
+        showEventLikeError();
       }
     } catch (error) {
       console.error('Error toggling like:', error);
-      alert('Network error. Please try again.');
+      showNetworkError();
     } finally {
-      setActionLoading(prev => ({ ...prev, like: false }));
+      setActionLoading((prev) => ({ ...prev, like: false }));
     }
   };
 
@@ -201,38 +235,40 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   };
 
   const handleViewOnMap = () => {
-      const coordinates = getEventCoordinates();
-      
-      if (!coordinates) {
-          alert('Location coordinates not available for this event');
-          return;
-      }
+    const coordinates = getEventCoordinates();
 
-      // Store event data in sessionStorage to pass to waypoint map
-      const eventMapData = {
-          eventId: event._id,
-          title: event.title.trim(), // Make sure title is clean
-          description: event.description,
-          latitude: coordinates.lat,
-          longitude: coordinates.lng,
-          eventDate: event.event_date || event.event_datetime?.split('T')[0],
-          eventTime: event.event_time || event.event_datetime?.split('T')[1]?.substring(0, 5),
-          location: event.location,
-          navigateToEvent: true,
-          // Add some debug info
-          debug: {
-              originalTitle: event.title,
-              cleanTitle: event.title.trim(),
-              coordinates: coordinates
-          }
-      };
-      
-      console.log('Storing event map data:', eventMapData);
-      sessionStorage.setItem('navigateToEvent', JSON.stringify(eventMapData));
-      
-      // Close modal and navigate to waypoint map
-      onClose();
-      navigate('/waypoint');
+    if (!coordinates) {
+      showLocationNotAvailableError();
+      return;
+    }
+
+    // Store event data in sessionStorage to pass to waypoint map
+    const eventMapData = {
+      eventId: event._id,
+      title: event.title.trim(), // Make sure title is clean
+      description: event.description,
+      latitude: coordinates.lat,
+      longitude: coordinates.lng,
+      eventDate: event.event_date || event.event_datetime?.split('T')[0],
+      eventTime:
+        event.event_time ||
+        event.event_datetime?.split('T')[1]?.substring(0, 5),
+      location: event.location,
+      navigateToEvent: true,
+      // Add some debug info
+      debug: {
+        originalTitle: event.title,
+        cleanTitle: event.title.trim(),
+        coordinates: coordinates,
+      },
+    };
+
+    console.log('Storing event map data:', eventMapData);
+    sessionStorage.setItem('navigateToEvent', JSON.stringify(eventMapData));
+
+    // Close modal and navigate to waypoint map
+    onClose();
+    navigate('/waypoint');
   };
 
   const getProfilePictureUrl = (profilePicture) => {
@@ -244,7 +280,6 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
     return "data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23e0e0e0'/%3E%3Ccircle cx='50' cy='35' r='15' fill='%23bdbdbd'/%3E%3Cellipse cx='50' cy='85' rx='25' ry='20' fill='%23bdbdbd'/%3E%3C/svg%3E";
   };
 
-
   const getEventIcon = (index) => {
     const icons = ['🎉', '🎵', '🎨', '🏃', '🍕', '📚', '🎬', '🎪', '🎯', '🎮'];
     return icons[index % icons.length];
@@ -253,31 +288,45 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   // Check if event has location coordinates - UPDATED FUNCTION
   const hasLocationCoordinates = () => {
     const currentEvent = eventDetails || event;
-    
+
     console.log('Checking coordinates for event:', currentEvent);
-    
+
     // Check for direct latitude/longitude properties (primary method now)
-    if (currentEvent.latitude !== null && currentEvent.latitude !== undefined && 
-        currentEvent.longitude !== null && currentEvent.longitude !== undefined) {
-      console.log('Found direct lat/lng:', currentEvent.latitude, currentEvent.longitude);
+    if (
+      currentEvent.latitude !== null &&
+      currentEvent.latitude !== undefined &&
+      currentEvent.longitude !== null &&
+      currentEvent.longitude !== undefined
+    ) {
+      console.log(
+        'Found direct lat/lng:',
+        currentEvent.latitude,
+        currentEvent.longitude,
+      );
       return true;
     }
-    
+
     // Check for alternative lat/lng properties (fallback)
     if (currentEvent.lat && currentEvent.lng) {
       console.log('Found alt lat/lng:', currentEvent.lat, currentEvent.lng);
       return true;
     }
-    
+
     // Check if location string contains coordinates (lat, lng format) - legacy fallback
     if (currentEvent.location && typeof currentEvent.location === 'string') {
-      const coordMatch = currentEvent.location.match(/(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/);
+      const coordMatch = currentEvent.location.match(
+        /(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/,
+      );
       if (coordMatch) {
-        console.log('Found coordinates in location string:', coordMatch[1], coordMatch[2]);
+        console.log(
+          'Found coordinates in location string:',
+          coordMatch[1],
+          coordMatch[2],
+        );
         return true;
       }
     }
-    
+
     console.log('No coordinates found');
     return false;
   };
@@ -285,34 +334,49 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   // Get coordinates from various possible formats - UPDATED FUNCTION
   const getEventCoordinates = () => {
     const currentEvent = eventDetails || event;
-    
+
     console.log('Getting coordinates from event:', currentEvent);
-    
+
     // Direct latitude/longitude properties (primary method now)
-    if (currentEvent.latitude !== null && currentEvent.latitude !== undefined && 
-        currentEvent.longitude !== null && currentEvent.longitude !== undefined) {
-      const coords = { lat: parseFloat(currentEvent.latitude), lng: parseFloat(currentEvent.longitude) };
+    if (
+      currentEvent.latitude !== null &&
+      currentEvent.latitude !== undefined &&
+      currentEvent.longitude !== null &&
+      currentEvent.longitude !== undefined
+    ) {
+      const coords = {
+        lat: parseFloat(currentEvent.latitude),
+        lng: parseFloat(currentEvent.longitude),
+      };
       console.log('Returning direct coordinates:', coords);
       return coords;
     }
-    
+
     // Alternative lat/lng properties (fallback)
     if (currentEvent.lat && currentEvent.lng) {
-      const coords = { lat: parseFloat(currentEvent.lat), lng: parseFloat(currentEvent.lng) };
+      const coords = {
+        lat: parseFloat(currentEvent.lat),
+        lng: parseFloat(currentEvent.lng),
+      };
       console.log('Returning alt coordinates:', coords);
       return coords;
     }
-    
+
     // Parse from location string if it contains coordinates (legacy fallback)
     if (currentEvent.location && typeof currentEvent.location === 'string') {
-      const coordMatch = currentEvent.location.match(/(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/);
+      const coordMatch = currentEvent.location.match(
+        /(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/,
+      );
       if (coordMatch) {
-        const coords = { lat: parseFloat(coordMatch[1]), lng: parseFloat(coordMatch[2]) };
+        const coords = {
+          lat: parseFloat(coordMatch[1]),
+          lng: parseFloat(coordMatch[2]),
+        };
         console.log('Returning parsed coordinates:', coords);
         return coords;
       }
     }
-    
+
     console.log('No coordinates could be extracted');
     return null;
   };
@@ -329,7 +393,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
       setLikesCount(0);
       setActionLoading({ like: false, attend: false });
       setIsPastEvent(false);
-      
+
       // Fetch new data
       fetchEventDetails();
     }
@@ -362,7 +426,9 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
             <div className="text-4xl">{getEventIcon(0)}</div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-2xl font-bold text-gray-900">{event.title}</h2>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {event.title}
+                </h2>
                 {isPastEvent && (
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                     <Clock className="w-3 h-3 mr-1" />
@@ -370,10 +436,20 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                   </span>
                 )}
               </div>
-              <p className="text-gray-600">Hosted by @{event.host_username || event.username || 'Unknown'}</p>
+              <p className="flex gap-2 text-gray-600 items-center">
+                Hosted by{' '}
+                <UserBadge
+                  user={event}
+                  username={event.username}
+                  withImage={false}
+                />
+              </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full"
+          >
             <X className="w-6 h-6 text-gray-500" />
           </button>
         </div>
@@ -390,10 +466,14 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                 <div className="flex items-start space-x-3">
                   <Calendar className="w-5 h-5 text-gray-500 mt-1" />
                   <div>
-                    <p className={`font-semibold ${isPastEvent ? 'text-gray-500' : 'text-gray-900'}`}>
+                    <p
+                      className={`font-semibold ${isPastEvent ? 'text-gray-500' : 'text-gray-900'}`}
+                    >
                       {dateTime.date}
                     </p>
-                    <p className={`${isPastEvent ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p
+                      className={`${isPastEvent ? 'text-gray-400' : 'text-gray-600'}`}
+                    >
                       {dateTime.time}
                     </p>
                   </div>
@@ -424,7 +504,9 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                   <Users className="w-5 h-5 text-gray-500 mt-1" />
                   <div>
                     <p className="font-semibold text-gray-900">
-                      {totalAttendees} {totalAttendees === 1 ? 'person' : 'people'} {isPastEvent ? 'attended' : 'attending'}
+                      {totalAttendees}{' '}
+                      {totalAttendees === 1 ? 'person' : 'people'}{' '}
+                      {isPastEvent ? 'attended' : 'attending'}
                     </p>
                   </div>
                 </div>
@@ -432,19 +514,27 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
 
               {event.description && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">About this event</h3>
-                  <p className="text-gray-700 leading-relaxed">{event.description}</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    About this event
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    {event.description}
+                  </p>
                 </div>
               )}
 
               {attendingFriends.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                    Friends {isPastEvent ? 'who attended' : 'attending'} ({attendingFriends.length})
+                    Friends {isPastEvent ? 'who attended' : 'attending'} (
+                    {attendingFriends.length})
                   </h3>
                   <div className="flex flex-wrap gap-3">
                     {attendingFriends.slice(0, 8).map((friend) => (
-                      <div key={friend._id} className="flex items-center space-x-2 bg-gray-50 rounded-full pr-3 py-1">
+                      <div
+                        key={friend._id}
+                        className="flex items-center space-x-2 bg-gray-50 rounded-full pr-3 py-1"
+                      >
                         <img
                           src={getProfilePictureUrl(friend.profile_picture)}
                           alt={friend.username}
@@ -485,12 +575,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                       ) : (
                         <UserPlus className="w-5 h-5" />
                       )}
-                      <span>
-                        {isAttending 
-                          ? 'Attending' 
-                          : 'Join Event'
-                        }
-                      </span>
+                      <span>{isAttending ? 'Attending' : 'Join Event'}</span>
                     </button>
                   ) : (
                     <div className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-gray-100 text-gray-500 rounded-lg font-semibold">
@@ -524,7 +609,9 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                       {actionLoading.like ? (
                         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
                       ) : (
-                        <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+                        <Heart
+                          className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`}
+                        />
                       )}
                       <span>{likesCount}</span>
                     </button>
@@ -540,15 +627,23 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">{totalAttendees}</p>
-                    <p className="text-sm text-gray-600">{isPastEvent ? 'Attended' : 'Attending'}</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {totalAttendees}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {isPastEvent ? 'Attended' : 'Attending'}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">{likesCount}</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {likesCount}
+                    </p>
                     <p className="text-sm text-gray-600">Likes</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">{attendingFriends.length}</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {attendingFriends.length}
+                    </p>
                     <p className="text-sm text-gray-600">Friends</p>
                   </div>
                 </div>

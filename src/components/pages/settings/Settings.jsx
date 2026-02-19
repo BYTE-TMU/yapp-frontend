@@ -155,39 +155,39 @@ function Settings() {
             <Sidebar />
             <div 
                 ref={mainContentRef}
-                className="ml-64 h-full overflow-y-auto p-6"
+                className="ml-0 md:ml-64 h-full overflow-y-auto p-4 sm:p-5 md:p-6"
             >
                 <div className="max-w-6xl mx-auto">
                     {/* Settings Header */}
-                    <div className="rounded-lg p-6 mb-6" style={{
+                    <div className="rounded-lg p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6" style={{
                         backgroundColor: isDarkMode ? '#171717' : '#f8f9fa',
                         border: isDarkMode ? 'none' : '1px solid #e5e7eb'
                     }}>
-                        <div className="flex items-center space-x-3 mb-6">
-                            <SettingsIcon className={`w-8 h-8 ${isDarkMode ? 'text-white' : 'text-gray-800'}`} />
-                            <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Settings</h1>
+                        <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-5 md:mb-6">
+                            <SettingsIcon className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 ${isDarkMode ? 'text-white' : 'text-gray-800'}`} />
+                            <h1 className={`text-2xl sm:text-2xl md:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Settings</h1>
                         </div>
                         
-                        <p className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <p className={`text-base sm:text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                             Manage your account preferences and settings
                         </p>
                     </div>
 
                     {/* Settings Sections */}
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-5 md:space-y-6">
                         {/* Account Section */}
-                        <div className="rounded-lg p-6" style={{
+                        <div className="rounded-lg p-4 sm:p-5 md:p-6" style={{
                             backgroundColor: isDarkMode ? '#171717' : '#f8f9fa',
                             border: isDarkMode ? 'none' : '1px solid #e5e7eb'
                         }}>
-                            <h2 className={`text-xl font-bold mb-4 flex items-center space-x-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                <Shield className="w-5 h-5" />
+                            <h2 className={`text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center space-x-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
                                 <span>Account</span>
                             </h2>
                             
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                                 <div 
-                                    className={`flex items-center justify-between p-4 rounded-lg hover:transition-colors cursor-pointer ${
+                                    className={`flex items-center justify-between p-3 sm:p-4 rounded-lg hover:transition-colors cursor-pointer ${
                                         isDarkMode ? '' : 'bg-white hover:bg-gray-50 border border-gray-200'
                                     }`} 
                                     style={{
@@ -202,10 +202,10 @@ function Settings() {
                                     onClick={() => setIsChangePasswordOpen(true)}
                                 >
                                     <div>
-                                        <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Change Password</p>
-                                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Update your account password</p>
+                                        <p className={`font-medium text-sm sm:text-base ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Change Password</p>
+                                        <p className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Update your account password</p>
                                     </div>
-                                    <div className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>›</div>
+                                    <div className={`text-lg sm:text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>›</div>
                                 </div>
                                 
                             </div>
@@ -214,17 +214,17 @@ function Settings() {
                         
 
                         {/* Appearance Section */}
-                        <div className="rounded-lg p-6" style={{
+                        <div className="rounded-lg p-4 sm:p-5 md:p-6" style={{
                             backgroundColor: isDarkMode ? '#171717' : '#f8f9fa',
                             border: isDarkMode ? 'none' : '1px solid #e5e7eb'
                         }}>
-                            <h2 className={`text-xl font-bold mb-4 flex items-center space-x-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                <Palette className="w-5 h-5" />
+                            <h2 className={`text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center space-x-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                <Palette className="w-4 h-4 sm:w-5 sm:h-5" />
                                 <span>Appearance</span>
                             </h2>
                             
-                            <div className="space-y-4">
-                                <div className={`flex items-center justify-between p-4 rounded-lg ${
+                            <div className="space-y-3 sm:space-y-4">
+                                <div className={`flex items-center justify-between p-3 sm:p-4 rounded-lg ${
                                     isDarkMode ? '' : 'bg-white border border-gray-200'
                                 }`} style={{
                                     backgroundColor: isDarkMode ? '#1c1c1c' : undefined
@@ -234,8 +234,8 @@ function Settings() {
                                     if (isDarkMode) e.target.style.backgroundColor = '#1c1c1c';
                                 }}>
                                     <div>
-                                        <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Dark Mode</p>
-                                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <p className={`font-medium text-sm sm:text-base ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Dark Mode</p>
+                                        <p className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                             {isDarkMode ? 'Currently using dark theme' : 'Currently using light theme'}
                                         </p>
                                     </div>
@@ -256,23 +256,23 @@ function Settings() {
 
                        
                         {/* Logout Section */}
-                        <div className="rounded-lg p-6" style={{
+                        <div className="rounded-lg p-4 sm:p-5 md:p-6" style={{
                             backgroundColor: isDarkMode ? '#171717' : '#f8f9fa',
                             border: isDarkMode ? 'none' : '1px solid #e5e7eb'
                         }}>
-                            <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Account Actions</h2>
+                            <h2 className={`text-lg sm:text-xl font-bold mb-3 sm:mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Account Actions</h2>
                             
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                                 <button 
                                     onClick={handleLogout}
                                     disabled={isLoggingOut}
-                                    className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-red-600 hover:bg-red-500 disabled:bg-red-700 disabled:opacity-50 text-white rounded-lg font-bold transition-colors"
+                                    className="w-full flex items-center justify-center space-x-2 sm:space-x-3 px-4 sm:px-5 md:px-6 py-2.5 sm:py-3 bg-red-600 hover:bg-red-500 disabled:bg-red-700 disabled:opacity-50 text-white rounded-lg font-bold transition-colors text-sm sm:text-base"
                                 >
-                                    <LogOut className="w-5 h-5" />
+                                    <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
                                     <span>{isLoggingOut ? 'Logging out...' : 'Log Out'}</span>
                                 </button>
                                 
-                                <p className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                <p className={`text-xs sm:text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                     You'll be redirected to the login page
                                 </p>
                             </div>
@@ -291,24 +291,24 @@ function Settings() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        padding: '20px'
+                        padding: '16px'
                     }}
                     onClick={handleClosePasswordModal}
                 >
                     {passwordSuccess ? (
-                        <div className={`w-full max-w-md p-6 rounded-2xl shadow-2xl ${
+                        <div className={`w-full max-w-md p-4 sm:p-5 md:p-6 rounded-2xl shadow-2xl ${
                             isDarkMode ? 'bg-[#1c1c1c]' : 'bg-white'
                         }`}>
                             <div className="text-center">
-                                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Check className="w-8 h-8 text-white" />
+                                <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                                    <Check className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
                                 </div>
-                                <h2 className={`text-xl font-bold mb-2 ${
+                                <h2 className={`text-lg sm:text-xl font-bold mb-2 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     Password Changed Successfully!
                                 </h2>
-                                <p className={`text-sm ${
+                                <p className={`text-xs sm:text-sm ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Your password has been updated securely.
@@ -323,15 +323,15 @@ function Settings() {
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Header */}
-                            <div className={`p-6 border-b ${
+                            <div className={`p-4 sm:p-5 md:p-6 border-b ${
                                 isDarkMode ? 'border-gray-700 bg-[#171717]' : 'border-gray-200 bg-gray-50'
                             }`}>
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-3">
-                                        <Lock className={`w-6 h-6 ${
+                                    <div className="flex items-center space-x-2 sm:space-x-3">
+                                        <Lock className={`w-5 h-5 sm:w-6 sm:h-6 ${
                                             isDarkMode ? 'text-orange-400' : 'text-orange-500'
                                         }`} />
-                                        <h2 className={`text-xl font-bold ${
+                                        <h2 className={`text-lg sm:text-xl font-bold ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             Change Password
@@ -340,34 +340,34 @@ function Settings() {
                                     <button
                                         onClick={handleClosePasswordModal}
                                         disabled={passwordLoading}
-                                        className={`p-2 rounded-full transition-colors ${
+                                        className={`p-1.5 sm:p-2 rounded-full transition-colors ${
                                             isDarkMode 
                                                 ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
                                                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
                                         } ${passwordLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
-                                        <X className="w-5 h-5" />
+                                        <X className="w-4 h-4 sm:w-5 sm:h-5" />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Form */}
-                            <form onSubmit={handlePasswordSubmit} className="p-6">
+                            <form onSubmit={handlePasswordSubmit} className="p-4 sm:p-5 md:p-6">
                                 {passwordError && (
-                                    <div className={`mb-4 p-3 rounded-lg flex items-center space-x-2 ${
+                                    <div className={`mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-lg flex items-center space-x-2 ${
                                         isDarkMode 
                                             ? 'bg-red-900/50 border border-red-700 text-red-300' 
                                             : 'bg-red-50 border border-red-200 text-red-700'
                                     }`}>
-                                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                        <span className="text-sm">{passwordError}</span>
+                                        <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                                        <span className="text-xs sm:text-sm">{passwordError}</span>
                                     </div>
                                 )}
 
-                                <div className="space-y-4">
+                                <div className="space-y-3 sm:space-y-4">
                                     {/* Current Password */}
                                     <div>
-                                        <label className={`block text-sm font-medium mb-2 ${
+                                        <label className={`block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>
                                             Current Password
@@ -379,7 +379,7 @@ function Settings() {
                                                 value={passwordForm.currentPassword}
                                                 onChange={handlePasswordInputChange}
                                                 required
-                                                className={`w-full px-4 py-3 pr-12 rounded-lg border transition-colors ${
+                                                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 sm:pr-12 rounded-lg border transition-colors text-sm sm:text-base ${
                                                     isDarkMode 
                                                         ? 'bg-[#2a2a2a] border-gray-600 text-white placeholder-gray-400 focus:border-orange-500' 
                                                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-orange-500'
@@ -389,18 +389,18 @@ function Settings() {
                                             <button
                                                 type="button"
                                                 onClick={() => togglePasswordVisibility('current')}
-                                                className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                                                className={`absolute right-2.5 sm:right-3 top-1/2 transform -translate-y-1/2 ${
                                                     isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
                                                 }`}
                                             >
-                                                {showPasswords.current ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                                {showPasswords.current ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                                             </button>
                                         </div>
                                     </div>
 
                                     {/* New Password */}
                                     <div>
-                                        <label className={`block text-sm font-medium mb-2 ${
+                                        <label className={`block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>
                                             New Password
@@ -412,7 +412,7 @@ function Settings() {
                                                 value={passwordForm.newPassword}
                                                 onChange={handlePasswordInputChange}
                                                 required
-                                                className={`w-full px-4 py-3 pr-12 rounded-lg border transition-colors ${
+                                                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 sm:pr-12 rounded-lg border transition-colors text-sm sm:text-base ${
                                                     isDarkMode 
                                                         ? 'bg-[#2a2a2a] border-gray-600 text-white placeholder-gray-400 focus:border-orange-500' 
                                                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-orange-500'
@@ -422,18 +422,18 @@ function Settings() {
                                             <button
                                                 type="button"
                                                 onClick={() => togglePasswordVisibility('new')}
-                                                className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                                                className={`absolute right-2.5 sm:right-3 top-1/2 transform -translate-y-1/2 ${
                                                     isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
                                                 }`}
                                             >
-                                                {showPasswords.new ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                                {showPasswords.new ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                                             </button>
                                         </div>
                                     </div>
 
                                     {/* Confirm Password */}
                                     <div>
-                                        <label className={`block text-sm font-medium mb-2 ${
+                                        <label className={`block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>
                                             Confirm New Password
@@ -445,7 +445,7 @@ function Settings() {
                                                 value={passwordForm.confirmPassword}
                                                 onChange={handlePasswordInputChange}
                                                 required
-                                                className={`w-full px-4 py-3 pr-12 rounded-lg border transition-colors ${
+                                                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 sm:pr-12 rounded-lg border transition-colors text-sm sm:text-base ${
                                                     isDarkMode 
                                                         ? 'bg-[#2a2a2a] border-gray-600 text-white placeholder-gray-400 focus:border-orange-500' 
                                                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-orange-500'
@@ -455,53 +455,53 @@ function Settings() {
                                             <button
                                                 type="button"
                                                 onClick={() => togglePasswordVisibility('confirm')}
-                                                className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                                                className={`absolute right-2.5 sm:right-3 top-1/2 transform -translate-y-1/2 ${
                                                     isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
                                                 }`}
                                             >
-                                                {showPasswords.confirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                                {showPasswords.confirm ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                                             </button>
                                         </div>
                                     </div>
 
                                     {/* Password Requirements */}
                                     {passwordForm.newPassword && (
-                                        <div className={`p-3 rounded-lg ${
+                                        <div className={`p-2.5 sm:p-3 rounded-lg ${
                                             isDarkMode ? 'bg-[#2a2a2a]' : 'bg-gray-50'
                                         }`}>
-                                            <p className={`text-sm font-medium mb-2 ${
+                                            <p className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
                                                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                             }`}>
                                                 Password Requirements:
                                             </p>
-                                            <div className="space-y-1">
-                                                <div className={`flex items-center space-x-2 text-sm ${
+                                            <div className="space-y-0.5 sm:space-y-1">
+                                                <div className={`flex items-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm ${
                                                     passwordValidation.minLength 
                                                         ? 'text-green-500' 
                                                         : isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                                 }`}>
-                                                    <div className={`w-2 h-2 rounded-full ${
+                                                    <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
                                                         passwordValidation.minLength ? 'bg-green-500' : 'bg-gray-400'
                                                     }`} />
                                                     <span>At least 6 characters</span>
                                                 </div>
-                                                <div className={`flex items-center space-x-2 text-sm ${
+                                                <div className={`flex items-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm ${
                                                     passwordValidation.different 
                                                         ? 'text-green-500' 
                                                         : isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                                 }`}>
-                                                    <div className={`w-2 h-2 rounded-full ${
+                                                    <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
                                                         passwordValidation.different ? 'bg-green-500' : 'bg-gray-400'
                                                     }`} />
                                                     <span>Different from current password</span>
                                                 </div>
                                                 {passwordForm.confirmPassword && (
-                                                    <div className={`flex items-center space-x-2 text-sm ${
+                                                    <div className={`flex items-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm ${
                                                         passwordValidation.match 
                                                             ? 'text-green-500' 
                                                             : 'text-red-500'
                                                     }`}>
-                                                        <div className={`w-2 h-2 rounded-full ${
+                                                        <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
                                                             passwordValidation.match ? 'bg-green-500' : 'bg-red-500'
                                                         }`} />
                                                         <span>Passwords match</span>
@@ -513,12 +513,12 @@ function Settings() {
                                 </div>
 
                                 {/* Actions */}
-                                <div className="flex space-x-3 mt-6">
+                                <div className="flex space-x-2 sm:space-x-3 mt-4 sm:mt-5 md:mt-6">
                                     <button
                                         type="button"
                                         onClick={handleClosePasswordModal}
                                         disabled={passwordLoading}
-                                        className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${
+                                        className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
                                             isDarkMode
                                                 ? 'bg-gray-700 hover:bg-gray-600 text-white'
                                                 : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
@@ -529,7 +529,7 @@ function Settings() {
                                     <button
                                         type="submit"
                                         disabled={!isPasswordFormValid || passwordLoading}
-                                        className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${
+                                        className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
                                             isPasswordFormValid && !passwordLoading
                                                 ? 'bg-orange-500 hover:bg-orange-600 text-white'
                                                 : 'bg-gray-400 text-gray-600 cursor-not-allowed'

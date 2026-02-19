@@ -86,10 +86,7 @@ function MessagesList({
     if (loading) {
         return (
             <div className="h-full flex flex-col">
-                <div className={`p-4 border-b ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
-                    <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Messages</h2>
-                </div>
-                <div className="flex-1 flex items-center justify-center">
+                <div className="flex-1 flex items-center justify-center pb-20 md:pb-0">
                     <div className="flex flex-col items-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mb-4"></div>
                         <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Loading conversations...</p>
@@ -102,10 +99,7 @@ function MessagesList({
     if (!conversations || conversations.length === 0) {
         return (
             <div className="h-full flex flex-col">
-                <div className={`p-4 border-b ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
-                    <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Messages</h2>
-                </div>
-                <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
+                <div className="flex-1 flex flex-col items-center justify-center p-4 text-center pb-20 md:pb-4">
                     <div className="mb-4">
                         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={`mx-auto ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
                             <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -119,26 +113,23 @@ function MessagesList({
     }
 
     return (
-        <div className="h-full flex flex-col">
-            <div className={`p-4 border-b ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
-                <div className="flex items-center justify-between">
-                    <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Messages</h2>
-                    <div className={`text-sm px-2 py-1 rounded-full ${
-                        isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600'
-                    }`}>
-                        {conversations.length}
-                    </div>
-                </div>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto">
+        <div className="h-full flex flex-col" style={{ 
+            position: 'relative', 
+            zIndex: 1,
+            touchAction: 'pan-y' 
+        }}>
+            <div className="flex-1 overflow-y-auto pb-20 md:pb-0" style={{
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain'
+            }}>
                 {sortedConversations.map((conversation, index) => {
+                    console.log('Rendering conversation:', conversation._id, conversation.other_participant?.username);
                     return (
                         <MessagePerson
                             key={conversation._id}
                             conversation={conversation}
                             isSelected={selectedConversation?._id === conversation._id}
-                            onClick={() => onConversationSelect(conversation)}
+                            onClick={onConversationSelect}
                             formatTime={formatTime}
                         />
                     );

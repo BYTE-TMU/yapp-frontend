@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../services/config';
 import EmailVerification from './EmailVerification'; // Import the verification component
@@ -113,6 +115,14 @@ function RegisterForm() {
             <div className={`w-full max-w-md rounded-2xl shadow-xl p-8 flex flex-col items-center relative z-10 ${
                 isDarkMode ? 'bg-[#181818]' : 'bg-white border border-gray-200'
             }`}>
+                {/* Back to Landing Page */}
+                <Link
+                    to="/"
+                    className="self-start inline-flex items-center gap-2 text-gray-400 hover:text-orange-400 transition-colors duration-200 mb-4 group"
+                >
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />
+                    <span className="text-sm font-medium">Back to home</span>
+                </Link>
                 <h2 className={`text-2xl font-bold mb-2 text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Welcome to Yapp</h2>
                 <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4 mt-4">
                     <label className={`text-sm font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Username</label>
