@@ -22,7 +22,7 @@ function MapClickHandler({ placementMode, onMapClick }) {
 // Component to handle map navigation
 function MapNavigator({ targetWaypoint, shouldOpenPopup }) {
     const map = useMap();
-    
+
     useEffect(() => {
         if (targetWaypoint) {
             // Always use flyTo for precise centering and smooth movement
@@ -31,7 +31,7 @@ function MapNavigator({ targetWaypoint, shouldOpenPopup }) {
                 easeLinearity: 0.05,
                 animate: true
             });
-            
+
             // If we should open the popup, do it much faster
             if (shouldOpenPopup) {
                 setTimeout(() => {
@@ -45,17 +45,17 @@ function MapNavigator({ targetWaypoint, shouldOpenPopup }) {
             }
         }
     }, [targetWaypoint, shouldOpenPopup, map]);
-    
+
     return null;
 }
 
-function WaypointMap({ 
-    waypoints, 
-    placementMode, 
-    refreshing, 
-    onMapClick, 
-    onJoinWaypoint, 
-    onDeleteWaypoint, 
+function WaypointMap({
+    waypoints,
+    placementMode,
+    refreshing,
+    onMapClick,
+    onJoinWaypoint,
+    onDeleteWaypoint,
     onLikeWaypoint,
     onBookmarkWaypoint,
     onJoinEvent,
@@ -75,15 +75,15 @@ function WaypointMap({
     // Get both current username and user ID
     const currentUsername = getCurrentUser();
     const markerRefs = useRef({});
-    
+
     // SLC coordinates (at the Library Building location)
     const SLC_COORDS = [43.6578, -79.3805];
-    
+
     // Get current user ID from JWT token
     const getCurrentUserId = () => {
         const token = localStorage.getItem('token');
         if (!token) return null;
-        
+
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
             return payload.user_id || null;
@@ -92,18 +92,18 @@ function WaypointMap({
             return null;
         }
     };
-    
+
     const currentUserId = getCurrentUserId();
 
     return (
-        <div className="flex-1 relative rounded-lg overflow-hidden" style={{backgroundColor: '#171717', minHeight: '600px'}}>
+        <div className="flex-1 relative rounded-lg overflow-hidden" style={{ backgroundColor: '#171717', minHeight: '400px' }}>
             <MapContainer
                 center={TMU_COORDS}
                 zoom={ZOOM_LEVEL}
-                style={{ 
-                    height: '100%', 
-                    width: '100%', 
-                    minHeight: '600px',
+                style={{
+                    height: '100%',
+                    width: '100%',
+                    minHeight: '400px',
                     cursor: placementMode ? 'crosshair' : 'grab'
                 }}
                 zoomControl={true}
@@ -145,9 +145,9 @@ function WaypointMap({
                 {/* Waypoint Markers */}
                 {waypoints.map((waypoint) => {
                     return (
-                        <Marker 
-                            key={waypoint.id} 
-                            position={waypoint.coords} 
+                        <Marker
+                            key={waypoint.id}
+                            position={waypoint.coords}
                             icon={createCustomIcon(waypoint.type)}
                             ref={(ref) => {
                                 if (ref) {
@@ -158,15 +158,15 @@ function WaypointMap({
                             }}
                         >
                             {/* Tooltip for hover */}
-                            <Tooltip 
-                                direction="top" 
-                                offset={[0, -20]} 
+                            <Tooltip
+                                direction="top"
+                                offset={[0, -20]}
                                 opacity={0.9}
                                 permanent={false}
                                 interactive={false}
                                 sticky={false}
                             >
-                                <div style={{ 
+                                <div style={{
                                     fontFamily: 'Albert Sans, sans-serif',
                                     fontSize: '14px',
                                     fontWeight: '600',
@@ -179,7 +179,7 @@ function WaypointMap({
 
                             {/* Popup for click (detailed info) */}
                             <Popup maxWidth={250}>
-                                <WaypointPopup 
+                                <WaypointPopup
                                     waypoint={waypoint}
                                     isOwner={waypoint.isOwner}
                                     currentUserId={currentUserId}
@@ -195,13 +195,13 @@ function WaypointMap({
                 })}
 
                 {/* Handle map clicks */}
-                <MapClickHandler 
-                    placementMode={placementMode} 
-                    onMapClick={onMapClick} 
+                <MapClickHandler
+                    placementMode={placementMode}
+                    onMapClick={onMapClick}
                 />
 
                 {/* Handle navigation to target waypoint */}
-                <MapNavigator 
+                <MapNavigator
                     targetWaypoint={targetWaypoint}
                     shouldOpenPopup={shouldOpenPopup}
                 />
@@ -211,7 +211,7 @@ function WaypointMap({
             <WaypointLegend />
 
             {/* Live Stats */}
-            <WaypointStats 
+            <WaypointStats
                 waypointCount={waypoints.length}
                 placementMode={placementMode}
                 refreshing={refreshing}

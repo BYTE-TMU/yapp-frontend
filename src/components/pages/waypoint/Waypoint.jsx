@@ -6,10 +6,10 @@ import WaypointHeader from './WaypointHeader.jsx';
 import WaypointMap from './WaypointMap.jsx';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../../services/config.js';
-import { 
-    showLoginRequired, 
-    showNoSavedWaypoints, 
-    showWaypointError, 
+import {
+    showLoginRequired,
+    showNoSavedWaypoints,
+    showWaypointError,
     showNotEventWaypoint,
     showEventJoinedSuccess,
     showEventLeftSuccess,
@@ -36,7 +36,7 @@ function Waypoint() {
     const [placementMode, setPlacementMode] = useState(false);
     const [targetWaypoint, setTargetWaypoint] = useState(null);
     const [shouldOpenPopup, setShouldOpenPopup] = useState(false);
-    
+
     // Saved waypoints navigation state
     const [savedWaypoints, setSavedWaypoints] = useState([]);
     const [currentSavedIndex, setCurrentSavedIndex] = useState(-1);
@@ -61,7 +61,7 @@ function Waypoint() {
     const getCurrentUserId = () => {
         const token = localStorage.getItem('token');
         if (!token) return null;
-        
+
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
             return payload.user_id || null;
@@ -77,7 +77,7 @@ function Waypoint() {
         if (!token) {
             return null;
         }
-        
+
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
             return payload.username;
@@ -91,7 +91,7 @@ function Waypoint() {
     const fetchWaypoints = async () => {
         try {
             setError(null);
-            
+
             // Make authenticated request to get user-specific data
             const response = await fetch(`${API_BASE_URL}/waypoint/campus/tmu?radius=2`, {
                 method: 'GET',
@@ -103,14 +103,14 @@ function Waypoint() {
             }
 
             const data = await response.json();
-            
 
-            
+
+
             // Fetch events data once for all event waypoints
             const currentUsername = getCurrentUser();
             const currentUserId = getCurrentUserId();
             let eventsData = null;
-            
+
             // Only fetch events if there are event waypoints
             const hasEventWaypoints = data.waypoints.some(w => w.type === 'event');
             if (hasEventWaypoints && currentUserId) {
@@ -129,7 +129,7 @@ function Waypoint() {
             const transformedWaypoints = await Promise.all(data.waypoints.map(async waypoint => {
                 let isAttending = false;
                 let attendeesCount = 0;
-                
+
                 // For event waypoints, get attendance information from pre-fetched events
                 if (waypoint.type === 'event' && currentUserId && eventsData) {
                     try {
@@ -138,7 +138,7 @@ function Waypoint() {
                         let matchingEvent = eventsData.events?.find(event => {
                             const titleMatch = event.title.toLowerCase().trim() === eventTitle.toLowerCase().trim();
                             let coordMatch = false;
-                            if (event.latitude !== null && event.latitude !== undefined && 
+                            if (event.latitude !== null && event.latitude !== undefined &&
                                 event.longitude !== null && event.longitude !== undefined) {
                                 const latDiff = Math.abs(waypoint.latitude - event.latitude);
                                 const lngDiff = Math.abs(waypoint.longitude - event.longitude);
@@ -156,7 +156,7 @@ function Waypoint() {
                             }
                             return titleMatch && coordMatch;
                         });
-                        
+
                         // Fallback: if no coordinate match, try title-only match for attendance
                         if (!matchingEvent) {
                             console.log(`🔄 No coordinate match for "${eventTitle}", trying title-only...`);
@@ -168,10 +168,10 @@ function Waypoint() {
                                 return titleMatch;
                             });
                         }
-                        
+
                         if (matchingEvent) {
                             attendeesCount = matchingEvent.attendees_count || 0;
-                            
+
                             // Check if current user is attending
                             const attendanceResponse = await fetch(`${API_BASE_URL}/events/${matchingEvent._id}/attend-status`, {
                                 headers: getAuthHeaders()
@@ -193,7 +193,7 @@ function Waypoint() {
                         console.warn('Error fetching attendance for waypoint:', waypoint.title, error);
                     }
                 }
-                
+
                 const waypointData = {
                     id: waypoint._id,
                     coords: [waypoint.latitude, waypoint.longitude],
@@ -215,7 +215,7 @@ function Waypoint() {
                     isAttending: isAttending,
                     attendeesCount: attendeesCount
                 };
-                
+
                 // Debug logging for event waypoints
                 if (waypoint.type === 'event') {
                     console.log(`🎯 Final waypoint data for "${waypoint.title}":`, {
@@ -225,12 +225,12 @@ function Waypoint() {
                         type: waypointData.type
                     });
                 }
-                
+
                 return waypointData;
             }));
 
             setWaypoints(transformedWaypoints);
-            
+
         } catch (err) {
             console.error('Error fetching waypoints:', err);
             setError(err.message);
@@ -260,7 +260,7 @@ function Waypoint() {
 
             const data = await response.json();
             setSavedWaypoints(data.waypoints);
-            
+
             if (data.waypoints.length > 0) {
                 setCurrentSavedIndex(0);
                 setIsNavigatingSaved(true);
@@ -286,11 +286,11 @@ function Waypoint() {
             author: savedWaypoint.username,
             interactions: savedWaypoint.interactions || { likes: 0, bookmarks: 0 }
         };
-        
+
         setTargetWaypoint(mapWaypoint);
         setShouldOpenPopup(true);
         setIsNavigating(true);
-        
+
         // Clear the popup flag and navigation lock after the movement completes
         setTimeout(() => {
             setShouldOpenPopup(false);
@@ -301,7 +301,7 @@ function Waypoint() {
     // Navigate to previous saved waypoint
     const goToPreviousSaved = () => {
         if (savedWaypoints.length === 0 || isNavigating) return;
-        
+
         const newIndex = currentSavedIndex > 0 ? currentSavedIndex - 1 : savedWaypoints.length - 1;
         setCurrentSavedIndex(newIndex);
         navigateToSavedWaypoint(savedWaypoints[newIndex]);
@@ -310,7 +310,7 @@ function Waypoint() {
     // Navigate to next saved waypoint
     const goToNextSaved = () => {
         if (savedWaypoints.length === 0 || isNavigating) return;
-        
+
         const newIndex = currentSavedIndex < savedWaypoints.length - 1 ? currentSavedIndex + 1 : 0;
         setCurrentSavedIndex(newIndex);
         navigateToSavedWaypoint(savedWaypoints[newIndex]);
@@ -341,7 +341,7 @@ function Waypoint() {
 
             // Refresh waypoints to show the new one
             fetchWaypoints();
-            
+
             setShowCreateModal(false);
             setNewPinLocation(null);
             setPlacementMode(false); // Exit placement mode after creating
@@ -386,10 +386,10 @@ function Waypoint() {
 
             // Find the corresponding event by matching title and coordinates
             const eventTitle = waypoint.title.replace(/^📅\s*/, ''); // Remove emoji prefix
-            
+
             console.log('🎫 Looking for event to join:', eventTitle);
             console.log('Waypoint coordinates:', waypoint.coords);
-            
+
             // Get events to find the matching one
             const eventsResponse = await fetch(`${API_BASE_URL}/events/feed?limit=100&include_past=false`, {
                 headers: getAuthHeaders()
@@ -408,7 +408,7 @@ function Waypoint() {
             console.log('Waypoint title (cleaned):', eventTitle);
             console.log('Waypoint coordinates:', waypoint.coords);
             console.log('Total events available:', events.length);
-            
+
             // Log all available events for comparison
             events.forEach((event, index) => {
                 console.log(`Event ${index + 1}:`, {
@@ -420,23 +420,23 @@ function Waypoint() {
 
             const matchingEvent = events.find(event => {
                 console.log(`\n🔎 Checking event: "${event.title}"`);
-                
+
                 const titleMatch = event.title.toLowerCase().trim() === eventTitle.toLowerCase().trim();
                 console.log('Title comparison:', {
                     eventTitle: event.title.toLowerCase().trim(),
                     waypointTitle: eventTitle.toLowerCase().trim(),
                     match: titleMatch
                 });
-                
+
                 // Check coordinate proximity if both waypoint and event have coordinates
                 let coordMatch = false;
-                if (event.latitude !== null && event.latitude !== undefined && 
+                if (event.latitude !== null && event.latitude !== undefined &&
                     event.longitude !== null && event.longitude !== undefined) {
                     const latDiff = Math.abs(waypoint.coords[0] - event.latitude);
                     const lngDiff = Math.abs(waypoint.coords[1] - event.longitude);
                     // Within ~50 meters (approximately 0.0005 degrees) - more lenient
                     coordMatch = latDiff < 0.0005 && lngDiff < 0.0005;
-                    
+
                     console.log('Coordinate comparison:', {
                         eventCoords: [event.latitude, event.longitude],
                         waypointCoords: waypoint.coords,
@@ -456,16 +456,16 @@ function Waypoint() {
 
             if (!matchingEvent) {
                 console.log('❌ No matching event found with strict matching');
-                
+
                 // Try fallback matching with more lenient criteria
                 console.log('🔄 Trying fallback matching...');
-                
+
                 // First try: title match only (no coordinate requirement)
                 const titleOnlyMatch = events.find(event => {
                     const titleMatch = event.title.toLowerCase().trim() === eventTitle.toLowerCase().trim();
                     return titleMatch;
                 });
-                
+
                 if (titleOnlyMatch) {
                     console.log('✅ Found event by title only:', titleOnlyMatch);
                     // Use the title-only match
@@ -491,7 +491,7 @@ function Waypoint() {
                     }
                     return;
                 }
-                
+
                 // Second try: partial title match
                 const partialMatch = events.find(event => {
                     const eventTitleLower = event.title.toLowerCase().trim();
@@ -499,13 +499,13 @@ function Waypoint() {
                     const partialMatch = eventTitleLower.includes(waypointTitleLower) || waypointTitleLower.includes(eventTitleLower);
                     return partialMatch;
                 });
-                
+
                 if (partialMatch) {
                     console.log('✅ Found event by partial title match:', partialMatch);
                     // Ask user for confirmation since this is a partial match
                     const confirmed = await showEventMatchConfirmation(partialMatch.title);
                     if (!confirmed) return;
-                    
+
                     // Use the partial match
                     const joinResponse = await fetch(`${API_BASE_URL}/events/${partialMatch._id}/attend`, {
                         method: 'POST',
@@ -529,7 +529,7 @@ function Waypoint() {
                     }
                     return;
                 }
-                
+
                 console.log('❌ No matching event found even with fallback methods');
                 showEventNotFoundError();
                 return;
@@ -571,7 +571,7 @@ function Waypoint() {
     const likeWaypoint = async (waypointId) => {
         try {
             const currentUserId = getCurrentUserId();
-            
+
             if (!currentUserId) {
                 showLoginRequired('like waypoints');
                 return;
@@ -602,7 +602,7 @@ function Waypoint() {
     const bookmarkWaypoint = async (waypointId) => {
         try {
             const currentUserId = getCurrentUserId();
-            
+
             if (!currentUserId) {
                 showLoginRequired('bookmark waypoints');
                 return;
@@ -676,10 +676,10 @@ function Waypoint() {
             // First, we need to find the corresponding event in the events system
             // We'll search for the event by matching title and coordinates
             const eventTitle = waypointTitle.replace(/^📅\s*/, ''); // Remove emoji prefix
-            
+
             console.log('🔍 Looking for event to cancel:', eventTitle);
             console.log('Waypoint coordinates:', waypoint.coords);
-            
+
             // Get events to find the matching one
             const eventsResponse = await fetch(`${API_BASE_URL}/events/feed?limit=100&include_past=true`, {
                 headers: getAuthHeaders()
@@ -695,10 +695,10 @@ function Waypoint() {
             // Find the matching event by title and coordinates
             const matchingEvent = events.find(event => {
                 const titleMatch = event.title.toLowerCase().trim() === eventTitle.toLowerCase().trim();
-                
+
                 // Check coordinate proximity if both waypoint and event have coordinates
                 let coordMatch = false;
-                if (event.latitude !== null && event.latitude !== undefined && 
+                if (event.latitude !== null && event.latitude !== undefined &&
                     event.longitude !== null && event.longitude !== undefined) {
                     const latDiff = Math.abs(waypoint.coords[0] - event.latitude);
                     const lngDiff = Math.abs(waypoint.coords[1] - event.longitude);
@@ -741,7 +741,7 @@ function Waypoint() {
             const currentUserId = getCurrentUserId();
             const eventUserId = String(matchingEvent.user_id || '');
             const currentUserIdStr = String(currentUserId || '');
-            
+
             if (currentUserIdStr !== eventUserId || currentUserIdStr === '') {
                 showCancelEventPermissionError();
                 return;
@@ -818,35 +818,35 @@ function Waypoint() {
         console.log('Event data received:', eventData);
         console.log('Available waypoints:', waypoints.length);
         console.log('Event waypoints available:', waypoints.filter(w => w.type === 'event'));
-        
+
         // Look for the actual existing event waypoint that matches this event
         const eventWaypoint = waypoints.find(waypoint => {
             console.log('Checking waypoint:', waypoint.title, waypoint.type);
-            
+
             // Must be an event type waypoint
             if (waypoint.type !== 'event') {
                 return false;
             }
-            
+
             // Check if this waypoint title matches the event title
             // Remove the 📅 emoji prefix from waypoint title for comparison
             const waypointTitle = waypoint.title.replace(/^📅\s*/, '').trim().toLowerCase();
             const eventTitle = eventData.title.trim().toLowerCase();
-            
+
             console.log('Comparing titles:', waypointTitle, 'vs', eventTitle);
-            
+
             // Exact title match (case insensitive)
             const titleMatch = waypointTitle === eventTitle;
-            
+
             // If we have coordinates in the event data, also check coordinate proximity
             let coordMatch = false;
-            if (eventData.latitude !== null && eventData.latitude !== undefined && 
+            if (eventData.latitude !== null && eventData.latitude !== undefined &&
                 eventData.longitude !== null && eventData.longitude !== undefined) {
                 const latDiff = Math.abs(waypoint.coords[0] - eventData.latitude);
                 const lngDiff = Math.abs(waypoint.coords[1] - eventData.longitude);
                 // Within ~10 meters (approximately 0.0001 degrees) - very precise match
                 coordMatch = latDiff < 0.0001 && lngDiff < 0.0001;
-                
+
                 console.log('Coordinate check:', {
                     waypointCoords: waypoint.coords,
                     eventCoords: [eventData.latitude, eventData.longitude],
@@ -855,11 +855,11 @@ function Waypoint() {
                     coordMatch
                 });
             }
-            
+
             // Match if BOTH title matches AND coordinates match closely (for precision)
             const isMatch = titleMatch && coordMatch;
             console.log('Match result:', isMatch, { titleMatch, coordMatch });
-            
+
             return isMatch;
         });
 
@@ -868,7 +868,7 @@ function Waypoint() {
             // Found the actual existing waypoint, navigate to it with popup
             setTargetWaypoint(eventWaypoint);
             setShouldOpenPopup(true);
-            
+
             // Clear the popup flag after navigation
             setTimeout(() => {
                 setShouldOpenPopup(false);
@@ -879,7 +879,7 @@ function Waypoint() {
                 title: w.title,
                 coords: w.coords
             })));
-            
+
             // Show notification that the waypoint doesn't exist or has expired
             showWaypointError('This event waypoint is not currently available on the map. The event waypoint may have expired or was not created.');
         }
@@ -889,7 +889,7 @@ function Waypoint() {
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!isNavigatingSaved || isNavigating) return;
-            
+
             if (e.key === 'ArrowLeft') {
                 e.preventDefault();
                 goToPreviousSaved();
@@ -922,10 +922,10 @@ function Waypoint() {
                 const eventData = JSON.parse(eventNavData);
                 // Clear the session storage
                 sessionStorage.removeItem('navigateToEvent');
-                
+
                 // Find and navigate to the event waypoint
                 findAndNavigateToEventWaypoint(eventData);
-                
+
             } catch (error) {
                 console.error('Error parsing event navigation data:', error);
             }
@@ -945,12 +945,12 @@ function Waypoint() {
     if (loading) {
         return (
             <div className="h-screen overflow-hidden font-bold" style={{
-                backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
+                backgroundColor: isDarkMode ? '#121212' : '#ffffff',
                 fontFamily: 'Albert Sans'
             }}>
                 <Header />
                 <Sidebar />
-                <div className="ml-64 h-full overflow-y-auto p-6">
+                <div className="ml-64 h-full overflow-y-auto p-6 pb-16 md:pb-6">
                     <div className="max-w-full mx-auto h-full flex items-center justify-center">
                         <div className="text-center">
                             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mb-4"></div>
@@ -965,12 +965,12 @@ function Waypoint() {
 
     return (
         <div className="h-screen overflow-hidden font-bold" style={{
-            backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
+            backgroundColor: isDarkMode ? '#121212' : '#ffffff',
             fontFamily: 'Albert Sans'
         }}>
             <Header />
             <Sidebar />
-            <div className="md:ml-64 h-full overflow-y-auto p-6">
+            <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6">
                 <div className="max-w-full mx-auto h-full flex flex-col">
 
 

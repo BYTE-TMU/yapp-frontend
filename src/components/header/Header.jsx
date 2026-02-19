@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, MessageCircle, Plus, User, Settings } from 'lucide-react';
+import { Home, Users, MessageCircle, Plus, User, Settings, MapPin } from 'lucide-react';
 import YappLogoDark from '../../assets/Yapp White logo.png';
 import YappLogoLight from '../../assets/yapp_light_mode.png';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -15,7 +15,7 @@ function Header() {
         { path: '/users', label: 'Users', icon: Users },
         { path: '/create', label: '', icon: Plus, isCreate: true },
         { path: '/messages', label: 'Messages', icon: MessageCircle },
-        { path: '/profile', label: 'Profile', icon: User },
+        { path: '/waypoint', label: 'Waypoint', icon: MapPin },
     ];
 
     return (
@@ -32,19 +32,34 @@ function Header() {
                         style={{ height: isDarkMode ? '4rem' : '3.25rem' }}
                     />
                 </Link>
-                <Link
-                    to="/settings"
-                    className={`p-2 rounded-lg transition-colors ${
-                        isActive('/settings')
-                            ? 'text-orange-500'
-                            : isDarkMode
-                                ? 'text-gray-400 hover:text-white'
-                                : 'text-gray-500 hover:text-gray-900'
-                    }`}
-                    aria-label="Settings"
-                >
-                    <Settings className="w-6 h-6" />
-                </Link>
+                <div className="flex items-center gap-1">
+                    <Link
+                        to="/profile"
+                        className={`p-2 rounded-lg transition-colors ${
+                            isActive('/profile')
+                                ? 'text-orange-500'
+                                : isDarkMode
+                                    ? 'text-gray-400 hover:text-white'
+                                    : 'text-gray-500 hover:text-gray-900'
+                        }`}
+                        aria-label="Profile"
+                    >
+                        <User className="w-6 h-6" />
+                    </Link>
+                    <Link
+                        to="/settings"
+                        className={`p-2 rounded-lg transition-colors ${
+                            isActive('/settings')
+                                ? 'text-orange-500'
+                                : isDarkMode
+                                    ? 'text-gray-400 hover:text-white'
+                                    : 'text-gray-500 hover:text-gray-900'
+                        }`}
+                        aria-label="Settings"
+                    >
+                        <Settings className="w-6 h-6" />
+                    </Link>
+                </div>
             </div>
 
             {/* Bottom navigation bar - mobile only (Instagram-style) */}
