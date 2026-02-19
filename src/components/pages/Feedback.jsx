@@ -99,10 +99,10 @@ function Feedback() {
         <Sidebar />
         <div className="flex-1 p-8 flex justify-center">
           <div className="max-w-2xl w-full text-center">
-            <div className="bg-gradient-to-br from-green-500/20 to-blue-500/20 border border-green-500 rounded-xl p-10 shadow-2xl">
+            <div className="bg-linear-to-br from-green-500/20 to-blue-500/20 border border-green-500 rounded-xl p-10 shadow-2xl">
               <div className="mb-6">
                 <MessageSquare className="w-20 h-20 text-green-500 mx-auto mb-4 animate-pulse" />
-                <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+                <h2 className="text-3xl font-bold mb-4 bg-linear-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
                   Thank You!
                 </h2>
               </div>
@@ -157,6 +157,11 @@ function Feedback() {
       <Header />
       <Sidebar />
       <div className="flex-1 p-8 flex justify-center mb-16">
+        {/* Animated Background */}
+        <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
         <div className="max-w-2xl w-full">
           <div className="mb-8 text-center">
             <h1 className={`text-3xl font-bold mb-2`}>Feedback</h1>
