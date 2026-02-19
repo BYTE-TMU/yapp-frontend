@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Calendar, Clock, MapPin, Users, Heart, X } from 'lucide-react';
+import { Clock, MapPin, X } from 'lucide-react';
 import EventModal from './EventModal';
 import { API_BASE_URL } from '@/services/config';
 import { useTheme } from '@/contexts/ThemeContext';
-import { formatEventDate, formatEventTime } from '@/utils/dateTimeUtils';
-import {
-  getProfilePictureUrl,
-  getDefaultProfilePicture,
-} from '@/utils/profileUtils';
+import { formatEventTime } from '@/utils/dateTimeUtils';
+
 import {
   showDeleteConfirmation,
   showEventDeletedSuccess,
