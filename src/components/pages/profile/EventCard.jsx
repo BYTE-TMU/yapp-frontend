@@ -12,13 +12,13 @@ const EventCard = ({ event, onEventClick }) => {
       date: date.toLocaleDateString('en-US', {
         weekday: 'short',
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
       }),
       time: date.toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
-        hour12: true
-      })
+        hour12: true,
+      }),
     };
   };
 
@@ -34,34 +34,34 @@ const EventCard = ({ event, onEventClick }) => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) {
-      return { 
-        status: 'past', 
-        text: 'Past Event', 
-        color: isDarkMode ? 'text-gray-500' : 'text-gray-600' 
+      return {
+        status: 'past',
+        text: 'Past Event',
+        color: 'text-muted-foreground',
       };
     } else if (diffDays === 0) {
-      return { 
-        status: 'today', 
-        text: 'Today', 
-        color: isDarkMode ? 'text-green-400' : 'text-green-600' 
+      return {
+        status: 'today',
+        text: 'Today',
+        color: isDarkMode ? 'text-green-400' : 'text-green-600',
       };
     } else if (diffDays === 1) {
-      return { 
-        status: 'tomorrow', 
-        text: 'Tomorrow', 
-        color: isDarkMode ? 'text-blue-400' : 'text-blue-600' 
+      return {
+        status: 'tomorrow',
+        text: 'Tomorrow',
+        color: isDarkMode ? 'text-blue-400' : 'text-blue-600',
       };
     } else if (diffDays <= 7) {
-      return { 
-        status: 'upcoming', 
-        text: `${diffDays} days`, 
-        color: isDarkMode ? 'text-yellow-400' : 'text-yellow-600' 
+      return {
+        status: 'upcoming',
+        text: `${diffDays} days`,
+        color: isDarkMode ? 'text-yellow-400' : 'text-yellow-600',
       };
     } else {
-      return { 
-        status: 'future', 
-        text: `${diffDays} days`, 
-        color: isDarkMode ? 'text-gray-400' : 'text-gray-500' 
+      return {
+        status: 'future',
+        text: `${diffDays} days`,
+        color: 'text-muted-foreground',
       };
     }
   };
@@ -71,70 +71,55 @@ const EventCard = ({ event, onEventClick }) => {
 
   return (
     <div
-      className={`rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-        isHovered ? 'transform scale-105 shadow-lg' : 'shadow-md'
-      } ${isDarkMode ? '' : 'border border-gray-200'}`}
-      style={{ backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className={`rounded-lg p-4 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg shadow-md border`}
       onClick={() => onEventClick(event)}
     >
       <div className="flex items-start space-x-3">
         {/* Event Icon */}
-        <div className="text-2xl flex-shrink-0">
-          {getEventIcon(0)}
-        </div>
+        <div className="text-2xl shrink-0">{getEventIcon(0)}</div>
 
         {/* Event Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-2">
-            <h4 className={`font-semibold text-sm line-clamp-2 ${
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            }`}>
+            <h4 className={`font-semibold text-sm line-clamp-2 `}>
               {event.title}
             </h4>
-            <span className={`text-xs font-medium ${timeStatus.color} flex-shrink-0 ml-2`}>
+            <span
+              className={`text-xs font-medium ${timeStatus.color} shrink-0 ml-2`}
+            >
               {timeStatus.text}
             </span>
           </div>
 
           {event.description && (
-            <p className={`text-xs line-clamp-2 mb-3 ${
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
-            }`}>
+            <p className={`text-xs line-clamp-2 mb-3 text-muted-foreground`}>
               {event.description}
             </p>
           )}
 
           {/* Event Details */}
           <div className="space-y-1">
-            <div className={`flex items-center text-xs ${
-              isDarkMode ? 'text-gray-400' : 'text-gray-500'
-            }`}>
-              <Calendar className="w-3 h-3 mr-1 flex-shrink-0" />
+            <div className={`flex items-center text-xs text-muted-foreground`}>
+              <Calendar className="w-3 h-3 mr-1 shrink-0" />
               <span>{dateTime.date}</span>
-              <Clock className="w-3 h-3 ml-2 mr-1 flex-shrink-0" />
+              <Clock className="w-3 h-3 ml-2 mr-1 shrink-0" />
               <span>{dateTime.time}</span>
             </div>
 
             {event.location && (
-              <div className={`flex items-center text-xs ${
-                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-              }`}>
-                <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+              <div
+                className={`flex items-center text-xs text-muted-foreground`}
+              >
+                <MapPin className="w-3 h-3 mr-1 shrink-0" />
                 <span className="line-clamp-1">{event.location}</span>
               </div>
             )}
 
-            <div className={`flex items-center text-xs ${
-              isDarkMode ? 'text-gray-400' : 'text-gray-500'
-            }`}>
-              <Users className="w-3 h-3 mr-1 flex-shrink-0" />
+            <div className={`flex items-center text-xs text-muted-foreground`}>
+              <Users className="w-3 h-3 mr-1 shrink-0" />
               <span>{event.attendees_count || 0} attending</span>
               {event.max_attendees && (
-                <span className={`ml-1 ${
-                  isDarkMode ? 'text-gray-500' : 'text-gray-400'
-                }`}>
+                <span className={`ml-1 text-muted-foreground`}>
                   / {event.max_attendees}
                 </span>
               )}
@@ -143,10 +128,8 @@ const EventCard = ({ event, onEventClick }) => {
         </div>
 
         {/* External Link Icon */}
-        <div className="flex-shrink-0">
-          <ExternalLink className={`w-4 h-4 ${
-            isDarkMode ? 'text-gray-500' : 'text-gray-400'
-          }`} />
+        <div className="shrink-0">
+          <ExternalLink className={`w-4 h-4 text-muted-foreground`} />
         </div>
       </div>
     </div>

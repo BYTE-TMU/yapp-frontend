@@ -1,10 +1,7 @@
-import { useTheme } from '../../contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
-import { getDefaultProfilePicture } from '../../utils/profileUtils';
 import UserAvatar from '../badges/UserAvatar';
 
 function ChatHeader({ conversation, getProfilePictureUrl, typingUsers = [] }) {
-  const { isDarkMode } = useTheme();
   const navigate = useNavigate();
 
   // Get typing status text

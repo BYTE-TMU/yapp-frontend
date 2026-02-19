@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Calendar, Clock, MapPin, Users, Heart, X } from 'lucide-react';
+import { Clock, MapPin, X } from 'lucide-react';
 import EventModal from './EventModal';
 import { API_BASE_URL } from '@/services/config';
 
-import { formatEventDate, formatEventTime } from '@/utils/dateTimeUtils';
-import {
-  getProfilePictureUrl,
-  getDefaultProfilePicture,
-} from '@/utils/profileUtils';
+import { formatEventTime } from '@/utils/dateTimeUtils';
+
 import {
   showDeleteConfirmation,
   showEventDeletedSuccess,
@@ -329,10 +326,9 @@ function EventItem() {
                             e.stopPropagation();
                             handleDeleteEvent(event._id);
                           }}
-                          variant="default"
                           size="icon"
                           disabled={deletingEvent === event._id}
-                          className="hover:bg-destructive disabled:bg-gray-500 text-white p-2 rounded-full transition-all duration-200 backdrop-blur-sm hover:scale-110 absolute top-3 right-3 z-10 cursor-pointer"
+                          className="hover:bg-destructive bg-white/30 disabled:bg-gray-500 text-black p-2 rounded-full transition-all duration-200 backdrop-blur-sm hover:scale-110 absolute top-3 right-3 z-10 cursor-pointer"
                           title="Delete Event"
                         >
                           {deletingEvent === event._id ? (

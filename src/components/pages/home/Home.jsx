@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import Sidebar from '../../sidebar/Sidebar';
+import Sidebar from '@/components/sidebar/Sidebar';
 import PostItem from './posts/PostItem';
-import Header from '../../header/Header';
+import Header from '@/components/header/Header';
 import EventItem from './events/EventItem';
 import EventItemModal from './events/EventItemModal';
 import HomepageActivities from './activities/HomepageActivities';
-import { API_BASE_URL } from '../../../services/config';
+import { API_BASE_URL } from '@/services/config';
 
 function Home() {
   const [posts, setPosts] = useState([]);

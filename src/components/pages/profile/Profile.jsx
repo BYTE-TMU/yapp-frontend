@@ -1,6 +1,6 @@
-import Header from '../../header/Header';
-import Sidebar from '../../sidebar/Sidebar';
-import PostItem from '../home/posts/PostItem';
+import Header from '@/components/header/Header';
+import Sidebar from '@/components/sidebar/Sidebar';
+import PostItem from '@/components/pages/home/posts/PostItem';
 import Program from './Program';
 import FriendList from './FriendList'; // Add this import
 import ProfileEvents from './ProfileEvents'; // Add this import
@@ -24,6 +24,7 @@ import {
 
 import { API_BASE_URL } from '../../../services/config';
 import UserAvatar from '@/components/badges/UserAvatar';
+import { Button } from '@/components/ui/button';
 
 const Profile = () => {
   const { userId } = useParams(); // Get userId from URL
@@ -511,32 +512,33 @@ const Profile = () => {
 
                   {/* Edit button for own profile */}
                   {isOwnProfile && !isEditing && (
-                    <button
+                    <Button
                       onClick={() => setIsEditing(true)}
-                      className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-bold transition-colors mt-4 md:mt-0 bg-secondary hover:bg-secondary/80 text-secondary-foreground"
+                      variant="secondary"
+                      className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors mt-4 md:mt-0 hover:bg-secondary/80"
                     >
                       <Edit3 className="w-4 h-4" />
                       <span>Edit Profile</span>
-                    </button>
+                    </Button>
                   )}
                 </div>
 
                 {/* Stats */}
-                <div className="flex space-x-6 mb-4">
+                <div className="flex space-x-6 mb-4 justify-center md:justify-start">
                   <span className="text-foreground">
                     <strong>{profile.posts_count || 0}</strong>
                     <span className="text-muted-foreground"> posts</span>
                   </span>
                   <button
                     onClick={() => setIsFollowerModalOpen(true)}
-                    className="hover:opacity-80 transition-opacity text-foreground"
+                    className="hover:opacity-80 transition-opacity"
                   >
                     <strong>{profile.followers_count || 0}</strong>
                     <span className="text-muted-foreground"> followers</span>
                   </button>
                   <button
                     onClick={() => setIsFollowingModalOpen(true)}
-                    className="hover:opacity-80 transition-opacity text-foreground"
+                    className="hover:opacity-80 transition-opacity"
                   >
                     <strong>{profile.following_count || 0}</strong>
                     <span className="text-muted-foreground"> following</span>
@@ -551,26 +553,25 @@ const Profile = () => {
 
                 {/* Profile Details */}
                 {!isEditing ? (
-                  <div className="space-y-2 gap-2 flex flex-col items-center justify-center md:items-start md:justify-start md:flex-row">
+                  <div className="space-y-2 gap-2 flex flex-col items-center justify-center md:justify-start md:flex-row">
                     {profile.bio && (
                       <p className="text-foreground">{profile.bio}</p>
                     )}
-
                     <div className="flex flex-wrap gap-4 text-sm items-center text-muted-foreground">
                       {profile.program && (
-                        <div className="flex items-center w-full md:w-auto justify-center gap-1">
+                        <div className="flex items-center w-full md:w-auto justify-center gap-2">
                           <GraduationCap className="w-4 h-4" />
                           <span>{profile.program}</span>
                         </div>
                       )}
                       {profile.location && (
-                        <div className="flex items-center w-full md:w-auto justify-center gap-1">
+                        <div className="flex items-center w-full md:w-auto justify-center gap-2">
                           <MapPin className="w-4 h-4" />
                           <span>{profile.location}</span>
                         </div>
                       )}
                       {profile.website && (
-                        <div className="flex items-center w-full md:w-auto justify-center gap-1">
+                        <div className="flex items-center w-full md:w-auto justify-center gap-2">
                           <Globe className="w-4 h-4" />
                           <a
                             href={profile.website}
@@ -582,7 +583,7 @@ const Profile = () => {
                           </a>
                         </div>
                       )}
-                      <div className="flex gap-2 items-center w-full md:w-auto justify-center gap-1">
+                      <div className="flex gap-2 items-center w-full md:w-auto justify-center">
                         <Calendar className="w-4 h-4" />
                         <span>
                           Joined{' '}

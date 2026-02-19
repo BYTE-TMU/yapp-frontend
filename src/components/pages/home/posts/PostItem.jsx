@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Trash2, MoreHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../../../services/config';
-import { useTheme } from '../../../../contexts/ThemeContext'; // Add this import
-import {
-  getProfilePictureUrl,
-  getDefaultProfilePicture,
-} from '../../../../utils/profileUtils';
+import { API_BASE_URL } from '@/services/config';
+import { useTheme } from '@/contexts/ThemeContext';
 import UserAvatar from '@/components/badges/UserAvatar';
 import {
   showLoginRequired,
@@ -279,36 +275,31 @@ function PostItem({ post, onPostDeleted }) {
 
   return (
     <div
-      className={`rounded-lg p-4 md:p-6 font-bold mb-4 transition-all duration-200 hover:shadow-sm hover:scale-101 cursor-pointer relative ${
-        isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-50'
-      }`}
+      className={`rounded-lg p-4 md:p-6 font-bold mb-4 transition-all duration-200 hover:shadow-sm hover:scale-101 cursor-pointer relative  border hover:bg-card `}
       style={{
         fontFamily: 'Albert Sans',
-        backgroundColor: isDarkMode ? '#171717' : '#ffffff',
-        border: isDarkMode ? 'none' : '1px solid #e5e7eb',
       }}
     >
       <div className="flex items-start space-x-3">
         {/* Profile Picture */}
-        <UserAvatar user={post} size="sm" className="border-0" />
+        <UserAvatar
+          user={post}
+          size="sm"
+          redirectOnClick={true}
+          className="border-0"
+        />
 
         <div className="flex-1">
           <div className="flex items-center justify-between mb-2">
             <div className="flex flex-col md:flex-row items-start md:items-center space-x-2">
               <strong
                 onClick={handleUsernameClick}
-                className={`cursor-pointer transition-colors ${
-                  isDarkMode
-                    ? 'text-white hover:text-gray-300'
-                    : 'text-gray-900 hover:text-gray-600'
-                }`}
+                className={`cursor-pointer transition-colors hover:text-muted-foreground`}
               >
                 @{post.username}
               </strong>
               <div
-                className={`text-xs md:text-sm font-extralight ${
-                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                }`}
+                className={`text-xs md:text-sm font-extralight text-muted-foreground`}
               >
                 {formatDate(post.created_at)}
               </div>
@@ -360,15 +351,7 @@ function PostItem({ post, onPostDeleted }) {
           </div>
 
           {/* Post Content */}
-          {post.content && (
-            <p
-              className={`leading-relaxed ${
-                isDarkMode ? 'text-white' : 'text-gray-900'
-              }`}
-            >
-              {post.content}
-            </p>
-          )}
+          {post.content && <p className={`leading-relaxed `}>{post.content}</p>}
 
           {/* Post Images */}
           {renderPostImages()}
@@ -378,11 +361,7 @@ function PostItem({ post, onPostDeleted }) {
             <button
               onClick={handleLike}
               disabled={loading}
-              className={`flex items-center space-x-1 transition-colors disabled:opacity-50 ${
-                isDarkMode
-                  ? 'text-gray-400 hover:text-red-400'
-                  : 'text-gray-500 hover:text-red-500'
-              }`}
+              className={`flex items-center space-x-1 transition-colors disabled:opacity-50 text-muted-foreground hover:text-destructive`}
             >
               <Heart
                 className={`w-5 h-5 ${liked ? 'fill-red-500 text-red-500' : ''}`}
@@ -392,11 +371,7 @@ function PostItem({ post, onPostDeleted }) {
 
             <button
               onClick={handleCommentClick}
-              className={`flex items-center space-x-1 transition-colors ${
-                isDarkMode
-                  ? 'text-gray-400 hover:text-blue-400'
-                  : 'text-gray-500 hover:text-blue-500'
-              }`}
+              className={`flex items-center space-x-1 transition-colors text-muted-foreground hover:text-primary`}
             >
               <MessageCircle className="w-5 h-5" />
               <span className="text-sm font-bold">{post.comments_count}</span>
@@ -410,31 +385,19 @@ function PostItem({ post, onPostDeleted }) {
         <>
           {/* Modal Portal - Fixed to entire viewport */}
           <div
-            className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[9999]"
+            className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-9999"
             onClick={() => setShowDeleteConfirm(false)}
           >
             <div
-              className={`rounded-lg p-4 w-64 shadow-xl ${
-                isDarkMode ? 'bg-[#1c1c1c]' : 'bg-white'
-              }`}
+              className={`rounded-lg p-4 w-64 shadow-xl bg-card`}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-center">
-                <Trash2 className="w-5 h-5 text-red-500 mx-auto mb-2" />
+                <Trash2 className="w-5 h-5 text-destructive mx-auto mb-2" />
 
-                <h3
-                  className={`text-base font-semibold mb-2 ${
-                    isDarkMode ? 'text-white' : 'text-gray-900'
-                  }`}
-                >
-                  Delete Post
-                </h3>
+                <h3 className={`text-base font-semibold mb-2 `}>Delete Post</h3>
 
-                <p
-                  className={`text-xs mb-4 ${
-                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                  }`}
-                >
+                <p className={`text-xs mb-4 text-muted-foreground`}>
                   This action cannot be undone.
                 </p>
 
