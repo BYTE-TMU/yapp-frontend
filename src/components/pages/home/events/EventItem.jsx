@@ -188,6 +188,7 @@ function EventItem() {
     try {
       const response = await fetch(`${API_BASE_URL}/events/${eventId}/cancel`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAuthHeaders(),
       });
 

@@ -103,7 +103,9 @@ function EventItemModal({ isOpen, onClose }) {
             setLoading(true);
             setError('');
             
-            const response = await fetch(`${API_BASE_URL}/events/feed?limit=50&include_past=false`);
+            const response = await fetch(`${API_BASE_URL}/events/feed?limit=50&include_past=false`, {
+                credentials: 'include'
+            });
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -179,6 +181,7 @@ function EventItemModal({ isOpen, onClose }) {
         try {
             const response = await fetch(`${API_BASE_URL}/events/${eventId}/cancel`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: getAuthHeaders(),
             });
 

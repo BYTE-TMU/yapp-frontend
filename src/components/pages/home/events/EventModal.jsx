@@ -62,6 +62,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         `${API_BASE_URL}/events/${event._id}/details`,
         {
           headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         },
       );
 
@@ -103,6 +104,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         `${API_BASE_URL}/events/${event._id}/attend-status`,
         {
           headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         },
       );
       if (response.ok) {
@@ -121,6 +123,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         `${API_BASE_URL}/events/${event._id}/like-status`,
         {
           headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         },
       );
       if (response.ok) {
@@ -139,6 +142,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         `${API_BASE_URL}/events/${event._id}/details`,
         {
           headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         },
       );
       if (response.ok) {
@@ -161,6 +165,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         },
       );
 
@@ -202,6 +207,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
       const response = await fetch(`${API_BASE_URL}/events/${event._id}/like`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
 
       if (response.ok) {

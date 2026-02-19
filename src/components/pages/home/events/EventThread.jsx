@@ -50,7 +50,7 @@ const EventThread = () => {
   const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
     return {
-      'Authorization': `Bearer ${token}`
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
     };
   };
 
@@ -65,6 +65,7 @@ const EventThread = () => {
   const fetchThreadInfo = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/eventthreads/${eventId}/info`, {
+        credentials: 'include',
         headers: getAuthHeaders()
       });
 
@@ -87,6 +88,7 @@ const EventThread = () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/eventthreads/${eventId}/posts?limit=50&sort_order=-1`, {
+        credentials: 'include',
         headers: getAuthHeaders()
       });
 
@@ -111,6 +113,7 @@ const EventThread = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/events/${eventId}/attend`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeaders()
@@ -162,6 +165,7 @@ const EventThread = () => {
 
       const response = await fetch(`${API_BASE_URL}/eventthreads/${eventId}/posts`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAuthHeaders(), // Don't set Content-Type for FormData
         body: formData
       });
@@ -213,6 +217,7 @@ const EventThread = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/eventthreads/posts/${postId}/like`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAuthHeaders()
       });
 
@@ -264,6 +269,7 @@ const EventThread = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/eventthreads/posts/${postId}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: getAuthHeaders()
       });
 
@@ -293,6 +299,7 @@ const EventThread = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/eventthreads/posts/${postId}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeaders()

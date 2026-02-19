@@ -27,11 +27,11 @@ function CommentsPage() {
         try {
             setLoading(true);
             console.log('Fetching comments for postId:', postId); // Debug log
-            
+
             // fetch the posts and comments
             const response = await fetch(`${API_BASE_URL}/comments/post/${postId}`);
             console.log('Response status:', response.status); // Debug log
-            
+
             const data = await response.json();
             console.log('Response data:', data); // Debug log
 
@@ -53,24 +53,21 @@ function CommentsPage() {
 
     const handleSubmitComment = async (e) => {
         e.preventDefault();
-        
+
         if (!newComment.trim()) {
             setError('Comment cannot be empty');
-            return;
-        }
-
-        const token = localStorage.getItem('token');
-        if (!token) {
-            setError('Please login to comment');
             return;
         }
 
         setSubmitting(true);
         setError('');
 
+        const token = localStorage.getItem('token');
+
         try {
             const response = await fetch(`${API_BASE_URL}/comments/create`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -87,7 +84,7 @@ function CommentsPage() {
                 // add the new comment to list
                 setComments(prev => [...prev, data.comment]);
                 setNewComment('');
-                
+
                 // update post comment count
                 setPost(prev => ({
                     ...prev,
@@ -110,6 +107,7 @@ function CommentsPage() {
         try {
             const response = await fetch(`${API_BASE_URL}/comments/${commentId}`, {
                 method: 'DELETE',
+                credentials: 'include',
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -118,7 +116,7 @@ function CommentsPage() {
             if (response.ok) {
                 // remove comment from list
                 setComments(prev => prev.filter(comment => comment._id !== commentId));
-                
+
                 // update post comment count
                 setPost(prev => ({
                     ...prev,
@@ -152,7 +150,7 @@ function CommentsPage() {
     if (loading) {
         return (
             <div className="min-h-screen font-bold" style={{
-                backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
+                backgroundColor: isDarkMode ? '#121212' : '#ffffff',
                 fontFamily: 'Albert Sans'
             }}>
                 <Header />
@@ -167,7 +165,7 @@ function CommentsPage() {
     if (error && !post) {
         return (
             <div className="min-h-screen font-bold" style={{
-                backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
+                backgroundColor: isDarkMode ? '#121212' : '#ffffff',
                 fontFamily: 'Albert Sans'
             }}>
                 <Header />
@@ -177,13 +175,13 @@ function CommentsPage() {
                         <p className="text-red-400 mb-4">Error: {error}</p>
                         <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-6>Post ID: {postId}</p>
                         <div className="space-x-4">
-                            <button 
+                            <button
                                 onClick={() => navigate(-1)}
                                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-bold transition-colors"
                             >
                                 Go Back
                             </button>
-                            <button 
+                            <button
                                 onClick={fetchPostAndComments}
                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold transition-colors"
                             >
@@ -199,7 +197,7 @@ function CommentsPage() {
     if (!post) {
         return (
             <div className="min-h-screen font-bold" style={{
-                backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
+                backgroundColor: isDarkMode ? '#121212' : '#ffffff',
                 fontFamily: 'Albert Sans'
             }}>
                 <Header />
@@ -207,7 +205,7 @@ function CommentsPage() {
                 <div className="ml-64 p-6">
                     <div className="text-center py-12">
                         <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-6>Post not found</p>
-                        <button 
+                        <button
                             onClick={() => navigate(-1)}
                             className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-bold transition-colors"
                         >
@@ -221,12 +219,12 @@ function CommentsPage() {
 
     return (
         <div className="min-h-screen font-bold" style={{
-            backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
+            backgroundColor: isDarkMode ? '#121212' : '#ffffff',
             fontFamily: 'Albert Sans'
         }}>
             <Sidebar />
             <div className="ml-64 p-6">
-                <button 
+                <button
                     onClick={() => navigate(-1)}
                     className="flex items-center space-x-2 mb-6 px-4 py-2 rounded-lg font-bold transition-colors text-white"
                     style={{
@@ -261,20 +259,19 @@ function CommentsPage() {
                             placeholder="Write your comment..."
                             maxLength={500}
                             disabled={submitting}
-                            className={`w-full p-3 border rounded-lg focus:outline-none resize-none h-24 ${
-                                isDarkMode 
-                                    ? 'border-gray-600 text-white placeholder-gray-400 focus:border-gray-400' 
-                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-gray-500'
-                            }`}
+                            className={`w-full p-3 border rounded-lg focus:outline-none resize-none h-24 ${isDarkMode
+                                ? 'border-gray-600 text-white placeholder-gray-400 focus:border-gray-400'
+                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-gray-500'
+                                }`}
                             style={{
                                 backgroundColor: isDarkMode ? '#1c1c1c' : undefined
                             }}
                         />
-                        
+
                         <div className="flex items-center justify-between">
                             <span className="text-gray-400 text-sm">{newComment.length}/500</span>
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 disabled={submitting || !newComment.trim()}
                                 className="px-6 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:opacity-50 text-white rounded-lg font-bold transition-colors"
                             >
@@ -291,9 +288,9 @@ function CommentsPage() {
                 </div>
 
                 {/* Comments List with profile pictures */}
-                <div className="rounded-lg p-6" style={{backgroundColor: '#171717'}}>
+                <div className="rounded-lg p-6" style={{ backgroundColor: '#171717' }}>
                     <h3 className="text-white text-lg font-bold mb-4">Comments ({comments.length})</h3>
-                    
+
                     {comments.length === 0 ? (
                         <p className="text-gray-400 text-center py-8">No comments yet. Be the first to comment!</p>
                     ) : (
@@ -301,7 +298,7 @@ function CommentsPage() {
                             {comments.map((comment) => (
                                 <div key={comment._id} className="border-b border-gray-600 pb-4 last:border-b-0">
                                     <div className="flex items-start space-x-3">
-                                        <img 
+                                        <img
                                             src={getProfilePictureUrl(comment.profile_picture)}
                                             alt={`${comment.username}'s profile`}
                                             onClick={() => navigate(`/profile/${comment.user_id}`)}
@@ -313,7 +310,7 @@ function CommentsPage() {
                                         <div className="flex-1">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center space-x-2 mb-2">
-                                                    <strong 
+                                                    <strong
                                                         onClick={() => navigate(`/profile/${comment.user_id}`)}
                                                         className="text-white hover:text-gray-300 cursor-pointer transition-colors"
                                                     >
@@ -323,10 +320,10 @@ function CommentsPage() {
                                                         {formatDate(comment.created_at)}
                                                     </span>
                                                 </div>
-                                                
+
                                                 {/* show delete button if user owns the comment */}
                                                 {localStorage.getItem('token') && (
-                                                    <button 
+                                                    <button
                                                         onClick={() => deleteComment(comment._id)}
                                                         className="text-gray-400 hover:text-red-400 transition-colors p-1"
                                                     >
@@ -334,7 +331,7 @@ function CommentsPage() {
                                                     </button>
                                                 )}
                                             </div>
-                                            
+
                                             <p className="text-white">{comment.content}</p>
                                         </div>
                                     </div>

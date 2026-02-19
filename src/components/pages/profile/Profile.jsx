@@ -86,6 +86,7 @@ const Profile = () => {
         `${API_BASE_URL}/users/${userId}/start-conversation`,
         {
           method: 'POST',
+          credentials: 'include',
           headers: getAuthHeaders(),
         },
       );
@@ -115,6 +116,7 @@ const Profile = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/users/${userId}/follow`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAuthHeaders(),
       });
 
@@ -155,6 +157,7 @@ const Profile = () => {
 
       const response = await fetch(url, {
         method: 'GET',
+        credentials: 'include',
         headers: getAuthHeaders(),
       });
 
@@ -224,6 +227,7 @@ const Profile = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/users/me`, {
         method: 'PUT',
+        credentials: 'include',
         headers: getAuthHeaders(),
         body: JSON.stringify(editForm),
       });
@@ -420,16 +424,20 @@ const Profile = () => {
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        width: '100%'
+        width: '100%',
       }}
     >
       <Header />
       <Sidebar />
-      <div ref={mainContentRef} className="md:ml-64 flex-1 p-6" style={{
-        overflow: 'auto',
-        WebkitOverflowScrolling: 'touch',
-        paddingBottom: 'env(safe-area-inset-bottom)'
-      }}>
+      <div
+        ref={mainContentRef}
+        className="md:ml-64 flex-1 p-6"
+        style={{
+          overflow: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}
+      >
         <div className="max-w-7xl mx-auto">
           {/* Profile Header */}
           <div

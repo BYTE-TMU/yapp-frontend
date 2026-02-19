@@ -44,18 +44,19 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
       setError(null);
 
       let url;
+      let fetchOptions = { method: 'GET' };
+      
       if (isOwnProfile) {
         // For own profile, use the authenticated endpoint
         url = `${API_BASE_URL}/events/attending?limit=10&include_past=true`;
+        fetchOptions.credentials = 'include';
+        fetchOptions.headers = getAuthHeaders();
       } else {
-        // For other users, use the public endpoint
+        // For other users, use the public endpoint (no auth required)
         url = `${API_BASE_URL}/events/user/${userId}/attending?limit=10&include_past=true`;
       }
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getAuthHeaders(),
-      });
+      const response = await fetch(url, fetchOptions);
 
       if (!response.ok) {
         const errorData = await response.json();
