@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import EventCard from './EventCard';
 import EventModal from '../home/events/EventModal';
 import { Calendar, Users, Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '../../../services/config';
-import { useTheme } from '../../../contexts/ThemeContext'; // Add this import
 
 const ProfileEvents = ({ userId, isOwnProfile }) => {
   const [events, setEvents] = useState([]);
@@ -13,16 +12,15 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const { isDarkMode } = useTheme(); // Add this hook
 
   // Get auth headers
-  const getAuthHeaders = () => {
+  const getAuthHeaders = useCallback(() => {
     const token = localStorage.getItem('token');
     return {
       'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` })
+      ...(token && { Authorization: `Bearer ${token}` }),
     };
-  };
+  }, []);
 
   // Get current user info
   useEffect(() => {
@@ -38,7 +36,7 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
   }, []);
 
   // Fetch user's attending events
-  const fetchUserEvents = async () => {
+  const fetchUserEvents = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -71,14 +69,15 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isOwnProfile, userId, getAuthHeaders]);
 
+  // Fetch events on component mount
   // Fetch events on component mount
   useEffect(() => {
     if (userId || isOwnProfile) {
       fetchUserEvents();
     }
-  }, [userId, isOwnProfile]);
+  }, [userId, isOwnProfile, fetchUserEvents]);
 
   // Handle event card click
   const handleEventClick = (event) => {
@@ -97,67 +96,48 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
     fetchUserEvents();
   };
 
-  const cardBgColor = isDarkMode ? '#171717' : '#ffffff';
-
   if (loading) {
     return (
-    <div className="lg:w-2/5 mb-10">
+      <div className="lg:w-2/5 mb-10">
         {/* Header outside the container */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className={`text-xl font-bold flex items-center ${
-            isDarkMode ? 'text-white' : 'text-gray-900'
-          }`}>
+          <h3 className="text-xl font-bold flex items-center text-foreground">
             <Calendar className="w-5 h-5 mr-2" />
             Events
           </h3>
         </div>
-        
+
         {/* Content container */}
-        <div 
-          className={`rounded-lg p-6 mb-6 ${isDarkMode ? '' : 'border border-gray-200'}`}
-          style={{ backgroundColor: cardBgColor }}
-        >
+        <div className="rounded-lg p-6 mb-6 border border-border bg-card">
           <div className="flex justify-center items-center py-8">
-            <div className={`flex items-center space-x-2 ${
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
-            }`}>
+            <div className="flex items-center space-x-2 text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin" />
               <span>Loading events...</span>
             </div>
           </div>
         </div>
-    </div>
-
+      </div>
     );
   }
 
   if (error) {
     return (
-    <div className="lg:w-2/5 mb-10">
+      <div className="lg:w-2/5 mb-10">
         {/* Header outside the container */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className={`text-xl font-bold flex items-center ${
-            isDarkMode ? 'text-white' : 'text-gray-900'
-          }`}>
+          <h3 className="text-xl font-bold flex items-center text-foreground">
             <Calendar className="w-5 h-5 mr-2" />
             Events
           </h3>
         </div>
-        
+
         {/* Content container */}
-        <div 
-          className={`rounded-lg p-6 mb-6 ${isDarkMode ? '' : 'border border-gray-200'}`}
-          style={{ backgroundColor: cardBgColor }}
-        >
+        <div className="rounded-lg p-6 mb-6 border border-border bg-card">
           <div className="text-center py-8">
-            <p className="text-red-400 mb-4">Error: {error}</p>
-            <button 
+            <p className="text-destructive mb-4">Error: {error}</p>
+            <button
               onClick={fetchUserEvents}
-              className={`px-4 py-2 rounded-lg font-bold transition-colors ${
-                isDarkMode
-                  ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
-              }`}
+              className="px-4 py-2 rounded-lg font-bold transition-colors bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               Try Again
             </button>
@@ -171,20 +151,14 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
     <div className="lg:w-2/5 mb-10">
       {/* Header outside the container */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className={`text-xl font-bold flex items-center ${
-          isDarkMode ? 'text-white' : 'text-gray-900'
-        }`}>
+        <h3 className="text-xl font-bold flex items-center text-foreground">
           <Calendar className="w-5 h-5 mr-2" />
           Events {events.length > 0 && `(${events.length})`}
         </h3>
         {events.length > 0 && (
-          <button 
+          <button
             onClick={refreshEvents}
-            className={`text-sm font-medium transition-colors ${
-              isDarkMode 
-                ? 'text-blue-400 hover:text-blue-300' 
-                : 'text-blue-600 hover:text-blue-500'
-            }`}
+            className="text-sm font-medium transition-colors text-primary hover:text-primary/80"
           >
             Refresh
           </button>
@@ -192,40 +166,33 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
       </div>
 
       {/* Content container */}
-      <div 
-        className={`rounded-lg mb-6 ${events.length > 0 ? '' : 'p-6 border border-gray-200'}`}
-        style={{ backgroundColor: cardBgColor }}
+      <div
+        className={`rounded-lg mb-6 ${events.length > 0 ? '' : 'p-6 border border-border'} bg-card`}
       >
         {events.length > 0 ? (
           <div className="space-y-3">
             {events.map((event) => (
-              <EventCard 
-                key={event._id} 
-                event={event} 
+              <EventCard
+                key={event._id}
+                event={event}
                 onEventClick={handleEventClick}
               />
             ))}
           </div>
         ) : (
           <div className="text-center py-8">
-            <div className={`mb-2 ${
-              isDarkMode ? 'text-gray-400' : 'text-gray-500'
-            }`}>
+            <div className="mb-2 text-muted-foreground">
               <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
             </div>
-            <p className={`${
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
-            }`}>
-              {isOwnProfile 
-                ? "You haven't signed up for any events yet." 
-                : `${userId ? 'This user' : 'They'} haven't signed up for any events yet.`
-              }
+            <p className="text-muted-foreground">
+              {isOwnProfile
+                ? "You haven't signed up for any events yet."
+                : `${userId ? 'This user' : 'They'} haven't signed up for any events yet.`}
             </p>
             {isOwnProfile && (
-              <p className={`text-sm mt-2 ${
-                isDarkMode ? 'text-gray-500' : 'text-gray-500'
-              }`}>
-                Check out the Events section on the home page to discover events!
+              <p className="text-sm mt-2 text-muted-foreground">
+                Check out the Events section on the home page to discover
+                events!
               </p>
             )}
           </div>
@@ -233,30 +200,22 @@ const ProfileEvents = ({ userId, isOwnProfile }) => {
       </div>
 
       {/* Event Modal */}
-      {isModalOpen && selectedEvent && createPortal(
-        <div 
-          className="fixed inset-0 backdrop-blur-sm transition-all duration-300"
-          style={{ 
-            backgroundColor: isDarkMode 
-              ? 'rgba(18, 18, 18, 0.85)' 
-              : 'rgba(0, 0, 0, 0.5)', 
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px'
-          }}
-          onClick={closeModal}
-        >
-          <EventModal
-            event={selectedEvent}
-            isOpen={isModalOpen}
-            onClose={closeModal}
-            currentUser={currentUser}
-          />
-        </div>,
-        document.body
-      )}
+      {isModalOpen &&
+        selectedEvent &&
+        createPortal(
+          <div
+            className="fixed inset-0 backdrop-blur-sm transition-all duration-300 bg-background/80 z-9999 flex items-center justify-center p-5"
+            onClick={closeModal}
+          >
+            <EventModal
+              event={selectedEvent}
+              isOpen={isModalOpen}
+              onClose={closeModal}
+              currentUser={currentUser}
+            />
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };

@@ -3,17 +3,19 @@ import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { Toaster } from 'sonner';
 
 function AppContent() {
-  const { isDarkMode } = useTheme();
-  
+  const { theme } = useTheme();
+
   return (
-    <div className="app-container" style={{ 
-      minHeight: '100vh',
-      backgroundColor: isDarkMode ? '#121212' : '#ffffff',
-      fontFamily: 'Albert Sans',
-      overflow: 'hidden' // Prevent scrollbars during transitions
-    }}>
-      <Toaster 
-        theme={isDarkMode ? 'dark' : 'light'}
+    <div
+      className="app-container bg-background"
+      style={{
+        minHeight: '100vh',
+        fontFamily: 'Albert Sans',
+        overflow: 'hidden', // Prevent scrollbars during transitions
+      }}
+    >
+      <Toaster
+        theme={theme}
         position="top-right"
         richColors
         closeButton
@@ -27,7 +29,7 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider>
-        <AppContent />
+      <AppContent />
     </ThemeProvider>
   );
 }

@@ -1,12 +1,12 @@
-import Header from '../../header/Header';
-import Sidebar from '../../sidebar/Sidebar';
-import PostItem from '../home/posts/PostItem';
+import Header from '@/components/header/Header';
+import Sidebar from '@/components/sidebar/Sidebar';
+import PostItem from '@/components/pages/home/posts/PostItem';
 import Program from './Program';
 import FriendList from './FriendList'; // Add this import
 import ProfileEvents from './ProfileEvents'; // Add this import
 import FollowerModal from './FollowerModal';
 import FollowingModal from './FollowingModal';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Camera,
@@ -21,13 +21,10 @@ import {
   GraduationCap,
   Heart,
 } from 'lucide-react';
-import { useTheme } from '../../../contexts/ThemeContext';
+
 import { API_BASE_URL } from '../../../services/config';
-import {
-  getProfilePictureUrl,
-  getDefaultProfilePicture,
-} from '../../../utils/profileUtils';
 import UserAvatar from '@/components/badges/UserAvatar';
+import { Button } from '@/components/ui/button';
 
 const Profile = () => {
   const { userId } = useParams(); // Get userId from URL
@@ -49,18 +46,18 @@ const Profile = () => {
   const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
   const fileInputRef = useRef(null);
   const mainContentRef = useRef(null);
-  const { isDarkMode } = useTheme();
 
   const isOwnProfile = !userId; // if no userId in URL, it's own profile
 
   // get auth headers
-  const getAuthHeaders = () => {
+  // get auth headers
+  const getAuthHeaders = useCallback(() => {
     const token = localStorage.getItem('token');
     return {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
     };
-  };
+  }, []);
 
   // get auth headers for file upload (without Content-Type)
   const getFileUploadHeaders = () => {
@@ -141,7 +138,7 @@ const Profile = () => {
   };
 
   // Fetch profile (own or other user's)
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       setLoading(true);
       let url;
@@ -218,7 +215,7 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isOwnProfile, userId, getAuthHeaders]);
 
   // update profile (only for own profile)
   const updateProfile = async () => {
@@ -318,7 +315,7 @@ const Profile = () => {
   // Re-fetch when userId changes
   useEffect(() => {
     fetchProfile();
-  }, [userId]);
+  }, [fetchProfile]);
 
   const handleInputChange = (field, value) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
@@ -341,26 +338,21 @@ const Profile = () => {
 
   // Use the centralized profile picture utility
 
-  // Dynamic colors based on theme
-  const headerBgColor = isDarkMode ? '#171717' : '#f8f9fa';
-  const cardBgColor = isDarkMode ? '#171717' : '#ffffff';
-  const inputBgColor = isDarkMode ? '#374151' : '#f9fafb';
+  // Dynamic color classes based on theme
+  const headerBgClass = 'bg-card';
 
   if (loading)
     return (
       <div
-        className="h-screen overflow-hidden font-bold"
+        className="h-screen overflow-hidden font-bold bg-background"
         style={{
-          backgroundColor: isDarkMode ? '#121212' : '#ffffff',
           fontFamily: 'Albert Sans',
         }}
       >
         <Header />
         <Sidebar />
         <div className="ml-64 h-full overflow-y-auto p-6">
-          <p className={isDarkMode ? 'text-white' : 'text-gray-900'}>
-            Loading...
-          </p>
+          <p className="text-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -368,9 +360,8 @@ const Profile = () => {
   if (error)
     return (
       <div
-        className="h-screen overflow-hidden font-bold"
+        className="h-screen overflow-hidden font-bold bg-background"
         style={{
-          backgroundColor: isDarkMode ? '#121212' : '#ffffff',
           fontFamily: 'Albert Sans',
         }}
       >
@@ -378,14 +369,10 @@ const Profile = () => {
         <Sidebar />
         <div className="ml-64 h-full overflow-y-auto p-6">
           <div className="text-center py-12">
-            <p className="text-red-400 mb-4">Error: {error}</p>
+            <p className="text-destructive mb-4">Error: {error}</p>
             <button
               onClick={fetchProfile}
-              className={`px-4 py-2 rounded-lg font-bold transition-colors ${
-                isDarkMode
-                  ? 'bg-orange-600 hover:bg-orange-500 text-white'
-                  : 'bg-orange-500 hover:bg-orange-600 text-white'
-              }`}
+              className="px-4 py-2 rounded-lg font-bold transition-colors bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               Try Again
             </button>
@@ -397,27 +384,23 @@ const Profile = () => {
   if (!profile)
     return (
       <div
-        className="h-screen overflow-hidden font-bold"
+        className="h-screen overflow-hidden font-bold bg-background"
         style={{
-          backgroundColor: isDarkMode ? '#121212' : '#ffffff',
           fontFamily: 'Albert Sans',
         }}
       >
         <Header />
         <Sidebar />
         <div className="ml-64 h-full overflow-y-auto p-6">
-          <p className={isDarkMode ? 'text-white' : 'text-gray-900'}>
-            Profile not found
-          </p>
+          <p className="text-foreground">Profile not found</p>
         </div>
       </div>
     );
 
   return (
     <div
-      className="font-bold"
+      className="font-bold bg-background"
       style={{
-        backgroundColor: isDarkMode ? '#121212' : '#ffffff',
         fontFamily: 'Albert Sans',
         height: '100dvh',
         minHeight: '-webkit-fill-available',
@@ -438,11 +421,15 @@ const Profile = () => {
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}
       >
+        {/* Animated Background */}
+        <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
         <div className="max-w-7xl mx-auto">
           {/* Profile Header */}
           <div
-            className={`rounded-lg p-6 mb-6 ${isDarkMode ? '' : 'border border-gray-200'}`}
-            style={{ backgroundColor: headerBgColor }}
+            className={`rounded-lg p-6 mb-6 border border-border ${headerBgClass}`}
           >
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-6">
               {/* Profile Picture */}
@@ -459,11 +446,7 @@ const Profile = () => {
                   <button
                     onClick={openFilePicker}
                     disabled={uploadingImage}
-                    className={`absolute bottom-2 right-2 p-2 text-white rounded-full transition-colors ${
-                      isDarkMode
-                        ? 'bg-orange-600 hover:bg-orange-500 disabled:bg-gray-600'
-                        : 'bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400'
-                    }`}
+                    className="absolute bottom-2 right-2 p-2 text-white rounded-full transition-colors bg-primary hover:opacity-90 disabled:bg-muted"
                   >
                     <Camera className="w-4 h-4" />
                   </button>
@@ -483,32 +466,20 @@ const Profile = () => {
               <div className="flex-1">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                   <div className="text-center md:text-left">
-                    <h1
-                      className={`text-2xl font-bold flex items-center gap-2 justify-center md:justify-start ${
-                        isDarkMode ? 'text-white' : 'text-gray-900'
-                      }`}
-                    >
+                    <h1 className="text-2xl font-bold flex items-center gap-2 justify-center md:justify-start text-foreground">
                       <span>@{profile.username}</span>
                       {profile.is_verified && (
                         <Check className="w-5 h-5 text-blue-400" />
                       )}
                     </h1>
                     {profile.full_name && (
-                      <p
-                        className={`text-lg ${
-                          isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                        }`}
-                      >
+                      <p className="text-lg text-muted-foreground">
                         {profile.full_name}
                       </p>
                     )}
                     {/* Always show email if available */}
                     {profile.email && (
-                      <p
-                        className={`text-sm text-center md:text-left ${
-                          isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}
-                      >
+                      <p className="text-sm text-center md:text-left text-muted-foreground">
                         {profile.email}
                       </p>
                     )}
@@ -521,10 +492,8 @@ const Profile = () => {
                         onClick={handleFollowToggle}
                         className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-colors ${
                           profile.is_following
-                            ? isDarkMode
-                              ? 'bg-gray-600 hover:bg-gray-500 text-white'
-                              : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-                            : 'bg-blue-600 hover:bg-blue-500 text-white'
+                            ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground'
+                            : 'bg-primary hover:bg-primary/90 text-primary-foreground'
                         }`}
                       >
                         {profile.is_following ? (
@@ -540,11 +509,7 @@ const Profile = () => {
                       <button
                         onClick={handleMessageUser}
                         disabled={messagingUser}
-                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-colors ${
-                          isDarkMode
-                            ? 'bg-gray-600 hover:bg-gray-500 disabled:bg-gray-700 disabled:opacity-50 text-white'
-                            : 'bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:opacity-50 text-gray-800'
-                        }`}
+                        className="flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-colors bg-secondary hover:bg-secondary/80 disabled:opacity-50 text-secondary-foreground"
                       >
                         <MessageCircle className="w-4 h-4" />
                         <span>
@@ -556,104 +521,66 @@ const Profile = () => {
 
                   {/* Edit button for own profile */}
                   {isOwnProfile && !isEditing && (
-                    <button
+                    <Button
                       onClick={() => setIsEditing(true)}
-                      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-bold transition-colors mt-4 md:mt-0 ${
-                        isDarkMode
-                          ? 'bg-gray-600 hover:bg-gray-500 text-white'
-                          : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-                      }`}
+                      variant="secondary"
+                      className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors mt-4 md:mt-0 hover:bg-secondary/80"
                     >
                       <Edit3 className="w-4 h-4" />
                       <span>Edit Profile</span>
-                    </button>
+                    </Button>
                   )}
                 </div>
 
                 {/* Stats */}
-                <div className="flex space-x-6 mb-4">
-                  <span
-                    className={` ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-                  >
+                <div className="flex space-x-6 mb-4 justify-center md:justify-start">
+                  <span className="text-foreground">
                     <strong>{profile.posts_count || 0}</strong>
-                    <span
-                      className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}
-                    >
-                      {' '}
-                      posts
-                    </span>
+                    <span className="text-muted-foreground"> posts</span>
                   </span>
                   <button
                     onClick={() => setIsFollowerModalOpen(true)}
-                    className={`hover:opacity-80 transition-opacity ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+                    className="hover:opacity-80 transition-opacity"
                   >
                     <strong>{profile.followers_count || 0}</strong>
-                    <span
-                      className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}
-                    >
-                      {' '}
-                      followers
-                    </span>
+                    <span className="text-muted-foreground"> followers</span>
                   </button>
                   <button
                     onClick={() => setIsFollowingModalOpen(true)}
-                    className={`hover:opacity-80 transition-opacity ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+                    className="hover:opacity-80 transition-opacity"
                   >
                     <strong>{profile.following_count || 0}</strong>
-                    <span
-                      className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}
-                    >
-                      {' '}
-                      following
-                    </span>
+                    <span className="text-muted-foreground"> following</span>
                   </button>
                   {profile.liked_posts_count !== undefined && (
-                    <span
-                      className={isDarkMode ? 'text-white' : 'text-gray-900'}
-                    >
+                    <span className="text-foreground">
                       <strong>{profile.liked_posts_count}</strong>
-                      <span
-                        className={
-                          isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                        }
-                      >
-                        {' '}
-                        likes
-                      </span>
+                      <span className="text-muted-foreground"> likes</span>
                     </span>
                   )}
                 </div>
 
                 {/* Profile Details */}
                 {!isEditing ? (
-                  <div className="space-y-2 gap-2 flex flex-col items-center justify-center md:items-start md:justify-start md:flex-row">
+                  <div className="space-y-2 gap-2 flex flex-col items-center justify-center md:justify-start md:flex-row">
                     {profile.bio && (
-                      <p
-                        className={isDarkMode ? 'text-white' : 'text-gray-900'}
-                      >
-                        {profile.bio}
-                      </p>
+                      <p className="text-foreground">{profile.bio}</p>
                     )}
-
-                    <div
-                      className={`flex flex-wrap gap-4 text-sm items-center ${
-                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                      }`}
-                    >
+                    <div className="flex flex-wrap gap-4 text-sm items-center text-muted-foreground">
                       {profile.program && (
-                        <div className="flex items-center w-full md:w-auto justify-center gap-1">
+                        <div className="flex items-center w-full md:w-auto justify-center gap-2">
                           <GraduationCap className="w-4 h-4" />
                           <span>{profile.program}</span>
                         </div>
                       )}
                       {profile.location && (
-                        <div className="flex items-center w-full md:w-auto justify-center gap-1">
+                        <div className="flex items-center w-full md:w-auto justify-center gap-2">
                           <MapPin className="w-4 h-4" />
                           <span>{profile.location}</span>
                         </div>
                       )}
                       {profile.website && (
-                        <div className="flex items-center w-full md:w-auto justify-center gap-1">
+                        <div className="flex items-center w-full md:w-auto justify-center gap-2">
                           <Globe className="w-4 h-4" />
                           <a
                             href={profile.website}
@@ -665,7 +592,7 @@ const Profile = () => {
                           </a>
                         </div>
                       )}
-                      <div className="flex gap-2 items-center w-full md:w-auto justify-center gap-1">
+                      <div className="flex gap-2 items-center w-full md:w-auto justify-center">
                         <Calendar className="w-4 h-4" />
                         <span>
                           Joined{' '}
@@ -677,11 +604,7 @@ const Profile = () => {
                 ) : (
                   <div className="space-y-4">
                     <div>
-                      <label
-                        className={`block text-sm mb-1 ${
-                          isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}
-                      >
+                      <label className="block text-sm mb-1 text-foreground">
                         Full Name
                       </label>
                       <input
@@ -691,20 +614,12 @@ const Profile = () => {
                           handleInputChange('full_name', e.target.value)
                         }
                         maxLength={100}
-                        className={`w-full px-3 py-2 border rounded focus:outline-none ${
-                          isDarkMode
-                            ? 'bg-gray-700 border-gray-600 text-white focus:border-gray-400'
-                            : 'bg-white border-gray-300 text-gray-900 focus:border-gray-500'
-                        }`}
+                        className="w-full px-3 py-2 border border-border rounded focus:outline-none bg-muted text-foreground"
                       />
                     </div>
 
                     <div>
-                      <label
-                        className={`block text-sm mb-1 ${
-                          isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}
-                      >
+                      <label className="block text-sm mb-1 text-foreground">
                         Bio
                       </label>
                       <textarea
@@ -713,11 +628,7 @@ const Profile = () => {
                           handleInputChange('bio', e.target.value)
                         }
                         maxLength={500}
-                        className={`w-full px-3 py-2 border rounded h-20 resize-none focus:outline-none ${
-                          isDarkMode
-                            ? 'bg-gray-700 border-gray-600 text-white focus:border-gray-400'
-                            : 'bg-white border-gray-300 text-gray-900 focus:border-gray-500'
-                        }`}
+                        className="w-full px-3 py-2 border border-border rounded h-20 resize-none focus:outline-none bg-muted text-foreground"
                       />
                     </div>
 
@@ -729,11 +640,7 @@ const Profile = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label
-                          className={`block text-sm mb-1 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                          }`}
-                        >
+                        <label className="block text-sm mb-1 text-foreground">
                           Website
                         </label>
                         <input
@@ -743,20 +650,12 @@ const Profile = () => {
                             handleInputChange('website', e.target.value)
                           }
                           placeholder="https://yourwebsite.com"
-                          className={`w-full px-3 py-2 border rounded focus:outline-none ${
-                            isDarkMode
-                              ? 'bg-gray-700 border-gray-600 text-white focus:border-gray-400'
-                              : 'bg-white border-gray-300 text-gray-900 focus:border-gray-500'
-                          }`}
+                          className="w-full px-3 py-2 border border-border rounded focus:outline-none bg-muted text-foreground"
                         />
                       </div>
 
                       <div>
-                        <label
-                          className={`block text-sm mb-1 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                          }`}
-                        >
+                        <label className="block text-sm mb-1 text-foreground">
                           Location
                         </label>
                         <input
@@ -767,11 +666,7 @@ const Profile = () => {
                           }
                           maxLength={100}
                           placeholder="City, Country"
-                          className={`w-full px-3 py-2 border rounded focus:outline-none ${
-                            isDarkMode
-                              ? 'bg-gray-700 border-gray-600 text-white focus:border-gray-400'
-                              : 'bg-white border-gray-300 text-gray-900 focus:border-gray-500'
-                          }`}
+                          className="w-full px-3 py-2 border border-border rounded focus:outline-none bg-muted text-foreground"
                         />
                       </div>
                     </div>
@@ -780,21 +675,13 @@ const Profile = () => {
                     <div className="flex space-x-3 pt-4">
                       <button
                         onClick={handleSave}
-                        className={` px-2 py-1 md:px-6 md:py-2 rounded-lg text-sm md:text-base font-bold transition-colors ${
-                          isDarkMode
-                            ? 'bg-orange-600 hover:bg-orange-500 text-white'
-                            : 'bg-orange-500 hover:bg-orange-600 text-white'
-                        }`}
+                        className="px-2 py-1 md:px-6 md:py-2 rounded-lg text-sm md:text-base font-bold transition-colors bg-primary hover:opacity-90 text-white"
                       >
                         Save Changes
                       </button>
                       <button
                         onClick={handleCancel}
-                        className={`px-6 py-2 rounded-lg font-bold transition-colors ${
-                          isDarkMode
-                            ? 'bg-gray-600 hover:bg-gray-500 text-white'
-                            : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-                        }`}
+                        className="px-6 py-2 rounded-lg font-bold transition-colors bg-muted hover:opacity-80 text-foreground"
                       >
                         Cancel
                       </button>
@@ -816,11 +703,7 @@ const Profile = () => {
             <div className="flex-1 lg:w-3/5">
               {/* Posts Section Header with Liked Posts Button */}
               <div className="flex items-center justify-between mb-6">
-                <h3
-                  className={`text-lg md:text-xl font-bold ${
-                    isDarkMode ? 'text-white' : 'text-gray-900'
-                  }`}
-                >
+                <h3 className="text-lg md:text-xl font-bold text-foreground">
                   Recent Posts{' '}
                   {profile.recent_posts &&
                     profile.recent_posts.length > 0 &&
@@ -831,11 +714,7 @@ const Profile = () => {
                 {isOwnProfile && (
                   <button
                     onClick={handleViewLikedPosts}
-                    className={`flex items-center space-x-2 px-2 py-1 md:px-4 md:py-2 rounded-lg font-bold transition-colors ${
-                      isDarkMode
-                        ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                        : 'bg-white hover:bg-gray-50 text-gray-900 border border-gray-200'
-                    }`}
+                    className="flex items-center space-x-2 px-2 py-1 md:px-4 md:py-2 rounded-lg font-bold transition-colors bg-secondary hover:bg-secondary/80 text-secondary-foreground"
                   >
                     <Heart className="w-4 h-4" />
                     <span>Liked Posts</span>
@@ -856,12 +735,9 @@ const Profile = () => {
               {(!profile.recent_posts || profile.recent_posts.length === 0) && (
                 <div className="text-center py-12">
                   <div
-                    className={`rounded-lg p-8 ${isDarkMode ? '' : 'border border-gray-200'}`}
-                    style={{ backgroundColor: cardBgColor }}
+                    className={`rounded-lg p-8 border border-border bg-card`}
                   >
-                    <p
-                      className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}
-                    >
+                    <p className="text-muted-foreground">
                       {isOwnProfile
                         ? "You haven't posted anything yet."
                         : `${profile.username} hasn't posted anything yet.`}
@@ -880,11 +756,8 @@ const Profile = () => {
       {/* Follower Modal */}
       {isFollowerModalOpen && (
         <div
-          className="fixed inset-0 backdrop-blur-sm transition-all duration-300"
+          className="fixed inset-0 backdrop-blur-sm transition-all duration-300 bg-background/80"
           style={{
-            backgroundColor: isDarkMode
-              ? 'rgba(18, 18, 18, 0.85)'
-              : 'rgba(0, 0, 0, 0.5)',
             zIndex: 9999,
             display: 'flex',
             alignItems: 'center',
@@ -905,11 +778,8 @@ const Profile = () => {
       {/* Following Modal */}
       {isFollowingModalOpen && (
         <div
-          className="fixed inset-0 backdrop-blur-sm transition-all duration-300"
+          className="fixed inset-0 backdrop-blur-sm transition-all duration-300 bg-background/80"
           style={{
-            backgroundColor: isDarkMode
-              ? 'rgba(18, 18, 18, 0.85)'
-              : 'rgba(0, 0, 0, 0.5)',
             zIndex: 9999,
             display: 'flex',
             alignItems: 'center',

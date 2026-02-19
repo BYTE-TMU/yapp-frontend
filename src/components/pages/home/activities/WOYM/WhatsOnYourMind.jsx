@@ -3,8 +3,12 @@ import { useState, useEffect } from 'react';
 import MindPost from './MindPost';
 import { API_BASE_URL } from '../../../../../services/config';
 import { useTheme } from '../../../../../contexts/ThemeContext';
-import { getProfilePictureUrl, getDefaultProfilePicture } from '../../../../../utils/profileUtils';
+import {
+  getProfilePictureUrl,
+  getDefaultProfilePicture,
+} from '../../../../../utils/profileUtils';
 import { showDeleteConfirmation } from '../../../../../utils/toastNotifications';
+import { Button } from '@/components/ui/button';
 
 // Utility: Fisher-Yates shuffle
 function shuffleArray(array) {
@@ -18,8 +22,8 @@ function shuffleArray(array) {
 
 // Reorder posts: posts not by current user first (shuffled), then user's own posts
 function reorderPosts(posts, currentUser) {
-  const others = posts.filter(p => p.username !== currentUser?.username);
-  const own = posts.filter(p => p.username === currentUser?.username);
+  const others = posts.filter((p) => p.username !== currentUser?.username);
+  const own = posts.filter((p) => p.username === currentUser?.username);
   return [...shuffleArray(others), ...own];
 }
 
@@ -32,7 +36,7 @@ export default function WhatsOnYourMind() {
   const [deleting, setDeleting] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const { isDarkMode } = useTheme(); // Add this hook
-  
+
   // Create post state
   const [newPost, setNewPost] = useState('');
   const [posting, setPosting] = useState(false);
@@ -46,21 +50,24 @@ export default function WhatsOnYourMind() {
   const getAuthHeaders = () => {
     // Get the JWT token from localStorage
     const token = localStorage.getItem('token');
-    
-    console.log('🔍 Frontend: Token from localStorage:', token ? 'Token exists' : 'No token found');
-    
+
+    console.log(
+      '🔍 Frontend: Token from localStorage:',
+      token ? 'Token exists' : 'No token found',
+    );
+
     if (!token) {
       console.log('🔍 Frontend: No token, sending basic headers');
       return {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       };
     }
-    
+
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     };
-    
+
     console.log('🔍 Frontend: Sending headers:', headers);
     return headers;
   };
@@ -73,8 +80,8 @@ export default function WhatsOnYourMind() {
       const response = await fetch(`${API_BASE_URL}/users/me`, {
         credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (response.ok) {
@@ -93,25 +100,25 @@ export default function WhatsOnYourMind() {
   const fetchPosts = async () => {
     console.log('🔍 Frontend: Starting fetchPosts...');
     console.log('🔍 Frontend: API_URL:', API_URL);
-    
+
     try {
       const response = await fetch(API_URL, {
         method: 'GET',
         headers: getAuthHeaders(),
         mode: 'cors',
-        credentials: 'include'
+        credentials: 'include',
       });
-      
+
       console.log('🔍 Frontend: Response received:', response);
       console.log('🔍 Frontend: Response status:', response.status);
       console.log('🔍 Frontend: Response ok:', response.ok);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('🔍 Frontend: Error response body:', errorText);
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
-      
+
       const data = await response.json();
       console.log('🔍 Frontend: Data received:', data);
       if (Array.isArray(data)) {
@@ -130,7 +137,7 @@ export default function WhatsOnYourMind() {
 
   const handleCreatePost = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (!newPost.trim()) {
       setError('Please write something before posting.');
@@ -150,7 +157,7 @@ export default function WhatsOnYourMind() {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
-          content: newPost.trim()
+          content: newPost.trim(),
         }),
       });
 
@@ -160,17 +167,16 @@ export default function WhatsOnYourMind() {
       }
 
       const createdPost = await response.json();
-      
+
       // Add user profile data to the created post
       createdPost.username = currentUser?.username || 'You';
       createdPost.profile_picture = currentUser?.profile_picture;
-      
+
       // Add the new post to the beginning of the list (newest first)
-      setPosts(prev => reorderPosts([createdPost, ...prev], currentUser));
-      
+      setPosts((prev) => reorderPosts([createdPost, ...prev], currentUser));
+
       // Reset form
       setNewPost('');
-      
     } catch (err) {
       console.error('Error creating post:', err);
       setError(err.message || 'Failed to create post. Please try again.');
@@ -199,8 +205,12 @@ export default function WhatsOnYourMind() {
       }
 
       // Remove the post from the list
-      setPosts(prev => reorderPosts(prev.filter(p => p._id !== postId), currentUser));
-
+      setPosts((prev) =>
+        reorderPosts(
+          prev.filter((p) => p._id !== postId),
+          currentUser,
+        ),
+      );
     } catch (err) {
       console.error('Error deleting post:', err);
       setError(err.message || 'Failed to delete post. Please try again.');
@@ -215,21 +225,36 @@ export default function WhatsOnYourMind() {
 
   if (loading) {
     return (
-      <div 
-        className={`rounded-lg p-4 ${isDarkMode ? '' : 'border border-gray-200'}`}
-        style={{ backgroundColor: mainBgColor }}
-      >
+      <div className={`rounded-lg p-4 border`}>
         <div className="animate-pulse">
-          <div className="h-4 rounded w-3/4 mb-4" style={{ backgroundColor: loadingBgColor }}></div>
-          <div className="h-20 rounded mb-4" style={{ backgroundColor: loadingBgColor }}></div>
+          <div
+            className="h-4 rounded w-3/4 mb-4"
+            style={{ backgroundColor: loadingBgColor }}
+          ></div>
+          <div
+            className="h-20 rounded mb-4"
+            style={{ backgroundColor: loadingBgColor }}
+          ></div>
           <div className="space-y-4">
             <div className="flex gap-3">
-              <div className="w-10 h-10 rounded-full" style={{ backgroundColor: loadingBgColor }}></div>
-              <div className="flex-1 h-16 rounded" style={{ backgroundColor: loadingBgColor }}></div>
+              <div
+                className="w-10 h-10 rounded-full"
+                style={{ backgroundColor: loadingBgColor }}
+              ></div>
+              <div
+                className="flex-1 h-16 rounded"
+                style={{ backgroundColor: loadingBgColor }}
+              ></div>
             </div>
             <div className="flex gap-3">
-              <div className="w-10 h-10 rounded-full" style={{ backgroundColor: loadingBgColor }}></div>
-              <div className="flex-1 h-12 rounded" style={{ backgroundColor: loadingBgColor }}></div>
+              <div
+                className="w-10 h-10 rounded-full"
+                style={{ backgroundColor: loadingBgColor }}
+              ></div>
+              <div
+                className="flex-1 h-12 rounded"
+                style={{ backgroundColor: loadingBgColor }}
+              ></div>
             </div>
           </div>
         </div>
@@ -238,23 +263,17 @@ export default function WhatsOnYourMind() {
   }
 
   return (
-    <div 
-      className={`rounded-lg p-4 flex flex-col h-full ${isDarkMode ? '' : 'border border-gray-200'}`}
-      style={{ backgroundColor: mainBgColor }}
-    >
+    <div className={`rounded-lg p-4 flex flex-col h-full border`}>
       {/* Header */}
-      <div className="mb-6 flex-shrink-0">
-        <h2 className={`text-xl font-bold mb-4 ${
-          isDarkMode ? 'text-white' : 'text-gray-900'
-        }`}>
-          What's on Your Mind?
-        </h2>
-        
+      <div className="mb-6 shrink-0">
+        <h2 className={`text-xl font-bold mb-4`}>What's on Your Mind?</h2>
+
         {/* Create Post Form */}
         <form onSubmit={handleCreatePost} className="space-y-3">
           <div className="flex gap-3">
             {/* Current User Avatar */}
-            <img 
+            {/* Need to use the UserAvatar component */}
+            <img
               src={getCurrentUserProfilePicture()}
               alt="Your profile"
               onError={(e) => {
@@ -262,36 +281,30 @@ export default function WhatsOnYourMind() {
               }}
               className="w-10 h-10 rounded-full object-cover flex-shrink-0"
             />
-            
+
             {/* Input Field */}
             <div className="flex-1">
               <textarea
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
                 placeholder="What's on your mind?"
-                className={`w-full px-4 py-3 border rounded-lg resize-none focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 ${
-                  isDarkMode
-                    ? 'border-gray-600 text-white placeholder-gray-400'
-                    : 'border-gray-300 text-gray-900 placeholder-gray-500'
-                }`}
-                style={{ backgroundColor: inputBgColor }}
+                className={`w-full px-4 py-3 border rounded-lg resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-muted`}
                 rows={3}
                 maxLength={500}
                 disabled={posting}
               />
               <div className="flex justify-between items-center mt-2">
-                <div className={`text-xs ${
-                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                }`}>
+                <div className={`text-xs text-muted-foreground `}>
                   {newPost.length}/500 characters
                 </div>
-                <button
+                <Button
                   type="submit"
+                  variant="default"
                   disabled={posting || !newPost.trim()}
-                  className="px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-bold transition-colors"
+                  className="disabled:bg-muted-foreground disabled:cursor-not-allowed"
                 >
-                  {posting ? 'Posting...' : 'Send'}
-                </button>
+                  {posting ? 'Posting...' : 'Post'}
+                </Button>
               </div>
             </div>
           </div>
@@ -299,22 +312,17 @@ export default function WhatsOnYourMind() {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-900/20 border border-red-800 text-red-300 rounded-lg flex-shrink-0">
+        <div className="mb-4 p-3 bg-red-900/20 border border-red-800 text-red-300 rounded-lg shrink-0">
           {error}
         </div>
       )}
 
       {/* Posts List */}
       {posts.length === 0 ? (
-        <div 
-          className={`text-center py-12 rounded-lg border flex-1 flex flex-col justify-center ${
-            isDarkMode ? 'border-gray-700' : 'border-gray-300'
-          }`}
-          style={{ backgroundColor: mainBgColor }}
+        <div
+          className={`text-center py-12 rounded-lg border flex-1 flex flex-col justify-center`}
         >
-          <p className={`mb-4 ${
-            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-          }`}>
+          <p className={`mb-4 text-muted-foreground`}>
             No posts yet. Share what's on your mind!
           </p>
         </div>

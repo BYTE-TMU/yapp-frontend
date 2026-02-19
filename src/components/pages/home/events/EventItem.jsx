@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Calendar, Clock, MapPin, Users, Heart, X } from 'lucide-react';
+import { Clock, MapPin, X } from 'lucide-react';
 import EventModal from './EventModal';
 import { API_BASE_URL } from '@/services/config';
-import { useTheme } from '@/contexts/ThemeContext';
-import { formatEventDate, formatEventTime } from '@/utils/dateTimeUtils';
-import {
-  getProfilePictureUrl,
-  getDefaultProfilePicture,
-} from '@/utils/profileUtils';
+
+import { formatEventTime } from '@/utils/dateTimeUtils';
+
 import {
   showDeleteConfirmation,
   showEventDeletedSuccess,
@@ -46,7 +43,6 @@ function EventItem() {
   const [deletingEvent, setDeletingEvent] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { isDarkMode } = useTheme();
 
   // Get current user ID from token
   useEffect(() => {
@@ -253,14 +249,8 @@ function EventItem() {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="flex flex-col items-center space-y-4">
-          <div
-            className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
-              isDarkMode ? 'border-blue-400' : 'border-blue-600'
-            }`}
-          ></div>
-          <div className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-            Loading events...
-          </div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="text-muted-foreground">Loading events...</div>
         </div>
       </div>
     );
@@ -271,18 +261,10 @@ function EventItem() {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-center">
-          <div
-            className={`mb-2 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}
-          >
-            {error}
-          </div>
+          <div className="mb-2 text-destructive">{error}</div>
           <button
             onClick={fetchEvents}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              isDarkMode
-                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
+            className="px-4 py-2 rounded-lg transition-colors bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             Retry
           </button>
@@ -296,9 +278,7 @@ function EventItem() {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-center">
-          <div className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-            No events found
-          </div>
+          <div className="text-muted-foreground">No events found</div>
         </div>
       </div>
     );
@@ -347,10 +327,9 @@ function EventItem() {
                             e.stopPropagation();
                             handleDeleteEvent(event._id);
                           }}
-                          variant="default"
                           size="icon"
                           disabled={deletingEvent === event._id}
-                          className="hover:bg-destructive disabled:bg-gray-500 text-white p-2 rounded-full transition-all duration-200 backdrop-blur-sm hover:scale-110 absolute top-3 right-3 z-10 cursor-pointer"
+                          className="hover:bg-destructive bg-white/30 disabled:bg-gray-500 text-black p-2 rounded-full transition-all duration-200 backdrop-blur-sm hover:scale-110 absolute top-3 right-3 z-10 cursor-pointer"
                           title="Delete Event"
                         >
                           {deletingEvent === event._id ? (
@@ -385,23 +364,15 @@ function EventItem() {
 
                           {/* Location */}
                           {event.location && (
-                            <div
-                              className={`flex gap-2 items-center text-xs ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                              }`}
-                            >
+                            <div className="flex gap-2 items-center text-xs text-muted-foreground">
                               <MapPin className="size-3 " />
                               <span className="truncate">{event.location}</span>
                             </div>
                           )}
                         </div>
                         <div className="flex items-center  w-full justify-between">
-                          <UserBadge
-                            user={event}
-                            username={event.username}
-                            isDarkMode={isDarkMode}
-                          />
-                          <LikeBadge event={event} isDarkMode={isDarkMode} />
+                          <UserBadge user={event} username={event.username} />
+                          <LikeBadge event={event} />
                         </div>
                       </CardDescription>
                     </CardHeader>
@@ -429,15 +400,7 @@ function EventItem() {
       {isModalOpen &&
         createPortal(
           <div
-            className="fixed inset-0 backdrop-blur-sm transition-all duration-300"
-            style={{
-              backgroundColor: 'rgba(18, 18, 18, 0.85)',
-              zIndex: 9999,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '20px',
-            }}
+            className="fixed inset-0 backdrop-blur-sm transition-all duration-300 bg-background/80 z-9999 flex items-center justify-center p-5"
             onClick={closeModal}
           >
             <EventModal

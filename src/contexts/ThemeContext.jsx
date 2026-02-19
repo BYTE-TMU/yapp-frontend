@@ -1,105 +1,64 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-const ThemeContext = createContext();
-
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
+const initialState = {
+  theme: 'system',
+  setTheme: () => null,
 };
 
-export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check localStorage for saved preference, default to dark mode
-    const saved = localStorage.getItem('theme');
-    return saved ? saved === 'dark' : true;
-  });
+const ThemeProviderContext = createContext(initialState);
+
+export function ThemeProvider({
+  children,
+  defaultTheme = 'system',
+  storageKey = 'vite-ui-theme',
+  ...props
+}) {
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem(storageKey) || defaultTheme,
+  );
 
   useEffect(() => {
-    // Save theme preference to localStorage
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    
-    // Apply theme to document
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      document.documentElement.style.backgroundColor = '#121212';
-      document.documentElement.style.color = '#ffffff';
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.style.backgroundColor = '#ffffff';
-      document.documentElement.style.color = '#000000';
-    }
-  }, [isDarkMode]);
+    const root = window.document.documentElement;
 
-  const toggleTheme = () => {
-    setIsDarkMode(prev => !prev);
-  };
+    root.classList.remove('light', 'dark');
+
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+        .matches
+        ? 'dark'
+        : 'light';
+
+      root.classList.add(systemTheme);
+      return;
+    }
+
+    root.classList.add(theme);
+  }, [theme]);
 
   const value = {
-    isDarkMode,
-    toggleTheme,
-    theme: isDarkMode ? 'dark' : 'light'
+    theme,
+    setTheme: (theme) => {
+      localStorage.setItem(storageKey, theme);
+      setTheme(theme);
+    },
+    // Add compatibility helpers if needed, but the goal is to remove them.
+    // However, to avoid immediate crashes before refactoring all components,
+    // I might temporarily add a computed isDarkMode, but the useEffect above relies on system pref.
+    // Better to just refactor the components immediately.
   };
 
   return (
-    <ThemeContext.Provider value={value}>
+    <ThemeProviderContext.Provider {...props} value={value}>
       {children}
-    </ThemeContext.Provider>
+    </ThemeProviderContext.Provider>
   );
-}; 
+}
 
-// const ThemeProviderContextV2 = createContext()
+export const useTheme = () => {
+  const context = useContext(ThemeProviderContext);
 
-// export function ThemeProviderV2({
-//   children,
-//   defaultTheme = "system",
-//   storageKey = "vite-ui-theme",
-//   ...props
-// }) {
-//   const [theme, setTheme] = useState(
-//     () => (localStorage.getItem(storageKey)) || defaultTheme
-//   )
+  if (context === undefined)
+    throw new Error('useTheme must be used within a ThemeProvider');
 
-//   useEffect(() => {
-//     const root = window.document.documentElement
-
-//     root.classList.remove("light", "dark")
-
-//     if (theme === "system") {
-//       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-//         .matches
-//         ? "dark"
-//         : "light"
-
-//       root.classList.add(systemTheme)
-//       return
-//     }
-
-//     root.classList.add(theme)
-//   }, [theme])
-
-//   const value = {
-//     theme,
-//     setTheme: (theme) => {
-//       localStorage.setItem(storageKey, theme)
-//       setTheme(theme)
-//     },
-//   }
-
-//   return (
-//     <ThemeProviderContextV2.Provider {...props} value={value}>
-//       {children}
-//     </ThemeProviderContextV2.Provider>
-//   )
-// }
-
-// export const useThemeV2 = () => {
-//   const context = useContext(ThemeProviderContextV2)
-
-//   if (context === undefined)
-//     throw new Error("useTheme must be used within a ThemeProvider")
-
-//   return context
-// }
+  return context;
+};

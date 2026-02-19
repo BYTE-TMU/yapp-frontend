@@ -5,6 +5,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { cn } from '@/utils/cnUtils';
 import { cva } from 'class-variance-authority';
+import { useNavigate } from 'react-router-dom';
 
 const avatarVariants = cva(
   'rounded-full dark:border-gray-600 border-gray-300',
@@ -24,7 +25,26 @@ const avatarVariants = cva(
   },
 );
 
-function UserAvatar({ user, size, className }) {
+function UserAvatar({ user, size, className, redirectOnClick }) {
+  const navigate = useNavigate();
+  const handleProfilePhotoClick = (e) => {
+    e.stopPropagation();
+    navigate(`/profile/${user.user_id}`);
+  };
+  if (redirectOnClick) {
+    return (
+      <Avatar
+        className={cn(avatarVariants({ size }), className)}
+        onClick={handleProfilePhotoClick}
+      >
+        <AvatarImage
+          src={getProfilePictureUrl(user.profile_picture)}
+          alt={user.username}
+        />
+        <AvatarFallback>{getDefaultProfilePicture()}</AvatarFallback>
+      </Avatar>
+    );
+  }
   return (
     <Avatar className={cn(avatarVariants({ size }), className)}>
       <AvatarImage
