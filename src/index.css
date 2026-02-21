@@ -149,6 +149,20 @@
   animation: float 6s ease-in-out infinite;
 }
 
+@keyframes float-gentle {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 6s ease-in-out infinite;
+}
+
 @keyframes glow {
   0%,
   100% {
@@ -177,6 +191,11 @@
 .animate-gradient {
   background-size: 200% 200%;
   animation: gradient-shift 3s ease infinite;
+}
+
+/* Cursive accent font */
+.font-cursive {
+  font-family: 'Reenie Beanie', cursive;
 }
 
 @theme inline {
