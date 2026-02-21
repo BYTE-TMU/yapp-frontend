@@ -599,7 +599,7 @@ const LandingPage = () => {
               className="h-10 w-auto opacity-70"
             />
             <div className="flex items-center gap-6 text-gray-600 text-sm">
-              <span>&copy; 2025 Yapp. All rights reserved.</span>
+              <span>&copy; {new Date().getFullYear()} Yapp. All rights reserved.</span>
               <Link
                 to="/login"
                 className="hover:text-gray-400 transition-colors"
