@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -19,6 +19,30 @@ import {
 } from 'lucide-react';
 import YappLogo from '../../assets/Yapp White logo.png';
 
+// Hook: returns a ref and whether it has entered the viewport
+const useScrollFade = (threshold = 0.15) => {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { threshold }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
+  return [ref, visible];
+};
+
+const TYPING_TEXTS = [
+  'Connect with your campus community',
+  'Discover amazing events',
+  'Explore TMU like never before',
+  'Join the next generation of campus social',
+];
+
 const LandingPage = () => {
   const [currentFeature, setCurrentFeature] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -26,12 +50,10 @@ const LandingPage = () => {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
 
-  const typingTexts = [
-    'Connect with your campus community',
-    'Discover amazing events',
-    'Explore TMU like never before',
-    'Join the next generation of campus social',
-  ];
+  const [featuresRef, featuresVisible] = useScrollFade();
+  const [platformRef, platformVisible] = useScrollFade();
+  const [ctaRef, ctaVisible] = useScrollFade(0.2);
+  const [footerRef, footerVisible] = useScrollFade(0.1);
 
   useEffect(() => {
     setIsVisible(true);
@@ -48,7 +70,7 @@ const LandingPage = () => {
   useEffect(() => {
     if (!isTyping) return;
 
-    const currentText = typingTexts[currentTextIndex];
+    const currentText = TYPING_TEXTS[currentTextIndex];
 
     if (typedText.length < currentText.length) {
       const timeout = setTimeout(() => {
@@ -58,12 +80,12 @@ const LandingPage = () => {
     } else {
       // Pause before starting next text
       const timeout = setTimeout(() => {
-        setCurrentTextIndex((prev) => (prev + 1) % typingTexts.length);
+        setCurrentTextIndex((prev) => (prev + 1) % TYPING_TEXTS.length);
         setTypedText('');
       }, 2000);
       return () => clearTimeout(timeout);
     }
-  }, [typedText, currentTextIndex, isTyping, typingTexts]);
+  }, [typedText, currentTextIndex, isTyping]);
 
   const features = [
     {
@@ -211,8 +233,8 @@ const LandingPage = () => {
           </h1>
 
           {/* Typing Animation */}
-          <div className="h-8 sm:h-10 mb-8 flex items-center justify-center">
-            <span className="text-lg sm:text-xl text-gray-300">
+          <div className="h-10 sm:h-12 mb-8 flex items-center justify-center overflow-hidden px-4">
+            <span className="text-lg sm:text-xl text-gray-300 text-center">
               {typedText}
               <span className="animate-pulse">|</span>
             </span>
@@ -225,7 +247,7 @@ const LandingPage = () => {
             campus like never before.
           </p>
 
-          <div className="flex flex-row sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 px-4">
             <Link
               to="/signup"
               className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-200 transform hover:scale-105 flex items-center animate-glow"
@@ -242,7 +264,11 @@ const LandingPage = () => {
       </section>
 
       {/* Main Features Section */}
-      <section className="relative z-10 px-4 sm:px-8 py-20">
+      <section
+        ref={featuresRef}
+        className={`relative z-10 px-4 sm:px-8 py-20 transition-all duration-700 ease-out ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+      >
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">
@@ -258,11 +284,10 @@ const LandingPage = () => {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className={`bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8 transition-all duration-500 transform hover:scale-105 ${
-                  currentFeature === index
-                    ? 'border-orange-500/50 shadow-orange-500/25'
-                    : ''
-                }`}
+                className={`bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8 transition-all duration-500 transform hover:scale-105 ${currentFeature === index
+                  ? 'border-orange-500/50 shadow-lg shadow-orange-500/25'
+                  : 'hover:border-white/20'
+                  }`}
               >
                 <div
                   className={`w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white mb-6`}
@@ -291,7 +316,11 @@ const LandingPage = () => {
       </section>
 
       {/* Platform Features Grid */}
-      <section className="relative z-10 px-4 sm:px-8 py-20">
+      <section
+        ref={platformRef}
+        className={`relative z-10 px-4 sm:px-8 py-20 transition-all duration-700 ease-out ${platformVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+      >
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">
@@ -322,7 +351,11 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative z-10 px-4 sm:px-8 py-20">
+      <section
+        ref={ctaRef}
+        className={`relative z-10 px-4 sm:px-8 py-20 transition-all duration-700 ease-out ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+      >
         <div className="max-w-4xl mx-auto text-center">
           <div className="bg-gradient-to-r from-orange-500/10 to-purple-500/10 backdrop-blur-lg border border-white/10 rounded-3xl p-12">
             <h2 className="text-4xl font-bold text-white mb-6">
@@ -352,14 +385,18 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 px-4 sm:px-8 py-12 border-t border-white/10">
+      <footer
+        ref={footerRef}
+        className={`relative z-10 px-4 sm:px-8 py-12 border-t border-white/10 transition-all duration-700 ease-out ${footerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+      >
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
               <img src={YappLogo} alt="Yapp Logo" className="h-16 w-auto" />
             </div>
             <div className="flex items-center space-x-6 text-gray-400">
-              <span>© 2024 Yapp. All rights reserved.</span>
+              <span>© {new Date().getFullYear()} Yapp. All rights reserved.</span>
               <Link to="/login" className="hover:text-white transition-colors">
                 Privacy
               </Link>
