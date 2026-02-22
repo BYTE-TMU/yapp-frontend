@@ -65,6 +65,7 @@ function PostItem({ post, onPostDeleted }) {
       const response = await fetch(
         `${API_BASE_URL}/posts/${post._id}/like-status`,
         {
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -93,6 +94,7 @@ function PostItem({ post, onPostDeleted }) {
     try {
       const response = await fetch(`${API_BASE_URL}/posts/${post._id}/like`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -127,6 +129,7 @@ function PostItem({ post, onPostDeleted }) {
     try {
       const response = await fetch(`${API_BASE_URL}/posts/${post._id}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           Authorization: `Bearer ${token}`,
         },
