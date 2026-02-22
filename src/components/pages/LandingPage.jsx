@@ -9,7 +9,7 @@ import {
   Plus,
 } from 'lucide-react';
 import YappLogo from '../../assets/Yapp White logo.png';
-import loopingVideo from '../../assets/loopingani.mp4';
+import loopingVideo from '../../assets/Make_it_feel_202602212226_rbw0t.mp4';
 
 import appImage0 from '../../assets/image0.jpg';
 import appImage1 from '../../assets/image1.jpg';
@@ -261,7 +261,7 @@ const LandingPage = () => {
   return (
     <div
       className="min-h-screen relative overflow-hidden"
-      style={{ backgroundColor: '#121212', fontFamily: "'Outfit', sans-serif" }}
+      style={{ backgroundColor: '#0d0d0d', fontFamily: "'Outfit', sans-serif" }}
     >
       {/* Grain Overlay */}
       <div
@@ -285,7 +285,7 @@ const LandingPage = () => {
       {/* Floating Pill Nav */}
       <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-3xl">
         <div className="bg-white/[0.07] backdrop-blur-[20px] rounded-full px-5 sm:px-6 py-3 flex items-center justify-between border border-white/[0.08] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)]">
-          <img src={YappLogo} alt="Yapp" className="h-8 w-auto" />
+          <img src={YappLogo} alt="Yapp" className="h-10 w-auto" />
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               to="/login"
@@ -316,7 +316,7 @@ const LandingPage = () => {
           >
             <source src={loopingVideo} type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#121212]/60 via-[#121212]/30 to-[#121212]/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0d0d0d]/60 via-[#0d0d0d]/30 to-[#0d0d0d]/70" />
         </div>
 
         <div className="relative pt-32 sm:pt-40 pb-20 px-4 text-center">
@@ -704,7 +704,7 @@ const LandingPage = () => {
             <img
               src={YappLogo}
               alt="Yapp"
-              className="h-10 w-auto opacity-70"
+              className="h-12 w-auto opacity-70"
             />
             <div className="flex items-center gap-6 text-gray-600 text-sm">
               <span>&copy; {new Date().getFullYear()} Yapp. All rights reserved.</span>
