@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import YappLogo from '../../assets/Yapp White logo.png';
 import loopingVideo from '../../assets/loopingani.mp4';
+
 import appImage0 from '../../assets/image0.jpg';
 import appImage1 from '../../assets/image1.jpg';
 import appImage2 from '../../assets/image2.jpg';
@@ -36,6 +37,92 @@ const useReveal = (threshold = 0.15) => {
   return [ref, isRevealed];
 };
 
+const useMarquee = (speed = 0.5, hoverSpeed = 0.15) => {
+  const containerRef = useRef(null);
+  const trackRef = useRef(null);
+  const offsetRef = useRef(0);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragOffset = useRef(0);
+  const isHovered = useRef(false);
+  const rafRef = useRef(null);
+
+  const animate = useCallback(() => {
+    if (!trackRef.current || !containerRef.current) {
+      rafRef.current = requestAnimationFrame(animate);
+      return;
+    }
+
+    const halfWidth = trackRef.current.scrollWidth / 2;
+
+    if (!isDragging.current) {
+      const currentSpeed = isHovered.current ? hoverSpeed : speed;
+      offsetRef.current -= currentSpeed;
+    }
+
+    if (offsetRef.current <= -halfWidth) {
+      offsetRef.current += halfWidth;
+    } else if (offsetRef.current > 0) {
+      offsetRef.current -= halfWidth;
+    }
+
+    trackRef.current.style.transform = `translateX(${offsetRef.current}px)`;
+    rafRef.current = requestAnimationFrame(animate);
+  }, [speed, hoverSpeed]);
+
+  useEffect(() => {
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [animate]);
+
+  const getClientX = (e) => (e.touches ? e.touches[0].clientX : e.clientX);
+
+  const onDragStart = useCallback((e) => {
+    isDragging.current = true;
+    dragStartX.current = getClientX(e);
+    dragOffset.current = offsetRef.current;
+    if (containerRef.current) containerRef.current.style.cursor = 'grabbing';
+  }, []);
+
+  const onDragMove = useCallback((e) => {
+    if (!isDragging.current) return;
+    const dx = getClientX(e) - dragStartX.current;
+    offsetRef.current = dragOffset.current + dx;
+  }, []);
+
+  const onDragEnd = useCallback(() => {
+    isDragging.current = false;
+    if (containerRef.current) containerRef.current.style.cursor = 'grab';
+  }, []);
+
+  const onMouseEnter = useCallback(() => {
+    isHovered.current = true;
+  }, []);
+
+  const onMouseLeave = useCallback(() => {
+    isHovered.current = false;
+    isDragging.current = false;
+    if (containerRef.current) containerRef.current.style.cursor = 'grab';
+  }, []);
+
+  const containerProps = {
+    ref: containerRef,
+    onMouseEnter,
+    onMouseLeave,
+    onMouseDown: onDragStart,
+    onMouseMove: onDragMove,
+    onMouseUp: onDragEnd,
+    onTouchStart: onDragStart,
+    onTouchMove: onDragMove,
+    onTouchEnd: onDragEnd,
+    style: { cursor: 'grab' },
+  };
+
+  return { containerProps, trackRef };
+};
+
 const LandingPage = () => {
   const [openFaq, setOpenFaq] = useState(null);
   const [typedText, setTypedText] = useState('');
@@ -48,6 +135,7 @@ const LandingPage = () => {
   const [testimonialRef, testimonialRevealed] = useReveal();
   const [faqRef, faqRevealed] = useReveal();
   const [ctaRef, ctaRevealed] = useReveal();
+  const { containerProps: marqueeProps, trackRef: marqueeTrackRef } = useMarquee(0.5, 0.15);
 
   const typingTexts = [
     'Connect with your campus community',
@@ -73,11 +161,18 @@ const LandingPage = () => {
   }, [typedText, currentTextIndex]);
 
   const scenarios = [
+    { time: '7:30 AM', text: 'Check campus buzz before heading out' },
     { time: '8:00 AM', text: 'Find the perfect study spot before class' },
+    { time: '9:15 AM', text: 'Meet a classmate from your tutorial' },
+    { time: '11:00 AM', text: 'Grab coffee at a hidden campus café' },
     { time: '12:30 PM', text: 'Discover new food places on campus' },
+    { time: '2:00 PM', text: 'RSVP to a club event happening tonight' },
     { time: '3:00 PM', text: 'Join a workshop you just heard about' },
+    { time: '4:30 PM', text: 'Find an open room for group practice' },
     { time: '6:00 PM', text: 'Connect with your study group for finals' },
+    { time: '7:45 PM', text: 'Navigate to a pop-up event across campus' },
     { time: '9:00 PM', text: 'Share your campus moments with friends' },
+    { time: '10:30 PM', text: 'Plan tomorrow with your crew' },
   ];
 
   const features = [
@@ -177,18 +272,14 @@ const LandingPage = () => {
         }}
       />
 
-      {/* Video Background */}
-      <div className="absolute inset-0">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-15"
-        >
-          <source src={loopingVideo} type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#121212]/50 via-[#121212]/30 to-[#121212]" />
+      {/* Orange glowing blobs — visible accents behind content */}
+      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+        <div className="absolute top-[25%] left-[5%] w-[350px] h-[350px] bg-orange-500/20 rounded-full blur-[100px] animate-float-gentle" />
+        <div className="absolute top-[40%] right-[10%] w-[300px] h-[300px] bg-orange-500/15 rounded-full blur-[90px] animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[60%] left-[40%] w-[250px] h-[250px] bg-orange-400/20 rounded-full blur-[80px] animate-float-gentle" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-[75%] right-[30%] w-[300px] h-[300px] bg-orange-500/15 rounded-full blur-[100px] animate-float" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-[55%] left-[70%] w-[200px] h-[200px] bg-orange-400/20 rounded-full blur-[70px] animate-float" style={{ animationDelay: '3s' }} />
+        <div className="absolute top-[88%] left-[15%] w-[280px] h-[280px] bg-orange-500/15 rounded-full blur-[90px] animate-float-gentle" style={{ animationDelay: '5s' }} />
       </div>
 
       {/* Floating Pill Nav */}
@@ -213,95 +304,112 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-32 sm:pt-40 pb-20 px-4 text-center">
-        {/* Blurred background blobs */}
-        <div className="absolute top-20 left-[15%] w-72 sm:w-96 h-72 sm:h-96 bg-orange-500/[0.1] rounded-full blur-[120px] animate-float-gentle" />
-        <div
-          className="absolute top-40 right-[15%] w-64 sm:w-80 h-64 sm:h-80 bg-purple-500/[0.07] rounded-full blur-[120px] animate-float-gentle"
-          style={{ animationDelay: '3s' }}
-        />
+      <section className="relative z-10 overflow-hidden">
+        {/* Bold Video Background — hero only */}
+        <div className="absolute inset-0">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover opacity-50"
+          >
+            <source src={loopingVideo} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#121212]/60 via-[#121212]/30 to-[#121212]/70" />
+        </div>
 
-        <div
-          ref={heroRef}
-          className={`max-w-2xl mx-auto ${revealClass(heroRevealed)}`}
-        >
-          <span className="text-orange-400/80 text-sm font-medium tracking-[0.15em] uppercase mb-8 block">
-            The future of campus social
-          </span>
+        <div className="relative pt-32 sm:pt-40 pb-20 px-4 text-center">
+          {/* Blurred background blobs */}
+          <div className="absolute top-20 left-[15%] w-72 sm:w-96 h-72 sm:h-96 bg-orange-500/[0.12] rounded-full blur-[120px] animate-float-gentle" />
+          <div
+            className="absolute top-40 right-[15%] w-64 sm:w-80 h-64 sm:h-80 bg-purple-500/[0.08] rounded-full blur-[120px] animate-float-gentle"
+            style={{ animationDelay: '3s' }}
+          />
 
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.08] mb-6 text-white">
-            Your campus,
-            <br />
-            your{' '}
-            <span className="font-cursive text-orange-400 text-[1.3em] leading-none">
-              community
+          <div
+            ref={heroRef}
+            className={`max-w-2xl mx-auto relative ${revealClass(heroRevealed)}`}
+          >
+            <span className="text-orange-400/90 text-sm font-medium tracking-[0.15em] uppercase mb-8 block drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+              The future of campus social
             </span>
-          </h1>
 
-          <div className="h-8 mb-8 flex items-center justify-center">
-            <span className="text-gray-400 text-lg">
-              {typedText}
-              <span className="animate-pulse text-orange-400">|</span>
-            </span>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.08] mb-6 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
+              Your campus,
+              <br />
+              your{' '}
+              <span className="font-cursive text-orange-400 text-[1.3em] leading-none">
+                community
+              </span>
+            </h1>
+
+            <div className="h-8 mb-8 flex items-center justify-center">
+              <span className="text-gray-300 text-lg drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
+                {typedText}
+                <span className="animate-pulse text-orange-400">|</span>
+              </span>
+            </div>
+
+            <p className="text-gray-300 text-lg leading-relaxed max-w-lg mx-auto mb-10 px-4 drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
+              Yapp is the revolutionary campus social platform designed exclusively
+              for TMU students. Connect with your community, discover events, and
+              explore your campus like never before.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                to="/signup"
+                className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3.5 rounded-full font-semibold text-base transition-all hover:scale-[1.03] shadow-[0_4px_24px_-4px_rgba(249,115,22,0.5)] flex items-center gap-2"
+              >
+                Get started
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                to="/login"
+                className="bg-white/[0.08] hover:bg-white/[0.12] text-white px-8 py-3.5 rounded-full font-medium border border-white/[0.1] transition-all text-base backdrop-blur-sm"
+              >
+                Sign in
+              </Link>
+            </div>
+
+            <p className="text-gray-500 text-sm mt-8 tracking-wide">
+              Verified TMU students only
+            </p>
           </div>
-
-          <p className="text-gray-400 text-lg leading-relaxed max-w-lg mx-auto mb-10 px-4">
-            Yapp is the revolutionary campus social platform designed exclusively
-            for TMU students. Connect with your community, discover events, and
-            explore your campus like never before.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to="/signup"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3.5 rounded-full font-semibold text-base transition-all hover:scale-[1.03] shadow-[0_4px_24px_-4px_rgba(249,115,22,0.5)] flex items-center gap-2"
-            >
-              Get started
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              to="/login"
-              className="bg-white/[0.06] hover:bg-white/[0.1] text-white px-8 py-3.5 rounded-full font-medium border border-white/[0.08] transition-all text-base"
-            >
-              Sign in
-            </Link>
-          </div>
-
-          <p className="text-gray-600 text-sm mt-8 tracking-wide">
-            Verified TMU students only
-          </p>
         </div>
       </section>
 
-      {/* Horizontal Scenario Scroll */}
+      {/* Scrolling Scenario Marquee */}
       <section
         ref={scenarioRef}
         className={`relative z-10 py-16 sm:py-24 ${revealClass(scenarioRevealed)}`}
       >
-        <div className="px-4 sm:px-8 max-w-6xl mx-auto mb-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 mb-10">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight text-center">
             A day with{' '}
             <span className="font-cursive text-orange-400 text-[1.3em]">
               Yapp
             </span>
           </h2>
         </div>
-        <div className="flex gap-4 overflow-x-auto px-4 sm:px-8 pb-4 scrollbar-hide">
-          <div className="flex-shrink-0 w-4 sm:w-0" />
-          {scenarios.map((s, i) => (
-            <div
-              key={i}
-              className="flex-shrink-0 w-72 h-40 bg-white/[0.04] backdrop-blur-sm border border-white/[0.06] rounded-3xl p-6 flex flex-col justify-between hover:border-orange-500/20 transition-all duration-300 group cursor-default"
-            >
-              <span className="text-sm text-gray-600 font-medium">
-                {s.time}
-              </span>
-              <p className="text-lg text-gray-200 font-medium group-hover:text-orange-400 transition-colors duration-300">
-                {s.text}
-              </p>
-            </div>
-          ))}
-          <div className="flex-shrink-0 w-4 sm:w-0" />
+
+        <div className="overflow-hidden select-none" {...marqueeProps}>
+          <div ref={marqueeTrackRef} className="flex w-max gap-4 will-change-transform">
+            {[...scenarios, ...scenarios].map((s, i) => (
+              <div
+                key={i}
+                className="flex-shrink-0 w-72 h-40 bg-white/[0.04] backdrop-blur-sm border border-white/[0.06] rounded-3xl p-6 flex flex-col justify-between hover:border-orange-500/20 transition-colors duration-300 group"
+              >
+                <span className="text-sm text-gray-600 font-medium">
+                  {s.time}
+                </span>
+                <p className="text-lg text-gray-200 font-medium group-hover:text-orange-400 transition-colors duration-300 pointer-events-none">
+                  {s.text}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
