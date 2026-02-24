@@ -305,14 +305,14 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <section className="relative z-10 overflow-hidden">
-        {/* Bold Video Background — hero only */}
+        {/* Bold Video Background — hero only (hidden on mobile for iOS compatibility) */}
         <div className="absolute inset-0">
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-50"
+            className="hidden md:block absolute inset-0 w-full h-full object-cover opacity-50"
           >
             <source src={loopingVideo} type="video/mp4" />
           </video>
