@@ -9,7 +9,7 @@ import {
   Plus,
 } from 'lucide-react';
 import YappLogo from '../../assets/Yapp White logo.png';
-import loopingVideo from '../../assets/Make_it_feel_202602212226_rbw0t.mp4';
+// Video is loaded dynamically only on md+ screens (see useEffect below)
 
 import appImage0 from '../../assets/image0.jpg';
 import appImage1 from '../../assets/image1.jpg';
@@ -127,6 +127,22 @@ const LandingPage = () => {
   const [openFaq, setOpenFaq] = useState(null);
   const [typedText, setTypedText] = useState('');
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [videoSrc, setVideoSrc] = useState(null);
+
+  // Only load the video on md+ screens to avoid downloading 1.5MB on mobile
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 768px)');
+    const handleChange = (e) => {
+      if (e.matches && !videoSrc) {
+        import('../../assets/Make_it_feel_202602212226_rbw0t.mp4').then((mod) =>
+          setVideoSrc(mod.default)
+        );
+      }
+    };
+    handleChange(mql);
+    mql.addEventListener('change', handleChange);
+    return () => mql.removeEventListener('change', handleChange);
+  }, [videoSrc]);
 
   const [heroRef, heroRevealed] = useReveal();
   const [scenarioRef, scenarioRevealed] = useReveal();
@@ -263,28 +279,28 @@ const LandingPage = () => {
       className="min-h-screen relative overflow-hidden"
       style={{ backgroundColor: '#0d0d0d', fontFamily: "'Outfit', sans-serif" }}
     >
-      {/* Grain Overlay */}
+      {/* Grain Overlay — hidden on mobile to reduce GPU compositing */}
       <div
-        className="fixed inset-0 z-50 pointer-events-none mix-blend-soft-light"
+        className="hidden md:block fixed inset-0 z-50 pointer-events-none mix-blend-soft-light"
         style={{
           opacity: 0.12,
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
         }}
       />
 
-      {/* Orange glowing blobs — visible accents behind content */}
+      {/* Orange glowing blobs — keep 2 on mobile, all 6 on desktop */}
       <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
         <div className="absolute top-[25%] left-[5%] w-[350px] h-[350px] bg-orange-500/20 rounded-full blur-[100px] animate-float-gentle" />
-        <div className="absolute top-[40%] right-[10%] w-[300px] h-[300px] bg-orange-500/15 rounded-full blur-[90px] animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-[60%] left-[40%] w-[250px] h-[250px] bg-orange-400/20 rounded-full blur-[80px] animate-float-gentle" style={{ animationDelay: '4s' }} />
+        <div className="hidden md:block absolute top-[40%] right-[10%] w-[300px] h-[300px] bg-orange-500/15 rounded-full blur-[90px] animate-float" style={{ animationDelay: '2s' }} />
+        <div className="hidden md:block absolute top-[60%] left-[40%] w-[250px] h-[250px] bg-orange-400/20 rounded-full blur-[80px] animate-float-gentle" style={{ animationDelay: '4s' }} />
         <div className="absolute top-[75%] right-[30%] w-[300px] h-[300px] bg-orange-500/15 rounded-full blur-[100px] animate-float" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-[55%] left-[70%] w-[200px] h-[200px] bg-orange-400/20 rounded-full blur-[70px] animate-float" style={{ animationDelay: '3s' }} />
-        <div className="absolute top-[88%] left-[15%] w-[280px] h-[280px] bg-orange-500/15 rounded-full blur-[90px] animate-float-gentle" style={{ animationDelay: '5s' }} />
+        <div className="hidden md:block absolute top-[55%] left-[70%] w-[200px] h-[200px] bg-orange-400/20 rounded-full blur-[70px] animate-float" style={{ animationDelay: '3s' }} />
+        <div className="hidden md:block absolute top-[88%] left-[15%] w-[280px] h-[280px] bg-orange-500/15 rounded-full blur-[90px] animate-float-gentle" style={{ animationDelay: '5s' }} />
       </div>
 
       {/* Floating Pill Nav */}
       <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-3xl">
-        <div className="bg-white/[0.07] backdrop-blur-[20px] rounded-full px-5 sm:px-6 py-3 flex items-center justify-between border border-white/[0.08] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)]">
+        <div className="bg-white/[0.07] backdrop-blur-none md:backdrop-blur-[20px] rounded-full px-5 sm:px-6 py-3 flex items-center justify-between border border-white/[0.08] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)]">
           <img src={YappLogo} alt="Yapp" className="h-10 w-auto" />
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
@@ -307,23 +323,25 @@ const LandingPage = () => {
       <section className="relative z-10 overflow-hidden">
         {/* Bold Video Background — hero only (hidden on mobile for iOS compatibility) */}
         <div className="absolute inset-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="hidden md:block absolute inset-0 w-full h-full object-cover opacity-50"
-          >
-            <source src={loopingVideo} type="video/mp4" />
-          </video>
+          {videoSrc && (
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="hidden md:block absolute inset-0 w-full h-full object-cover opacity-50"
+            >
+              <source src={videoSrc} type="video/mp4" />
+            </video>
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-[#0d0d0d]/60 via-[#0d0d0d]/30 to-[#0d0d0d]/70" />
         </div>
 
         <div className="relative pt-32 sm:pt-40 pb-20 px-4 text-center">
-          {/* Blurred background blobs */}
-          <div className="absolute top-20 left-[15%] w-72 sm:w-96 h-72 sm:h-96 bg-orange-500/[0.12] rounded-full blur-[120px] animate-float-gentle" />
+          {/* Blurred background blobs — hidden on mobile */}
+          <div className="hidden md:block absolute top-20 left-[15%] w-72 sm:w-96 h-72 sm:h-96 bg-orange-500/[0.12] rounded-full blur-[120px] animate-float-gentle" />
           <div
-            className="absolute top-40 right-[15%] w-64 sm:w-80 h-64 sm:h-80 bg-purple-500/[0.08] rounded-full blur-[120px] animate-float-gentle"
+            className="hidden md:block absolute top-40 right-[15%] w-64 sm:w-80 h-64 sm:h-80 bg-purple-500/[0.08] rounded-full blur-[120px] animate-float-gentle"
             style={{ animationDelay: '3s' }}
           />
 
@@ -367,7 +385,7 @@ const LandingPage = () => {
               </Link>
               <Link
                 to="/login"
-                className="bg-white/[0.08] hover:bg-white/[0.12] text-white px-8 py-3.5 rounded-full font-medium border border-white/[0.1] transition-all text-base backdrop-blur-sm"
+                className="bg-white/[0.08] hover:bg-white/[0.12] text-white px-8 py-3.5 rounded-full font-medium border border-white/[0.1] transition-all text-base backdrop-blur-none md:backdrop-blur-sm"
               >
                 Sign in
               </Link>
@@ -399,7 +417,7 @@ const LandingPage = () => {
             {[...scenarios, ...scenarios].map((s, i) => (
               <div
                 key={i}
-                className="flex-shrink-0 w-72 h-40 bg-white/[0.04] backdrop-blur-sm border border-white/[0.06] rounded-3xl p-6 flex flex-col justify-between hover:border-orange-500/20 transition-colors duration-300 group"
+                className="flex-shrink-0 w-72 h-40 bg-white/[0.04] backdrop-blur-none md:backdrop-blur-sm border border-white/[0.06] rounded-3xl p-6 flex flex-col justify-between hover:border-orange-500/20 transition-colors duration-300 group"
               >
                 <span className="text-sm text-gray-600 font-medium">
                   {s.time}
@@ -436,7 +454,7 @@ const LandingPage = () => {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-white/[0.04] backdrop-blur-sm border border-white/[0.06] rounded-[2rem] p-8 hover:border-orange-500/20 transition-all duration-500 group"
+                className="bg-white/[0.04] backdrop-blur-none md:backdrop-blur-sm border border-white/[0.06] rounded-[2rem] p-8 hover:border-orange-500/20 transition-all duration-500 group"
               >
                 <div className="w-14 h-14 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-400 mb-6 group-hover:bg-orange-500/15 transition-colors">
                   {feature.icon}
@@ -491,6 +509,7 @@ const LandingPage = () => {
                   src={appImage1}
                   alt="Create Post"
                   className="w-full rounded-[1.5rem]"
+                  loading="lazy"
                 />
               </div>
               <p className="text-center text-gray-600 text-sm mt-4">
@@ -505,6 +524,7 @@ const LandingPage = () => {
                   src={appImage0}
                   alt="Home Feed"
                   className="w-full rounded-[1.5rem]"
+                  loading="lazy"
                 />
               </div>
               <p className="text-center text-gray-600 text-sm mt-4">
@@ -519,6 +539,7 @@ const LandingPage = () => {
                   src={appImage2}
                   alt="Campus Map"
                   className="w-full rounded-[1.5rem]"
+                  loading="lazy"
                 />
               </div>
               <p className="text-center text-gray-600 text-sm mt-4">
@@ -537,6 +558,7 @@ const LandingPage = () => {
                     src={phone.src}
                     alt={phone.label}
                     className="w-full rounded-[1.5rem]"
+                    loading="lazy"
                   />
                 </div>
                 <p className="text-center text-gray-600 text-sm mt-3">
@@ -560,6 +582,7 @@ const LandingPage = () => {
                 src={appImageDesktop}
                 alt="Yapp Desktop"
                 className="w-full rounded-b-[1.25rem]"
+                loading="lazy"
               />
             </div>
             <p className="text-center text-gray-600 text-sm mt-4">
@@ -705,6 +728,7 @@ const LandingPage = () => {
               src={YappLogo}
               alt="Yapp"
               className="h-12 w-auto opacity-70"
+              loading="lazy"
             />
             <div className="flex items-center gap-6 text-gray-600 text-sm">
               <span>&copy; {new Date().getFullYear()} Yapp. All rights reserved.</span>
