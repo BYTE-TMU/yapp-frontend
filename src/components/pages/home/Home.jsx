@@ -86,7 +86,10 @@ function Home() {
         }
       }
 
-      const response = await fetch(url, { headers });
+      const response = await fetch(url, { 
+        credentials: 'include',
+        headers 
+      });
       const data = await response.json();
 
       if (response.ok) {

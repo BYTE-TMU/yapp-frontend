@@ -47,6 +47,7 @@ function Likes() {
       const response = await fetch(
         `${API_BASE_URL}/posts/liked?page=${pageNum}&limit=20`,
         {
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
