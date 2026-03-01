@@ -10,10 +10,10 @@ const getBackendUrl = () => {
     const hostname = window.location.hostname;
     console.log('🔍 Current hostname:', hostname);
     
-    if (hostname.includes('.vercel.app')) {
-        // On Vercel - use Railway backend URL
+    if (hostname.includes('.vercel.app') || hostname.includes('yapp-mu.com')) {
+        // On Vercel / custom domain - use Railway backend URL
         const railwayUrl = 'https://web-production-b77b8.up.railway.app';
-        console.log('✅ Detected Vercel domain, using Railway backend:', railwayUrl);
+        console.log('✅ Detected production domain, using Railway backend:', railwayUrl);
         return railwayUrl;
     }
     
