@@ -47,10 +47,17 @@ function Waypoint() {
   const [isNavigating, setIsNavigating] = useState(false); // Prevent rapid navigation
   const { isDarkMode } = useTheme();
 
-  // Reverse geocode the pin location whenever a new one is set
+  // Reverse geocode the pin location whenever a new one is set.
+  // If the location already carries an address (e.g. from the search bar) skip the API call.
   useEffect(() => {
     if (!newPinLocation) {
       setResolvedAddress(null);
+      return;
+    }
+    // Address pre-filled from autocomplete — no need to reverse-geocode
+    if (newPinLocation.address) {
+      setResolvedAddress(newPinLocation.address);
+      setAddressLoading(false);
       return;
     }
     let cancelled = false;
@@ -927,6 +934,13 @@ function Waypoint() {
     setShowCreateModal(true);
   };
 
+  // Handle a result selected from the search bar:
+  // The map flies to the location (done inside LocationSearchBar).
+  // We just activate placement mode so the user can click the exact spot to drop the waypoint.
+  const handleSearchSelect = () => {
+    setPlacementMode(true);
+  };
+
   // Handle creating waypoint
   const handleCreatePin = (pinData) => {
     createWaypoint(pinData);
@@ -1167,6 +1181,7 @@ function Waypoint() {
             ZOOM_LEVEL={ZOOM_LEVEL}
             targetWaypoint={targetWaypoint}
             shouldOpenPopup={shouldOpenPopup}
+            onSearchSelect={handleSearchSelect}
             // Navigation overlay props
             isNavigatingSaved={isNavigatingSaved}
             currentSavedWaypoint={savedWaypoints[currentSavedIndex]}

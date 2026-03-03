@@ -71,7 +71,8 @@ function WaypointMap({
     currentSavedIndex = -1,
     savedWaypointsCount = 0,
     onPreviousSaved,
-    onNextSaved
+    onNextSaved,
+    onSearchSelect = null,
 }) {
     // Get both current username and user ID
     const currentUsername = getCurrentUser();
@@ -116,8 +117,8 @@ function WaypointMap({
                     maxZoom={19}
                 />
 
-                {/* Address search bar — navigate only, no pin placement */}
-                <LocationSearchBar />
+                {/* Address search bar — navigate + optional waypoint placement */}
+                <LocationSearchBar onSelect={onSearchSelect} />
 
                 {/* Campus Marker */}
                 <Marker position={TMU_COORDS} icon={campusIcon}>
