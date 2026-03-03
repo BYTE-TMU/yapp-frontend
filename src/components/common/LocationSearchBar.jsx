@@ -78,6 +78,13 @@ function LocationSearchBar({ onSelect }) {
     }
   }, [map, onSelect]);
 
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Enter' && results.length > 0) {
+      e.preventDefault();
+      handleSelect(results[0]);
+    }
+  }, [results, handleSelect]);
+
   const handleBlur = useCallback(() => {
     // Small delay so mouseDown on a result can fire before the list disappears
     setTimeout(() => setOpen(false), 150);
@@ -114,6 +121,7 @@ function LocationSearchBar({ onSelect }) {
           type="text"
           value={query}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           onBlur={handleBlur}
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder="Search address…"
