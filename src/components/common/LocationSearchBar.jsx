@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useMap } from 'react-leaflet';
+import L from 'leaflet';
 import { searchAddress } from '../../services/locationiqService';
 
 /**
@@ -20,23 +21,13 @@ function LocationSearchBar({ onSelect }) {
   const containerRef = useRef(null);
   const debounceRef = useRef(null);
 
-  // Stop Leaflet map click/scroll from firing when interacting with the search widget.
-  // We do this with native listeners so we don't accidentally block React's own event
-  // delegation (which L.DomEvent.disableClickPropagation would do).
+  // Stop Leaflet from swallowing mouse/touch/scroll events on the search widget
   useEffect(() => {
     const el = containerRef.current;
-    if (!el) return;
-    const stop = (e) => e.stopPropagation();
-    el.addEventListener('click', stop);
-    el.addEventListener('dblclick', stop);
-    el.addEventListener('contextmenu', stop);
-    el.addEventListener('wheel', stop, { passive: false });
-    return () => {
-      el.removeEventListener('click', stop);
-      el.removeEventListener('dblclick', stop);
-      el.removeEventListener('contextmenu', stop);
-      el.removeEventListener('wheel', stop);
-    };
+    if (el) {
+      L.DomEvent.disableClickPropagation(el);
+      L.DomEvent.disableScrollPropagation(el);
+    }
   }, []);
 
   const handleInputChange = useCallback((e) => {
