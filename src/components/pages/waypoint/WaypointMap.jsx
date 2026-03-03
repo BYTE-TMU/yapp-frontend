@@ -5,6 +5,7 @@ import WaypointPopup from './WaypointPopup.jsx';
 import WaypointLegend from './WaypointLegend.jsx';
 import WaypointStats from './WaypointStats.jsx';
 import WaypointNavigationOverlay from './WaypointNavigationOverlay.jsx';
+import LocationSearchBar from '../../common/LocationSearchBar.jsx';
 
 // Component to handle map clicks
 function MapClickHandler({ placementMode, onMapClick }) {
@@ -114,6 +115,9 @@ function WaypointMap({
                     attribution='© <a href="https://locationiq.com/?ref=maps" target="_blank" rel="noopener">LocationIQ</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
                     maxZoom={19}
                 />
+
+                {/* Address search bar — navigate only, no pin placement */}
+                <LocationSearchBar />
 
                 {/* Campus Marker */}
                 <Marker position={TMU_COORDS} icon={campusIcon}>

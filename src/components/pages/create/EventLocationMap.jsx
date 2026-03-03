@@ -4,6 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useTheme } from '../../../contexts/ThemeContext'; // Add this import
 import { reverseGeocode } from '../../../services/locationiqService';
+import LocationSearchBar from '../../common/LocationSearchBar';
 
 // Fix Leaflet default markers
 delete L.Icon.Default.prototype._getIconUrl;
@@ -85,6 +86,12 @@ function EventLocationMap({
         address: resolved,
       });
     }
+  };
+
+  // Called when the user picks a result from the LocationSearchBar.
+  // The address is already resolved from the autocomplete response.
+  const handleSearchBarSelect = ({ lat, lng, address }) => {
+    onLocationSelect({ lat, lng, address });
   };
 
   const handleClearLocation = () => {
@@ -178,6 +185,9 @@ function EventLocationMap({
                   icon={eventLocationIcon}
                 />
               )}
+
+              {/* Address search bar — navigate + place pin */}
+              <LocationSearchBar onSelect={handleSearchBarSelect} />
 
               {/* Handle map clicks */}
               <MapClickHandler onLocationSelect={handleLocationSelect} />
