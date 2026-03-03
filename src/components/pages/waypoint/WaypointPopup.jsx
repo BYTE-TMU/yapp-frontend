@@ -110,6 +110,14 @@ function WaypointPopup({ waypoint, isOwner, onLike, onBookmark, onDelete, onJoin
                 )}
             </div>
 
+            {/* Human-readable address */}
+            {waypoint.address && (
+                <p className="m-0 mb-2 text-gray-500 text-xs flex items-center gap-1">
+                    <span>📍</span>
+                    <span>{waypoint.address}</span>
+                </p>
+            )}
+
             {/* Event-specific information */}
             {isEventWaypoint && eventDetails && (
                 <div className={`rounded-md p-2 mb-2 border ${

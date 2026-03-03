@@ -186,6 +186,11 @@ function SavedWaypointsNavigator({
                                     <h3 className="font-semibold text-gray-900 truncate">
                                         {currentWaypoint.title}
                                     </h3>
+                                    {currentWaypoint.address && (
+                                        <p className="text-xs text-gray-500 mt-0.5 truncate">
+                                            📍 {currentWaypoint.address}
+                                        </p>
+                                    )}
                                     <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                                         {currentWaypoint.description}
                                     </p>

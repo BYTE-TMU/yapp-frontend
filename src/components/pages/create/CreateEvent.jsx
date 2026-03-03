@@ -65,9 +65,16 @@ function CreateEvent() {
   // Handle location selection from map
   const handleLocationSelect = (locationData) => {
     setEventLocation(locationData);
-    // Auto-populate location title with the address if no title is set
-    if (!locationTitle && locationData.address) {
-      setLocationTitle(locationData.address);
+    // Auto-populate location title with the address.
+    // Also update if the current value is still a raw coordinate string (not yet edited by user).
+    if (locationData.address) {
+      setLocationTitle((prev) => {
+        const isRawCoords = /^-?\d+\.\d+,\s*-?\d+\.\d+$/.test(prev);
+        if (!prev || isRawCoords) {
+          return locationData.address;
+        }
+        return prev;
+      });
     }
   };
 

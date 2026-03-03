@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '../../sidebar/Sidebar.jsx';
 import Header from '../../header/Header';
+import { reverseGeocode } from '../../../services/locationiqService';
 import WaypointModal from './WaypointModal.jsx';
 import WaypointHeader from './WaypointHeader.jsx';
 import WaypointMap from './WaypointMap.jsx';
@@ -30,6 +31,8 @@ function Waypoint() {
   const [waypoints, setWaypoints] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newPinLocation, setNewPinLocation] = useState(null);
+  const [resolvedAddress, setResolvedAddress] = useState(null);
+  const [addressLoading, setAddressLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -43,6 +46,24 @@ function Waypoint() {
   const [isNavigatingSaved, setIsNavigatingSaved] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false); // Prevent rapid navigation
   const { isDarkMode } = useTheme();
+
+  // Reverse geocode the pin location whenever a new one is set
+  useEffect(() => {
+    if (!newPinLocation) {
+      setResolvedAddress(null);
+      return;
+    }
+    let cancelled = false;
+    setResolvedAddress(null);
+    setAddressLoading(true);
+    reverseGeocode(newPinLocation.lat, newPinLocation.lng).then((addr) => {
+      if (!cancelled) {
+        setResolvedAddress(addr);
+        setAddressLoading(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [newPinLocation]);
 
   // TMU Campus coordinates
   const TMU_COORDS = [43.6577, -79.3788];
@@ -244,6 +265,8 @@ function Waypoint() {
             isOwner: currentUsername && waypoint.username === currentUsername,
             liked_users: waypoint.liked_users || [],
             bookmarked_users: waypoint.bookmarked_users || [],
+            // Human-readable address from reverse geocoding
+            address: waypoint.address || null,
             // Event-specific fields
             isAttending: isAttending,
             attendeesCount: attendeesCount,
@@ -365,6 +388,7 @@ function Waypoint() {
           type: waypointData.type,
           latitude: newPinLocation.lat,
           longitude: newPinLocation.lng,
+          address: waypointData.address || resolvedAddress || null,
           expires_in_hours: 24, // Optional: expire after 24 hours
         }),
       });
@@ -1158,9 +1182,12 @@ function Waypoint() {
             onClose={() => {
               setShowCreateModal(false);
               setNewPinLocation(null);
+              setResolvedAddress(null);
             }}
             onSubmit={handleCreatePin}
             location={newPinLocation}
+            address={resolvedAddress}
+            addressLoading={addressLoading}
           />
         </div>
       </div>

@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useTheme } from '../../../contexts/ThemeContext'; // Add this import
+import { reverseGeocode } from '../../../services/locationiqService';
 
 // Fix Leaflet default markers
 delete L.Icon.Default.prototype._getIconUrl;
@@ -67,12 +68,23 @@ function EventLocationMap({
   const TMU_COORDS = [43.6577, -79.3788];
   const ZOOM_LEVEL = 16;
 
-  const handleLocationSelect = (latlng) => {
+  const handleLocationSelect = async (latlng) => {
+    // Immediately emit coordinates so the pin appears right away
     onLocationSelect({
       lat: latlng.lat,
       lng: latlng.lng,
-      address: `${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`,
+      address: `${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}`,
     });
+
+    // Resolve the human-readable address in the background
+    const resolved = await reverseGeocode(latlng.lat, latlng.lng);
+    if (resolved) {
+      onLocationSelect({
+        lat: latlng.lat,
+        lng: latlng.lng,
+        address: resolved,
+      });
+    }
   };
 
   const handleClearLocation = () => {
@@ -154,8 +166,8 @@ function EventLocationMap({
               doubleClickZoom={true}
             >
               <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="© OpenStreetMap contributors"
+                url={`https://{s}-tiles.locationiq.com/v3/streets/r/{z}/{x}/{y}.png?key=${import.meta.env.VITE_LOCATIONIQ_API_KEY}`}
+                attribution='© <a href="https://locationiq.com/?ref=maps" target="_blank" rel="noopener">LocationIQ</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
                 maxZoom={19}
               />
 
