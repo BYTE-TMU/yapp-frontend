@@ -21,6 +21,7 @@ import {
   GraduationCap,
   Heart,
 } from 'lucide-react';
+import LoadingDots from '@/components/common/LoadingDots';
 
 import { API_BASE_URL } from '../../../services/config';
 import UserAvatar from '@/components/badges/UserAvatar';
@@ -351,8 +352,11 @@ const Profile = () => {
       >
         <Header />
         <Sidebar />
-        <div className="ml-64 h-full overflow-y-auto p-6">
-          <p className="text-foreground">Loading...</p>
+        <div className="md:ml-64 h-full overflow-y-auto p-6 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <LoadingDots size={14} />
+            <p className="text-muted-foreground text-sm">Loading profile...</p>
+          </div>
         </div>
       </div>
     );
@@ -490,11 +494,10 @@ const Profile = () => {
                     <div className="flex space-x-3 mt-4 md:mt-0">
                       <button
                         onClick={handleFollowToggle}
-                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-colors ${
-                          profile.is_following
-                            ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground'
-                            : 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                        }`}
+                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-colors ${profile.is_following
+                          ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground'
+                          : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                          }`}
                       >
                         {profile.is_following ? (
                           <UserMinus className="w-4 h-4" />

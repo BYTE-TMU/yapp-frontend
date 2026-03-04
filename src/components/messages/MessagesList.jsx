@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import MessagePerson from './MessagePerson';
 import { useTheme } from '../../contexts/ThemeContext';
 import { messageService } from '../../services/messageService';
+import LoadingDots from '../common/LoadingDots';
 
 function MessagesList({
   conversations,
@@ -75,29 +76,29 @@ function MessagesList({
   // Sort conversations by last_message_at to ensure proper ordering
   const sortedConversations = conversations
     ? [...conversations].sort((a, b) => {
-        const timeA = a.last_message_at || a.created_at;
-        const timeB = b.last_message_at || b.created_at;
+      const timeA = a.last_message_at || a.created_at;
+      const timeB = b.last_message_at || b.created_at;
 
-        if (!timeA && !timeB) return 0;
-        if (!timeA) return 1;
-        if (!timeB) return -1;
+      if (!timeA && !timeB) return 0;
+      if (!timeA) return 1;
+      if (!timeB) return -1;
 
-        // Parse dates and sort in descending order (newest first)
-        try {
-          return new Date(timeB) - new Date(timeA);
-        } catch (error) {
-          console.error('Error sorting conversations:', error);
-          return 0;
-        }
-      })
+      // Parse dates and sort in descending order (newest first)
+      try {
+        return new Date(timeB) - new Date(timeA);
+      } catch (error) {
+        console.error('Error sorting conversations:', error);
+        return 0;
+      }
+    })
     : [];
 
   if (loading) {
     return (
       <div className="h-full flex flex-col">
         <div className="flex-1 flex items-center justify-center pb-20 md:pb-0">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+          <div className="flex flex-col items-center gap-3">
+            <LoadingDots />
             <p>Loading conversations...</p>
           </div>
         </div>

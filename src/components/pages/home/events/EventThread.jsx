@@ -8,6 +8,7 @@ import ETPostsFeed from './thread/ETPostsFeed';
 import { API_BASE_URL } from '../../../../services/config';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import { showLeaveEventError, showNetworkError, showPostMessageError, showDeleteConfirmation } from '../../../../utils/toastNotifications';
+import LoadingDots from '../../../common/LoadingDots';
 
 const EventThread = () => {
   const { eventId } = useParams();
@@ -28,7 +29,7 @@ const EventThread = () => {
     const getCurrentUser = () => {
       const token = localStorage.getItem('token');
       if (!token) return null;
-      
+
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         return payload;
@@ -144,7 +145,7 @@ const EventThread = () => {
 
   const handlePostSubmit = async (e, selectedImages = []) => {
     e.preventDefault();
-    
+
     if ((!newPostContent.trim() && selectedImages.length === 0) || posting) return;
 
     setPosting(true);
@@ -153,11 +154,11 @@ const EventThread = () => {
       const formData = new FormData();
       formData.append('content', newPostContent.trim());
       formData.append('post_type', selectedImages.length > 0 ? 'image' : 'text');
-      
+
       if (replyingTo) {
         formData.append('reply_to', replyingTo._id);
       }
-      
+
       // Append multiple images
       selectedImages.forEach((image, index) => {
         formData.append('image', image);  // All with same name for getlist()
@@ -172,25 +173,25 @@ const EventThread = () => {
 
       if (response.ok) {
         const data = await response.json();
-        
+
         // Use the complete post data from the server response
         const newPost = data.post;
-        
+
         // Add any missing fields that the frontend expects
         newPost.profile_picture = newPost.profile_picture || currentUser.profile_picture;
         newPost.user_full_name = newPost.user_full_name || currentUser.full_name;
         newPost.is_liked_by_user = false;
         newPost.replies = newPost.replies || [];
-        
+
         // The server should already include secure_image_urls if images were uploaded
         if (!newPost.secure_image_urls) {
           newPost.secure_image_urls = [];
         }
 
         if (replyingTo) {
-          setPosts(prevPosts => 
-            prevPosts.map(post => 
-              post._id === replyingTo._id 
+          setPosts(prevPosts =>
+            prevPosts.map(post =>
+              post._id === replyingTo._id
                 ? { ...post, replies: [newPost, ...post.replies], replies_count: post.replies_count + 1 }
                 : post
             )
@@ -223,23 +224,23 @@ const EventThread = () => {
 
       if (response.ok) {
         const data = await response.json();
-        
+
         if (isReply && parentPostId) {
           setPosts(prevPosts =>
             prevPosts.map(post =>
               post._id === parentPostId
                 ? {
-                    ...post,
-                    replies: post.replies.map(reply =>
-                      reply._id === postId
-                        ? {
-                            ...reply,
-                            is_liked_by_user: data.liked,
-                            likes_count: data.liked ? reply.likes_count + 1 : Math.max(0, reply.likes_count - 1)
-                          }
-                        : reply
-                    )
-                  }
+                  ...post,
+                  replies: post.replies.map(reply =>
+                    reply._id === postId
+                      ? {
+                        ...reply,
+                        is_liked_by_user: data.liked,
+                        likes_count: data.liked ? reply.likes_count + 1 : Math.max(0, reply.likes_count - 1)
+                      }
+                      : reply
+                  )
+                }
                 : post
             )
           );
@@ -248,10 +249,10 @@ const EventThread = () => {
             prevPosts.map(post =>
               post._id === postId
                 ? {
-                    ...post,
-                    is_liked_by_user: data.liked,
-                    likes_count: data.liked ? post.likes_count + 1 : Math.max(0, post.likes_count - 1)
-                  }
+                  ...post,
+                  is_liked_by_user: data.liked,
+                  likes_count: data.liked ? post.likes_count + 1 : Math.max(0, post.likes_count - 1)
+                }
                 : post
             )
           );
@@ -279,10 +280,10 @@ const EventThread = () => {
             prevPosts.map(post =>
               post._id === parentPostId
                 ? {
-                    ...post,
-                    replies: post.replies.filter(reply => reply._id !== postId),
-                    replies_count: Math.max(0, post.replies_count - 1)
-                  }
+                  ...post,
+                  replies: post.replies.filter(reply => reply._id !== postId),
+                  replies_count: Math.max(0, post.replies_count - 1)
+                }
                 : post
             )
           );
@@ -313,13 +314,13 @@ const EventThread = () => {
             prevPosts.map(post =>
               post._id === parentPostId
                 ? {
-                    ...post,
-                    replies: post.replies.map(reply =>
-                      reply._id === postId
-                        ? { ...reply, content: newContent, updated_at: new Date().toISOString() }
-                        : reply
-                    )
-                  }
+                  ...post,
+                  replies: post.replies.map(reply =>
+                    reply._id === postId
+                      ? { ...reply, content: newContent, updated_at: new Date().toISOString() }
+                      : reply
+                  )
+                }
                 : post
             )
           );
@@ -364,8 +365,8 @@ const EventThread = () => {
 
   const canEditOrDelete = (post) => {
     return currentUser && (
-      currentUser._id === post.user_id || 
-      currentUser.id === post.user_id || 
+      currentUser._id === post.user_id ||
+      currentUser.id === post.user_id ||
       currentUser.sub === post.user_id
     );
   };
@@ -373,7 +374,7 @@ const EventThread = () => {
   if (error) {
     return (
       <div className="h-screen overflow-hidden font-bold" style={{
-        backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
+        backgroundColor: isDarkMode ? '#121212' : '#ffffff',
         fontFamily: 'Albert Sans'
       }}>
         <Header />
@@ -382,7 +383,7 @@ const EventThread = () => {
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className={`text-lg mb-4 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>{error}</div>
-              <button 
+              <button
                 onClick={() => navigate(-1)}
                 className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-bold transition-colors"
               >
@@ -398,14 +399,14 @@ const EventThread = () => {
   if (!threadInfo) {
     return (
       <div className="h-screen overflow-hidden font-bold" style={{
-        backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
+        backgroundColor: isDarkMode ? '#121212' : '#ffffff',
         fontFamily: 'Albert Sans'
       }}>
         <Header />
         <Sidebar />
         <div className="ml-0 md:ml-64 h-full overflow-y-auto p-4 md:p-6">
           <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+            <LoadingDots />
           </div>
         </div>
       </div>
@@ -414,7 +415,7 @@ const EventThread = () => {
 
   return (
     <div className="h-screen overflow-hidden font-bold" style={{
-      backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
+      backgroundColor: isDarkMode ? '#121212' : '#ffffff',
       fontFamily: 'Albert Sans'
     }}>
       <Header />
@@ -424,7 +425,7 @@ const EventThread = () => {
         <div className="flex-shrink-0 p-3 md:p-6 pb-0">
           <ETHeader threadInfo={threadInfo} onLeaveEvent={handleLeaveEvent} />
         </div>
-        
+
         {/* Fixed Input */}
         <div className="flex-shrink-0 px-3 md:px-6 pb-4">
           <ETInput
@@ -440,7 +441,7 @@ const EventThread = () => {
         </div>
 
         {/* Scrollable Posts Feed */}
-        <div 
+        <div
           ref={mainContentRef}
           className="flex-1 overflow-y-auto px-3 md:px-6 pb-6 scrollbar-custom"
         >
