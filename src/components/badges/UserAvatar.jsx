@@ -2,7 +2,7 @@ import {
   getDefaultProfilePicture,
   getProfilePictureUrl,
 } from '@/utils/profileUtils';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/utils/cnUtils';
 import { cva } from 'class-variance-authority';
 import { useNavigate } from 'react-router-dom';

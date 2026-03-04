@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { API_BASE_URL } from '../../services/config';
+import { API_BASE_URL } from '@/services/config';
 import EmailVerification from './EmailVerification'; // Import the verification component
 
 function RegisterForm() {

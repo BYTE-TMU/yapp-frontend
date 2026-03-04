@@ -9,8 +9,8 @@ import {
   MapPin,
   Send,
 } from 'lucide-react';
-import YappLogoDark from '../../assets/Yapp White logo.png';
-import YappLogoLight from '../../assets/yapp_light_mode.png';
+import YappLogoDark from '@/assets/Yapp White logo.png';
+import YappLogoLight from '@/assets/yapp_light_mode.png';
 
 function Header() {
   const location = useLocation();

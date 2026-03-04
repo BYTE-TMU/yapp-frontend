@@ -164,7 +164,6 @@ function Home() {
           fontFamily: 'Albert Sans',
         }}
       >
-        <Header />
         <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <LoadingDots size={14} />
@@ -176,12 +175,7 @@ function Home() {
   }
 
   return (
-    <div
-      className="h-screen overflow-hidden font-bold bg-background"
-      style={{
-        fontFamily: 'Albert Sans',
-      }}
-    >
+    <div className="h-screen overflow-hidden font-bold bg-background">
       <div
         ref={mainContentRef}
         className="h-full w-fill md:ml-64 mt-10 md:mt-0 overflow-y-auto p-6 pb-20 md:pb-6 scrollbar-custom"
@@ -218,20 +212,22 @@ function Home() {
                 <div className="flex items-center gap-2 text-sm">
                   <button
                     onClick={() => handleFeedTypeChange('recent')}
-                    className={`transition-colors ${feedType === 'recent'
-                      ? 'text-primary font-semibold'
-                      : 'text-muted-foreground hover:text-foreground'
-                      }`}
+                    className={`transition-colors ${
+                      feedType === 'recent'
+                        ? 'text-primary font-semibold'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
                   >
                     Recent
                   </button>
                   <span className="text-muted-foreground">|</span>
                   <button
                     onClick={() => handleFeedTypeChange('following')}
-                    className={`transition-colors ${feedType === 'following'
-                      ? 'text-primary font-semibold'
-                      : 'text-muted-foreground hover:text-foreground'
-                      }`}
+                    className={`transition-colors ${
+                      feedType === 'following'
+                        ? 'text-primary font-semibold'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
                   >
                     Following
                   </button>

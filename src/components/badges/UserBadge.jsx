@@ -1,5 +1,5 @@
 import UserAvatar from './UserAvatar';
-import { Badge } from '../ui/badge';
+import { Badge } from '@/components/ui/badge';
 
 function UserBadge({ user, username, withImage = true }) {
   return (

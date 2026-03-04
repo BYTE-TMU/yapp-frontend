@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import UserAvatar from '../badges/UserAvatar';
+import UserAvatar from '@/components/badges/UserAvatar';
 
 function ChatHeader({ conversation, getProfilePictureUrl, typingUsers = [] }) {
   const navigate = useNavigate();
