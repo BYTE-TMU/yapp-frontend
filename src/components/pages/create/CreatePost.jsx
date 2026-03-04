@@ -203,6 +203,7 @@ function CreatePost() {
 
         const response = await fetch(`${API_BASE_URL}/posts/upload-image`, {
           method: 'POST',
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -252,6 +253,7 @@ function CreatePost() {
 
       const response = await fetch(`${API_BASE_URL}/posts/create`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
