@@ -1,7 +1,5 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../../sidebar/Sidebar';
-import Header from '../../header/Header';
 import {
   LogOut,
   Settings as SettingsIcon,
@@ -169,14 +167,7 @@ function Settings() {
   };
 
   return (
-    <div
-      className="h-screen overflow-hidden font-bold bg-background text-foreground"
-      style={{
-        fontFamily: 'Albert Sans',
-      }}
-    >
-      <Header />
-      <Sidebar />
+    <div className="h-screen overflow-hidden font-bold bg-background text-foreground mt-12 md:mt-0 mb-16 md:mb-0">
       <div
         ref={mainContentRef}
         className="ml-0 md:ml-64 h-full overflow-y-auto p-4 sm:p-5 md:p-6"

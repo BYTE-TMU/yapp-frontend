@@ -1,5 +1,3 @@
-import Header from '@/components/header/Header';
-import Sidebar from '@/components/sidebar/Sidebar';
 import PostItem from '@/components/pages/home/posts/PostItem';
 import Program from './Program';
 import FriendList from './FriendList'; // Add this import
@@ -349,8 +347,6 @@ const Profile = () => {
           fontFamily: 'Albert Sans',
         }}
       >
-        <Header />
-        <Sidebar />
         <div className="ml-64 h-full overflow-y-auto p-6">
           <p className="text-foreground">Loading...</p>
         </div>
@@ -365,8 +361,6 @@ const Profile = () => {
           fontFamily: 'Albert Sans',
         }}
       >
-        <Header />
-        <Sidebar />
         <div className="ml-64 h-full overflow-y-auto p-6">
           <div className="text-center py-12">
             <p className="text-destructive mb-4">Error: {error}</p>
@@ -389,8 +383,6 @@ const Profile = () => {
           fontFamily: 'Albert Sans',
         }}
       >
-        <Header />
-        <Sidebar />
         <div className="ml-64 h-full overflow-y-auto p-6">
           <p className="text-foreground">Profile not found</p>
         </div>
@@ -399,24 +391,16 @@ const Profile = () => {
 
   return (
     <div
-      className="font-bold bg-background"
+      className="font-bold bg-background mt-10 md:mt-0 mb-2 md:mb-0 w-screen flex flex-col overflow-hidden"
       style={{
-        fontFamily: 'Albert Sans',
         height: '100dvh',
         minHeight: '-webkit-fill-available',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
       }}
     >
-      <Header />
-      <Sidebar />
       <div
         ref={mainContentRef}
-        className="md:ml-64 flex-1 p-6"
+        className="md:ml-64 flex-1 p-6 overflow-auto"
         style={{
-          overflow: 'auto',
           WebkitOverflowScrolling: 'touch',
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}

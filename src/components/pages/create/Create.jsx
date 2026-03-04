@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import Sidebar from '@/components/sidebar/Sidebar';
-import Header from '@/components/header/Header';
 import CreatePost from './CreatePost';
 import CreateEvent from './CreateEvent';
 
@@ -19,10 +17,7 @@ function Create() {
         fontFamily: 'Albert Sans',
       }}
     >
-      <Header />
-      <Sidebar />
-
-      <div className="md:ml-64 h-full overflow-y-auto relative pb-20 md:pb-6 scrollbar-hide md:scrollbar-custom">
+      <div className="md:ml-64 h-full mt-12 md:mt-0 overflow-y-auto relative pb-20 md:pb-6 scrollbar-hide md:scrollbar-custom">
         {/* Animated Background */}
         <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>

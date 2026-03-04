@@ -6,8 +6,6 @@ import {
   CheckCircle,
   ArrowLeft,
 } from 'lucide-react';
-import Sidebar from '../sidebar/Sidebar';
-import Header from '../header/Header';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../services/config';
 import { Button } from '../ui/button';
@@ -75,8 +73,6 @@ function Feedback() {
   if (submitSuccess && !submitted) {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col md:flex-row">
-        <Header />
-        <Sidebar />
         <div className="flex-1 p-8 flex justify-center items-center">
           <div className="text-center">
             <div className="animate-bounce">
@@ -95,8 +91,6 @@ function Feedback() {
   if (submitted) {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col md:flex-row">
-        <Header />
-        <Sidebar />
         <div className="flex-1 p-8 flex justify-center">
           <div className="max-w-2xl w-full text-center">
             <div className="bg-linear-to-br from-green-500/20 to-blue-500/20 border border-green-500 rounded-xl p-10 shadow-2xl">
@@ -153,9 +147,7 @@ function Feedback() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row md:ml-64">
-      <Header />
-      <Sidebar />
+    <div className="min-h-screen flex flex-col md:flex-row md:ml-64 mt-12 md:mt-0 mb-12 md:mb-0">
       <div className="flex-1 p-8 flex justify-center mb-16">
         {/* Animated Background */}
         <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">

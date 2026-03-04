@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Search, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom'; // Add this import
-import Sidebar from '../sidebar/Sidebar';
-import Header from '../header/Header';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../services/config';
 import UserAvatar from '../badges/UserAvatar';
@@ -87,14 +85,7 @@ function Users() {
   const skeletonElementBg = isDarkMode ? '#374151' : '#d1d5db';
 
   return (
-    <div
-      className="min-h-screen font-bold w-screen"
-      style={{
-        fontFamily: 'Albert Sans',
-      }}
-    >
-      <Header />
-      <Sidebar />
+    <div className="min-h-screen font-bold w-screen mt-10 md:mt-0">
       <div className="md:ml-64 p-6">
         {/* Animated Background */}
         <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">

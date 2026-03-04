@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2 } from 'lucide-react';
-import Header from '../header/Header';
-import Sidebar from '../sidebar/Sidebar';
 import PostItem from './home/posts/PostItem';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../services/config';
@@ -157,8 +155,6 @@ function CommentsPage() {
           fontFamily: 'Albert Sans',
         }}
       >
-        <Header />
-        <Sidebar />
         <div className="ml-64 p-6">
           <p className={isDarkMode ? 'text-white' : 'text-gray-900'}>
             Loading...
@@ -176,8 +172,6 @@ function CommentsPage() {
           fontFamily: 'Albert Sans',
         }}
       >
-        <Header />
-        <Sidebar />
         <div className="ml-64 p-6">
           <div className="text-center py-12">
             <p className="text-red-400 mb-4">Error: {error}</p>
@@ -212,8 +206,6 @@ function CommentsPage() {
           fontFamily: 'Albert Sans',
         }}
       >
-        <Header />
-        <Sidebar />
         <div className="ml-64 p-6">
           <div className="text-center py-12">
             <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-6>
@@ -233,13 +225,11 @@ function CommentsPage() {
 
   return (
     <div
-      className="min-h-screen font-bold"
+      className="min-h-screen font-bold mt-12 md:mt-0 mb-12 md:mb-0"
       style={{
         fontFamily: 'Albert Sans',
       }}
     >
-      <Header />
-      <Sidebar />
       <div className="md:ml-64 p-6">
         {/* Animated Background */}
         <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">

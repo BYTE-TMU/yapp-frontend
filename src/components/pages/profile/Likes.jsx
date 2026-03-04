@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import Header from '../../header/Header';
-import Sidebar from '../../sidebar/Sidebar';
 import PostItem from '../home/posts/PostItem';
 import { API_BASE_URL } from '../../../services/config';
 import { useTheme } from '../../../contexts/ThemeContext';
@@ -94,13 +92,11 @@ function Likes() {
 
   return (
     <div
-      className="h-screen overflow-hidden font-bold"
+      className="h-screen overflow-hidden font-bold mt-10 md:mt-0 mb-12 md:mb-0"
       style={{
         fontFamily: 'Albert Sans',
       }}
     >
-      <Header />
-      <Sidebar />
       <div ref={mainContentRef} className="md:ml-64 h-full overflow-y-auto p-6">
         {/* Animated Background */}
         <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">

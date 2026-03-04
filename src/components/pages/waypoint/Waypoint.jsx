@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import Sidebar from '../../sidebar/Sidebar.jsx';
-import Header from '../../header/Header';
 import WaypointModal from './WaypointModal.jsx';
 import WaypointHeader from './WaypointHeader.jsx';
 import WaypointMap from './WaypointMap.jsx';
@@ -1068,8 +1066,6 @@ function Waypoint() {
           fontFamily: 'Albert Sans',
         }}
       >
-        <Header />
-        <Sidebar />
         <div className="ml-64 h-full overflow-y-auto p-6 pb-16 md:pb-6">
           <div className="max-w-full mx-auto h-full flex items-center justify-center">
             <div className="text-center">
@@ -1096,9 +1092,7 @@ function Waypoint() {
         fontFamily: 'Albert Sans',
       }}
     >
-      <Header />
-      <Sidebar />
-      <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6">
+      <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6 mt-12 md:mt-0 mb-16 md:mb-0">
         {/* Animated Background */}
         <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>

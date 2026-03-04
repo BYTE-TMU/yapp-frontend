@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Header from '../header/Header';
-import Sidebar from '../sidebar/Sidebar';
 import MessagesList from '../messages/MessagesList';
 import MessageChat from '../messages/MessageChat';
 import EventsList from '../messages/EventsList';
@@ -300,18 +298,12 @@ function Messages() {
 
   return (
     <div
-      className="font-bold"
+      className="font-bold mt-10 md:mt-0 mb-2 md:mb-0 w-screen flex flex-col overflow-hidden"
       style={{
-        fontFamily: 'Albert Sans',
         height: '100dvh',
         minHeight: '-webkit-fill-available',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
       }}
     >
-      <Header />
-      <Sidebar />
       <div className="flex flex-1" style={{ overflow: 'hidden' }}>
         {/* Animated Background */}
         <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
