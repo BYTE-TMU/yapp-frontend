@@ -189,8 +189,8 @@ function Users() {
                   className="rounded-2xl p-6 flex flex-col items-center gap-2"
                   style={{ backgroundColor: cardBg, border: `1px solid ${borderColor}` }}
                 >
-                  <UsersIcon className={`w-10 h-10 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                  <UsersIcon className="w-10 h-10 text-orange-400" />
+                  <p className={`text-sm ${isDarkMode ? 'text-white' : 'text-black'}`}>
                     Follow more people to get recommendations
                   </p>
                 </div>
