@@ -4,6 +4,7 @@ import WaypointHeader from './WaypointHeader.jsx';
 import WaypointMap from './WaypointMap.jsx';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../../services/config.js';
+import LoadingDots from '../../common/LoadingDots';
 import {
   showLoginRequired,
   showNoSavedWaypoints,
@@ -1068,10 +1069,10 @@ function Waypoint() {
       >
         <div className="ml-64 h-full overflow-y-auto p-6 pb-16 md:pb-6">
           <div className="max-w-full mx-auto h-full flex items-center justify-center">
-            <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mb-4"></div>
+            <div className="text-center flex flex-col items-center gap-4">
+              <LoadingDots size={12} />
               <h2
-                className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+                className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
               >
                 Loading Waypoints...
               </h2>

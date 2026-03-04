@@ -4,6 +4,7 @@ import EventItem from './events/EventItem';
 import EventItemModal from './events/EventItemModal';
 import HomepageActivities from './activities/HomepageActivities';
 import { API_BASE_URL } from '@/services/config';
+import LoadingDots from '@/components/common/LoadingDots';
 
 function Home() {
   const [posts, setPosts] = useState([]);
@@ -163,8 +164,12 @@ function Home() {
           fontFamily: 'Albert Sans',
         }}
       >
-        <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6">
-          <p className="text-foreground">Loading posts...</p>
+        <Header />
+        <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <LoadingDots size={14} />
+            <p className="text-muted-foreground text-sm">Loading posts...</p>
+          </div>
         </div>
       </div>
     );
@@ -213,22 +218,20 @@ function Home() {
                 <div className="flex items-center gap-2 text-sm">
                   <button
                     onClick={() => handleFeedTypeChange('recent')}
-                    className={`transition-colors ${
-                      feedType === 'recent'
-                        ? 'text-primary font-semibold'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
+                    className={`transition-colors ${feedType === 'recent'
+                      ? 'text-primary font-semibold'
+                      : 'text-muted-foreground hover:text-foreground'
+                      }`}
                   >
                     Recent
                   </button>
                   <span className="text-muted-foreground">|</span>
                   <button
                     onClick={() => handleFeedTypeChange('following')}
-                    className={`transition-colors ${
-                      feedType === 'following'
-                        ? 'text-primary font-semibold'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
+                    className={`transition-colors ${feedType === 'following'
+                      ? 'text-primary font-semibold'
+                      : 'text-muted-foreground hover:text-foreground'
+                      }`}
                   >
                     Following
                   </button>

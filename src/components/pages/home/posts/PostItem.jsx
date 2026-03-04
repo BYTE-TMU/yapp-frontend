@@ -185,9 +185,8 @@ function PostItem({ post, onPostDeleted }) {
           <img
             src={post.images[0]}
             alt="Post image"
-            className={`max-w-full max-h-96 object-contain rounded-lg border ${
-              isDarkMode ? 'border-gray-600' : 'border-gray-300'
-            }`}
+            className={`max-w-full max-h-96 object-contain rounded-lg border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'
+              }`}
             onError={(e) => {
               e.target.style.display = 'none';
             }}
@@ -204,9 +203,8 @@ function PostItem({ post, onPostDeleted }) {
               key={index}
               src={image}
               alt={`Post image ${index + 1}`}
-              className={`max-w-full max-h-48 object-contain rounded-lg border ${
-                isDarkMode ? 'border-gray-600' : 'border-gray-300'
-              }`}
+              className={`max-w-full max-h-48 object-contain rounded-lg border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'
+                }`}
               onError={(e) => {
                 e.target.style.display = 'none';
               }}
@@ -222,9 +220,8 @@ function PostItem({ post, onPostDeleted }) {
           <img
             src={post.images[0]}
             alt="Post image 1"
-            className={`max-w-full max-h-48 object-contain rounded-lg border ${
-              isDarkMode ? 'border-gray-600' : 'border-gray-300'
-            }`}
+            className={`max-w-full max-h-48 object-contain rounded-lg border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'
+              }`}
             onError={(e) => {
               e.target.style.display = 'none';
             }}
@@ -235,9 +232,8 @@ function PostItem({ post, onPostDeleted }) {
                 key={index + 1}
                 src={image}
                 alt={`Post image ${index + 2}`}
-                className={`max-w-full max-h-32 object-contain rounded-lg border ${
-                  isDarkMode ? 'border-gray-600' : 'border-gray-300'
-                }`}
+                className={`max-w-full max-h-32 object-contain rounded-lg border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'
+                  }`}
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
@@ -256,9 +252,8 @@ function PostItem({ post, onPostDeleted }) {
               key={index}
               src={image}
               alt={`Post image ${index + 1}`}
-              className={`max-w-full max-h-32 object-contain rounded-lg border ${
-                isDarkMode ? 'border-gray-600' : 'border-gray-300'
-              }`}
+              className={`max-w-full max-h-32 object-contain rounded-lg border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'
+                }`}
               onError={(e) => {
                 e.target.style.display = 'none';
               }}
@@ -314,11 +309,10 @@ function PostItem({ post, onPostDeleted }) {
                     e.stopPropagation();
                     setShowMenu(!showMenu);
                   }}
-                  className={`p-2 rounded-full transition-colors ${
-                    isDarkMode
-                      ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
+                  className={`p-2 rounded-full transition-colors ${isDarkMode
+                    ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
                 >
                   <MoreHorizontal className="w-4 h-4" />
                 </button>
@@ -326,11 +320,10 @@ function PostItem({ post, onPostDeleted }) {
                 {/* Dropdown menu */}
                 {showMenu && (
                   <div
-                    className={`absolute right-0 top-full mt-1 rounded-lg shadow-lg z-10 min-w-[120px] ${
-                      isDarkMode
-                        ? 'bg-[#1c1c1c] border border-gray-600'
-                        : 'bg-white border border-gray-200'
-                    }`}
+                    className={`absolute right-0 top-full mt-1 rounded-lg shadow-lg z-10 min-w-[120px] ${isDarkMode
+                      ? 'bg-[#1c1c1c] border border-gray-600'
+                      : 'bg-white border border-gray-200'
+                      }`}
                   >
                     <button
                       onClick={(e) => {
@@ -338,9 +331,8 @@ function PostItem({ post, onPostDeleted }) {
                         setShowDeleteConfirm(true);
                         setShowMenu(false);
                       }}
-                      className={`w-full px-4 py-2 text-left text-red-400 flex items-center space-x-2 rounded-lg ${
-                        isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-                      }`}
+                      className={`w-full px-4 py-2 text-left text-red-400 flex items-center space-x-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                        }`}
                     >
                       <Trash2 className="w-4 h-4" />
                       <span>Delete</span>
@@ -352,7 +344,7 @@ function PostItem({ post, onPostDeleted }) {
           </div>
 
           {/* Post Content */}
-          {post.content && <p className={`leading-relaxed `}>{post.content}</p>}
+          {post.content && <p className={`leading-relaxed break-all whitespace-pre-wrap`}>{post.content}</p>}
 
           {/* Post Images */}
           {renderPostImages()}
@@ -406,11 +398,10 @@ function PostItem({ post, onPostDeleted }) {
                   <button
                     onClick={() => setShowDeleteConfirm(false)}
                     disabled={deleting}
-                    className={`flex-1 py-1.5 px-3 rounded text-xs font-medium transition-colors disabled:opacity-50 ${
-                      isDarkMode
-                        ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                    }`}
+                    className={`flex-1 py-1.5 px-3 rounded text-xs font-medium transition-colors disabled:opacity-50 ${isDarkMode
+                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      }`}
                   >
                     Cancel
                   </button>

@@ -5,12 +5,8 @@ import ETInput from './thread/ETInput';
 import ETPostsFeed from './thread/ETPostsFeed';
 import { API_BASE_URL } from '../../../../services/config';
 import { useTheme } from '../../../../contexts/ThemeContext';
-import {
-  showLeaveEventError,
-  showNetworkError,
-  showPostMessageError,
-  showDeleteConfirmation,
-} from '../../../../utils/toastNotifications';
+import { showLeaveEventError, showNetworkError, showPostMessageError, showDeleteConfirmation } from '../../../../utils/toastNotifications';
+import LoadingDots from '../../../common/LoadingDots';
 
 const EventThread = () => {
   const { eventId } = useParams();
@@ -160,18 +156,14 @@ const EventThread = () => {
   const handlePostSubmit = async (e, selectedImages = []) => {
     e.preventDefault();
 
-    if ((!newPostContent.trim() && selectedImages.length === 0) || posting)
-      return;
+    if ((!newPostContent.trim() && selectedImages.length === 0) || posting) return;
 
     setPosting(true);
     try {
       // Create FormData for multipart upload if images are selected
       const formData = new FormData();
       formData.append('content', newPostContent.trim());
-      formData.append(
-        'post_type',
-        selectedImages.length > 0 ? 'image' : 'text',
-      );
+      formData.append('post_type', selectedImages.length > 0 ? 'image' : 'text');
 
       if (replyingTo) {
         formData.append('reply_to', replyingTo._id);
@@ -212,16 +204,12 @@ const EventThread = () => {
         }
 
         if (replyingTo) {
-          setPosts((prevPosts) =>
-            prevPosts.map((post) =>
+          setPosts(prevPosts =>
+            prevPosts.map(post =>
               post._id === replyingTo._id
-                ? {
-                    ...post,
-                    replies: [newPost, ...post.replies],
-                    replies_count: post.replies_count + 1,
-                  }
-                : post,
-            ),
+                ? { ...post, replies: [newPost, ...post.replies], replies_count: post.replies_count + 1 }
+                : post
+            )
           );
         } else {
           setPosts((prevPosts) => [newPost, ...prevPosts]);
@@ -264,35 +252,31 @@ const EventThread = () => {
             prevPosts.map((post) =>
               post._id === parentPostId
                 ? {
-                    ...post,
-                    replies: post.replies.map((reply) =>
-                      reply._id === postId
-                        ? {
-                            ...reply,
-                            is_liked_by_user: data.liked,
-                            likes_count: data.liked
-                              ? reply.likes_count + 1
-                              : Math.max(0, reply.likes_count - 1),
-                          }
-                        : reply,
-                    ),
-                  }
-                : post,
-            ),
+                  ...post,
+                  replies: post.replies.map(reply =>
+                    reply._id === postId
+                      ? {
+                        ...reply,
+                        is_liked_by_user: data.liked,
+                        likes_count: data.liked ? reply.likes_count + 1 : Math.max(0, reply.likes_count - 1)
+                      }
+                      : reply
+                  )
+                }
+                : post
+            )
           );
         } else {
           setPosts((prevPosts) =>
             prevPosts.map((post) =>
               post._id === postId
                 ? {
-                    ...post,
-                    is_liked_by_user: data.liked,
-                    likes_count: data.liked
-                      ? post.likes_count + 1
-                      : Math.max(0, post.likes_count - 1),
-                  }
-                : post,
-            ),
+                  ...post,
+                  is_liked_by_user: data.liked,
+                  likes_count: data.liked ? post.likes_count + 1 : Math.max(0, post.likes_count - 1)
+                }
+                : post
+            )
           );
         }
       }
@@ -325,14 +309,12 @@ const EventThread = () => {
             prevPosts.map((post) =>
               post._id === parentPostId
                 ? {
-                    ...post,
-                    replies: post.replies.filter(
-                      (reply) => reply._id !== postId,
-                    ),
-                    replies_count: Math.max(0, post.replies_count - 1),
-                  }
-                : post,
-            ),
+                  ...post,
+                  replies: post.replies.filter(reply => reply._id !== postId),
+                  replies_count: Math.max(0, post.replies_count - 1)
+                }
+                : post
+            )
           );
         } else {
           setPosts((prevPosts) =>
@@ -371,19 +353,15 @@ const EventThread = () => {
             prevPosts.map((post) =>
               post._id === parentPostId
                 ? {
-                    ...post,
-                    replies: post.replies.map((reply) =>
-                      reply._id === postId
-                        ? {
-                            ...reply,
-                            content: newContent,
-                            updated_at: new Date().toISOString(),
-                          }
-                        : reply,
-                    ),
-                  }
-                : post,
-            ),
+                  ...post,
+                  replies: post.replies.map(reply =>
+                    reply._id === postId
+                      ? { ...reply, content: newContent, updated_at: new Date().toISOString() }
+                      : reply
+                  )
+                }
+                : post
+            )
           );
         } else {
           setPosts((prevPosts) =>
@@ -432,11 +410,10 @@ const EventThread = () => {
   };
 
   const canEditOrDelete = (post) => {
-    return (
-      currentUser &&
-      (currentUser._id === post.user_id ||
-        currentUser.id === post.user_id ||
-        currentUser.sub === post.user_id)
+    return currentUser && (
+      currentUser._id === post.user_id ||
+      currentUser.id === post.user_id ||
+      currentUser.sub === post.user_id
     );
   };
 
@@ -473,14 +450,11 @@ const EventThread = () => {
     return (
       <div
         className="h-screen overflow-hidden font-bold"
-        style={{
-          backgroundColor: isDarkMode ? '#121212' : '#ffffff',
-          fontFamily: 'Albert Sans',
-        }}
+       
       >
         <div className="ml-0 md:ml-64 h-full overflow-y-auto p-4 md:p-6">
           <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+            <LoadingDots />
           </div>
         </div>
       </div>
