@@ -517,7 +517,7 @@ const EventThread = () => {
         {/* Scrollable Posts Feed */}
         <div
           ref={mainContentRef}
-          className="flex-1 overflow-y-auto px-3 md:px-6 pb-6 scrollbar-custom"
+          className="flex-1 overflow-y-auto px-3 md:px-6 pb-6 scrollbar-custom w-full"
         >
           <ETPostsFeed
             posts={posts}

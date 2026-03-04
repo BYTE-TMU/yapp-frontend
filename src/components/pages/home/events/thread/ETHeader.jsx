@@ -46,9 +46,7 @@ const ETHeader = ({ threadInfo, onLeaveEvent }) => {
           <div className="flex items-start space-x-2 md:space-x-4 flex-1 min-w-0">
             <button
               onClick={() => navigate(-1)}
-              className={`p-2 rounded-full transition-colors shrink-0 ${
-                isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'
-              }`}
+              className={`p-2 rounded-full transition-colors shrink-0 hover:bg-accent  `}
             >
               <ArrowLeft className={`w-5 h-5 `} />
             </button>
@@ -68,17 +66,19 @@ const ETHeader = ({ threadInfo, onLeaveEvent }) => {
               >
                 <div className="flex items-center space-x-1">
                   <Users className="w-3 h-3 md:w-4 md:h-4" />
-                  <span>
+                  <span className="font-normal">
                     {threadInfo.thread_stats.total_attendees} attending
                   </span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <MessageCircle className="w-3 h-3 md:w-4 md:h-4" />
-                  <span>{threadInfo.thread_stats.total_posts} posts</span>
+                  <span className="font-normal">
+                    {threadInfo.thread_stats.total_posts} posts
+                  </span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Calendar className="w-3 h-3 md:w-4 md:h-4" />
-                  <span className="truncate">
+                  <span className="font-normal truncate">
                     {new Date(
                       threadInfo.event.event_datetime,
                     ).toLocaleDateString()}

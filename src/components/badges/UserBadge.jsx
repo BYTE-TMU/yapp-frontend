@@ -7,7 +7,7 @@ function UserBadge({ user, username, withImage = true }) {
       {withImage && <UserAvatar user={user} size="xs" />}
       <div className="flex items-center gap-2">
         <span className="text-xs font-medium text-muted-foreground">
-          {username || 'Unknown'}
+          {username || user.username || 'Unknown'}
         </span>
       </div>
     </Badge>

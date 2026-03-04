@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import ETReply from './ETReply';
 import UserAvatar from '@/components/badges/UserAvatar';
+import UserBadge from '@/components/badges/UserBadge';
 
 const ETPost = ({
   post,
@@ -34,23 +35,15 @@ const ETPost = ({
   // Special rendering for join notifications
   if (post.post_type === 'join_notification') {
     return (
-      <div className="rounded-lg p-4 bg-linear-to-r from-green-900/20 to-emerald-900/20 border border-green-700/30">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-green-600 rounded-full">
-            <UserPlus className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex items-center space-x-3 flex-1">
-            <UserAvatar user={post} />
-            <div className="flex items-center space-x-2">
-              <span className="font-medium text-green-400">
-                {post.user_full_name || post.username}
-              </span>
-              <span className="text-green-300 text-xs">joined</span>
-              <span className="text-gray-500 text-xs">•</span>
-              <span className="text-gray-500 text-xs">
-                {formatTime(post.created_at)}
-              </span>
-            </div>
+      <div className="rounded-full px-2 py-1 bg-linear-to-r from-green-900/20 to-emerald-900/20 border border-green-700/30 items-center flex justify-center gap-2 w-fit">
+        <div className="flex items-center space-x-2">
+          <UserBadge user={post} />
+          <div className="flex items-center space-x-2">
+            <span className="text-green-300 text-xs">joined</span>
+            <span className="text-gray-500 text-xs">•</span>
+            <span className="text-gray-500 text-xs">
+              {formatTime(post.created_at)}
+            </span>
           </div>
         </div>
       </div>
@@ -60,24 +53,14 @@ const ETPost = ({
   // Special rendering for leave notifications
   if (post.post_type === 'leave_notification') {
     return (
-      <div className="rounded-lg p-4 bg-linear-to-r from-red-900/20 to-rose-900/20 border border-red-700/30">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-red-600 rounded-full">
-            <UserMinus className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex items-center space-x-3 flex-1">
-            <UserAvatar user={post} />
-            <div className="flex items-center space-x-2">
-              <span className="font-medium text-red-400">
-                {post.user_full_name || post.username}
-              </span>
-              <span className="text-red-300 text-xs">left</span>
-              <span className="text-gray-500 text-xs">•</span>
-              <span className="text-gray-500 text-xs">
-                {formatTime(post.created_at)}
-              </span>
-            </div>
-          </div>
+      <div className="rounded-full px-2 py-1 bg-linear-to-r from-red-900/20 to-rose-900/20 border border-red-700/30 items-center flex justify-center gap-2 w-fit">
+        <UserBadge user={post} />
+        <div className="flex items-center space-x-2">
+          <span className="text-red-300 text-xs">left</span>
+          <span className="text-gray-500 text-xs">•</span>
+          <span className="text-gray-500 text-xs">
+            {formatTime(post.created_at)}
+          </span>
         </div>
       </div>
     );
@@ -85,7 +68,7 @@ const ETPost = ({
 
   // Regular post rendering
   return (
-    <div className="rounded-lg p-4" style={{ backgroundColor: '#171717' }}>
+    <div className="rounded-lg p-4 w-full bg-accent">
       {/* Post Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center space-x-3">
