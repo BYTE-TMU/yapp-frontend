@@ -158,12 +158,7 @@ function Home() {
 
   if (loading && posts.length === 0) {
     return (
-      <div
-        className="h-screen overflow-hidden font-bold bg-background"
-        style={{
-          fontFamily: 'Albert Sans',
-        }}
-      >
+      <div className="h-screen overflow-hidden font-bold bg-background">
         <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <LoadingDots size={14} />
@@ -175,16 +170,8 @@ function Home() {
   }
 
   return (
-    <div className="h-screen overflow-hidden font-bold bg-background">
-      <div
-        ref={mainContentRef}
-        className="h-full w-fill md:ml-64 mt-10 md:mt-0 overflow-y-auto p-6 pb-20 md:pb-6 scrollbar-custom"
-      >
-        {/* Animated Background */}
-        <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
+    <div className="">
+      <div ref={mainContentRef} className="page-container">
         {/* Events Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -280,7 +267,7 @@ function Home() {
           </div>
 
           {/* Activities Section - 40% width */}
-          <div className="w-full lg:w-2/5 mb-20">
+          <div className="w-full lg:w-2/5 md:mb-20">
             <h2 className="text-xl font-bold mb-6 text-foreground">
               Activities
             </h2>

@@ -342,77 +342,37 @@ const Profile = () => {
 
   if (loading)
     return (
-      <div
-        className="h-screen overflow-hidden font-bold bg-background"
-       
-      >
-     
-        <div className="md:ml-64 h-full overflow-y-auto p-6 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <LoadingDots size={14} />
-            <p className="text-muted-foreground text-sm">Loading profile...</p>
-          </div>
+      <div className="page-container flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <LoadingDots size={14} />
+          <p className="text-muted-foreground text-sm">Loading profile...</p>
         </div>
       </div>
     );
 
   if (error)
     return (
-      <div
-        className="h-screen overflow-hidden font-bold bg-background"
-        style={{
-          fontFamily: 'Albert Sans',
-        }}
-      >
-        <div className="ml-64 h-full overflow-y-auto p-6">
-          <div className="text-center py-12">
-            <p className="text-destructive mb-4">Error: {error}</p>
-            <button
-              onClick={fetchProfile}
-              className="px-4 py-2 rounded-lg font-bold transition-colors bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              Try Again
-            </button>
-          </div>
-        </div>
+      <div className="page-container text-center py-12">
+        <p className="text-destructive mb-4">Error: {error}</p>
+        <button
+          onClick={fetchProfile}
+          className="px-4 py-2 rounded-lg font-bold transition-colors bg-primary hover:bg-primary/90 text-primary-foreground"
+        >
+          Try Again
+        </button>
       </div>
     );
 
   if (!profile)
     return (
-      <div
-        className="h-screen overflow-hidden font-bold bg-background"
-        style={{
-          fontFamily: 'Albert Sans',
-        }}
-      >
-        <div className="ml-64 h-full overflow-y-auto p-6">
-          <p className="text-foreground">Profile not found</p>
-        </div>
+      <div className="page-container text-center py-12">
+        <p className="text-foreground">Profile not found</p>
       </div>
     );
 
   return (
-    <div
-      className="font-bold bg-background mt-10 md:mt-0 mb-2 md:mb-0 w-screen flex flex-col overflow-hidden"
-      style={{
-        height: '100dvh',
-        minHeight: '-webkit-fill-available',
-      }}
-    >
-      <div
-        ref={mainContentRef}
-        className="md:ml-64 flex-1 p-6 overflow-auto"
-        style={{
-          WebkitOverflowScrolling: 'touch',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }}
-      >
-        {/* Animated Background */}
-        <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
+    <div className="page-container flex flex-col h-full ">
+      <div className="" ref={mainContentRef}>
         <div className="max-w-7xl mx-auto">
           {/* Profile Header */}
           <div
@@ -477,10 +437,11 @@ const Profile = () => {
                     <div className="flex space-x-3 mt-4 md:mt-0">
                       <button
                         onClick={handleFollowToggle}
-                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-colors ${profile.is_following
-                          ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground'
-                          : 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                          }`}
+                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-colors ${
+                          profile.is_following
+                            ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground'
+                            : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                        }`}
                       >
                         {profile.is_following ? (
                           <UserMinus className="w-4 h-4" />

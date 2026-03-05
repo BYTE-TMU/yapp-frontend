@@ -28,7 +28,7 @@ function Header() {
   return (
     <>
       {/* Top header bar - mobile only (logo + settings) */}
-      <div className="flex md:hidden items-center justify-between bg-white/[0.07] backdrop-blur-[5px] rounded-full px-2 py-1 border border-white/8 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)] fixed top-2 left-2 right-2 z-50">
+      <div className="flex md:hidden items-center justify-between bg-white/[0.07] backdrop-blur-[5px] rounded-full px-2 py-1 border border-white/8 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)] absolute top-2 left-2 right-2 z-50 h-12">
         <Link to="/home" className="flex items-center">
           <img
             src={YappLogoLight}
@@ -74,7 +74,7 @@ function Header() {
 
       {/* Bottom navigation bar - mobile only (Instagram-style) */}
       <nav
-        className="fixed bottom-2 left-2 right-2 z-50 md:hidden flex items-center justify-around px-2 py-1 bg-white/[0.07] backdrop-blur-[5px] rounded-full  border border-white/8 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)]"
+        className="fixed bottom-2 left-2 right-2 z-50 md:hidden flex items-center justify-around px-2 py-1 bg-white/[0.07] backdrop-blur-[5px] rounded-full  border border-white/8 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)] h-12"
         style={{
           paddingBottom: 'max(0.25rem, env(safe-area-inset-bottom))',
         }}
@@ -92,15 +92,15 @@ function Header() {
             }`}
           >
             {isCreate ? (
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary shadow-lg shadow-primary/30">
-                <Icon className="w-5 h-5 text-white" strokeWidth={2.5} />
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary shadow-lg shadow-primary/30">
+                <Icon className="w-4 h-4 text-white" strokeWidth={2.5} />
               </div>
             ) : (
               <>
                 <Icon
-                  className={`w-6 h-6 ${isActive(path) ? 'stroke-[2.5]' : ''}`}
+                  className={`w-4 h-4 ${isActive(path) ? 'stroke-[2.5]' : ''}`}
                 />
-                <span className="text-[10px] mt-0.5">{label}</span>
+                <span className="text-[10px] font-normal mt-0.5">{label}</span>
               </>
             )}
           </Link>

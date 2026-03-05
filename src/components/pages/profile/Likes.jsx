@@ -91,124 +91,104 @@ function Likes() {
   const cardBgColor = isDarkMode ? '#171717' : '#ffffff';
 
   return (
-    <div
-      className="h-screen overflow-hidden font-bold mt-10 md:mt-0 mb-12 md:mb-0"
-      style={{
-        fontFamily: 'Albert Sans',
-      }}
-    >
-      <div ref={mainContentRef} className="md:ml-64 h-full overflow-y-auto p-6">
-        {/* Animated Background */}
-        <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
-        <div className="max-w-6xl mx-auto">
-          {/* Header with optional back button */}
-          <div className="mb-6 flex items-center space-x-4">
-            {fromProfile && (
-              <button
-                onClick={handleBackToProfile}
-                className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors bg-accent `}
-                aria-label="Back to profile"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-            )}
+    <div className="page-container overflow-y-auto" ref={mainContentRef}>
+      <div className="max-w-6xl mx-auto">
+        {/* Header with optional back button */}
+        <div className="mb-6 flex items-center space-x-4">
+          {fromProfile && (
+            <button
+              onClick={handleBackToProfile}
+              className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors bg-accent `}
+              aria-label="Back to profile"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          )}
 
-            <div>
-              <h1 className={`text-2xl font-bold mb-2 `}>Posts You've Liked</h1>
-              {totalLiked > 0 && (
-                <p className={`text-muted-foreground`}>
-                  {totalLiked} liked posts
-                </p>
-              )}
+          <div>
+            <h1 className={`text-2xl font-bold mb-2 `}>Posts You've Liked</h1>
+            {totalLiked > 0 && (
+              <p className={`text-muted-foreground`}>
+                {totalLiked} liked posts
+              </p>
+            )}
+          </div>
+        </div>
+
+        {loading && (
+          <div className="text-center py-12">
+            <p className={`text-muted-foreground`}>
+              Loading your liked posts...
+            </p>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-12">
+            <div
+              className={`rounded-lg p-6 mb-6 border dark:border-none`}
+              style={{ backgroundColor: cardBgColor }}
+            >
+              <p className="text-red-400 mb-4">Error: {error}</p>
+              <button
+                onClick={() => fetchLikedPosts()}
+                className={`px-4 py-2 rounded-lg font-bold transition-colors ${
+                  isDarkMode
+                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                }`}
+              >
+                Try Again
+              </button>
             </div>
           </div>
+        )}
 
-          {loading && (
-            <div className="text-center py-12">
+        {!loading && !error && likedPosts.length === 0 && (
+          <div className="text-center py-12">
+            <div
+              className={`rounded-lg p-8 border dark:border-none`}
+              style={{ backgroundColor: cardBgColor }}
+            >
+              <h2 className={`text-xl font-bold mb-2 `}>No liked posts yet</h2>
               <p className={`text-muted-foreground`}>
-                Loading your liked posts...
+                Posts you like will appear here
               </p>
             </div>
-          )}
+          </div>
+        )}
 
-          {error && (
-            <div className="text-center py-12">
-              <div
-                className={`rounded-lg p-6 mb-6 border dark:border-none`}
-                style={{ backgroundColor: cardBgColor }}
-              >
-                <p className="text-red-400 mb-4">Error: {error}</p>
+        {!loading && !error && likedPosts.length > 0 && (
+          <div className="space-y-6">
+            {likedPosts.map((post) => (
+              <PostItem key={post._id} post={post} />
+            ))}
+
+            {hasMore && (
+              <div className="text-center mt-8">
                 <button
-                  onClick={() => fetchLikedPosts()}
-                  className={`px-4 py-2 rounded-lg font-bold transition-colors ${
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className={`px-6 py-3 rounded-lg font-bold transition-colors  ${
                     isDarkMode
-                      ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                      : 'bg-blue-500 hover:bg-blue-600 text-white'
+                      ? 'bg-gray-700 hover:bg-gray-600 disabled:bg-[#1c1c1c] disabled:opacity-50 text-white'
+                      : 'bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:opacity-50 text-gray-800'
                   }`}
                 >
-                  Try Again
+                  {loadingMore ? 'Loading...' : 'Load More'}
                 </button>
               </div>
-            </div>
-          )}
+            )}
 
-          {!loading && !error && likedPosts.length === 0 && (
-            <div className="text-center py-12">
-              <div
-                className={`rounded-lg p-8 ${
-                  isDarkMode ? '' : 'border border-gray-200'
-                }`}
-                style={{ backgroundColor: cardBgColor }}
-              >
-                <h2
-                  className={`text-xl font-bold mb-2 ${
-                    isDarkMode ? 'text-white' : 'text-gray-900'
-                  }`}
-                >
-                  No liked posts yet
-                </h2>
-                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                  Posts you like will appear here
+            {!hasMore && likedPosts.length > 0 && (
+              <div className="text-center">
+                <p className={`text-muted-foreground`}>
+                  You've seen all your liked posts!
                 </p>
               </div>
-            </div>
-          )}
-
-          {!loading && !error && likedPosts.length > 0 && (
-            <div className="space-y-6">
-              {likedPosts.map((post) => (
-                <PostItem key={post._id} post={post} />
-              ))}
-
-              {hasMore && (
-                <div className="text-center mt-8">
-                  <button
-                    onClick={loadMore}
-                    disabled={loadingMore}
-                    className={`px-6 py-3 rounded-lg font-bold transition-colors ${
-                      isDarkMode
-                        ? 'bg-gray-700 hover:bg-gray-600 disabled:bg-[#1c1c1c] disabled:opacity-50 text-white'
-                        : 'bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:opacity-50 text-gray-800'
-                    }`}
-                  >
-                    {loadingMore ? 'Loading...' : 'Load More'}
-                  </button>
-                </div>
-              )}
-
-              {!hasMore && likedPosts.length > 0 && (
-                <div className="text-center mt-8">
-                  <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                    You've seen all your liked posts!
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

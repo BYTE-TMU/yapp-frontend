@@ -308,6 +308,11 @@
   --sidebar-ring: oklch(0.704 0.191 35.325);
 }
 
+@layer components {
+  .page-container {
+    @apply h-screen w-full mt-16 md:mt-0 mb-16 md:mb-0 p-2 md:p-6;
+  }
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;

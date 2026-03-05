@@ -76,21 +76,21 @@ function MessagesList({
   // Sort conversations by last_message_at to ensure proper ordering
   const sortedConversations = conversations
     ? [...conversations].sort((a, b) => {
-      const timeA = a.last_message_at || a.created_at;
-      const timeB = b.last_message_at || b.created_at;
+        const timeA = a.last_message_at || a.created_at;
+        const timeB = b.last_message_at || b.created_at;
 
-      if (!timeA && !timeB) return 0;
-      if (!timeA) return 1;
-      if (!timeB) return -1;
+        if (!timeA && !timeB) return 0;
+        if (!timeA) return 1;
+        if (!timeB) return -1;
 
-      // Parse dates and sort in descending order (newest first)
-      try {
-        return new Date(timeB) - new Date(timeA);
-      } catch (error) {
-        console.error('Error sorting conversations:', error);
-        return 0;
-      }
-    })
+        // Parse dates and sort in descending order (newest first)
+        try {
+          return new Date(timeB) - new Date(timeA);
+        } catch (error) {
+          console.error('Error sorting conversations:', error);
+          return 0;
+        }
+      })
     : [];
 
   if (loading) {
