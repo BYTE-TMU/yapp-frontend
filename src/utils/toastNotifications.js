@@ -191,6 +191,41 @@ export const showNotEventWaypoint = () => {
     toast.warning('This is not an event waypoint');
 };
 
+// Check-In
+export const showCheckInSuccess = (username) => {
+    toast.success(`${username} checked in! ✅`);
+};
+
+export const showAlreadyCheckedIn = (username) => {
+    toast.info(`${username} is already checked in`);
+};
+
+export const showCheckInError = (message) => {
+    toast.error('Check-in failed', {
+        description: message || 'Please try again'
+    });
+};
+
+export const showCameraDenied = () => {
+    toast.warning('Camera access denied', {
+        description: 'Switching to manual check-in mode'
+    });
+};
+
+export const showTicketError = () => {
+    toast.error('Failed to generate ticket', {
+        description: 'Please try again'
+    });
+};
+
+export const showAttendeeApproved = (username) => {
+    toast.success(`${username} approved! ✅`);
+};
+
+export const showAttendeeWaitlisted = (username) => {
+    toast.info(`${username} moved to waitlist`);
+};
+
 // ===== CONFIRMATION DIALOGS =====
 /**
  * Show a confirmation dialog using toast
