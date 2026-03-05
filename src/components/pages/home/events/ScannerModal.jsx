@@ -119,7 +119,7 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
             // Try rear camera first (phones), fall back to front camera (laptops)
             try {
                 await html5QrCode.start(
-                    { facingMode: 'environment' },
+                    { facingMode: { exact: 'environment' } },
                     scanConfig,
                     onScanSuccess,
                     () => { }
