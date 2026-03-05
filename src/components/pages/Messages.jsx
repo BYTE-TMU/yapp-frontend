@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Header from '../header/Header';
-import Sidebar from '../sidebar/Sidebar';
 import MessagesList from '../messages/MessagesList';
 import MessageChat from '../messages/MessageChat';
 import EventsList from '../messages/EventsList';
 import { messageService } from '../../services/messageService';
-import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../services/config';
 
 function Messages() {
@@ -15,7 +12,6 @@ function Messages() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('messages'); // 'messages' or 'events'
   const [searchParams] = useSearchParams();
-  const { isDarkMode } = useTheme();
 
   // Get current user identifier (same logic as in your components)
   const getCurrentUserIdentifier = () => {
@@ -299,243 +295,222 @@ function Messages() {
   }, [selectedConversation, showMobileChat]);
 
   return (
-    <div
-      className="font-bold"
-      style={{
-        fontFamily: 'Albert Sans',
-        height: '100dvh',
-        minHeight: '-webkit-fill-available',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <Header />
-      <Sidebar />
-      <div className="flex flex-1" style={{ overflow: 'hidden' }}>
-        {/* Animated Background */}
-        <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+    <div className="page-container flex flex-1">
+      {/* Left side - Conversations/Events list */}
+      <div
+        className={`${
+          showMobileChat ? 'hidden md:flex' : 'flex'
+        } w-full md:w-80 border-r flex-col`}
+        style={{
+          height: '100%',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        {/* Tab Navigation */}
+        <div
+          className={`flex items-center justify-center gap-4 p-4 border-b`}
+          style={{
+            position: 'relative',
+            zIndex: 2,
+          }}
+        >
+          <button
+            onClick={() => setActiveTab('messages')}
+            className={`transition-colors font-semibold touch-manipulation ${
+              activeTab === 'messages' ? 'text-primary' : ''
+            }`}
+            style={{
+              WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation',
+            }}
+          >
+            Messages
+          </button>
+          <span className="text-muted-foreground">|</span>
+          <button
+            onClick={() => setActiveTab('events')}
+            className={`transition-colors font-semibold touch-manipulation ${
+              activeTab === 'events' ? 'text-primary' : ''
+            }`}
+            style={{
+              WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation',
+            }}
+          >
+            Events
+          </button>
         </div>
-        <div className="flex flex-1 md:ml-64" style={{ overflow: 'hidden' }}>
-          {/* Left side - Conversations/Events list */}
-          <div
-            className={`${
-              showMobileChat ? 'hidden md:flex' : 'flex'
-            } w-full md:w-80 border-r flex-col`}
-            style={{
-              height: '100%',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              position: 'relative',
-              zIndex: 1,
-            }}
-          >
-            {/* Tab Navigation */}
-            <div
-              className={`flex items-center justify-center gap-4 p-4 border-b`}
-              style={{
-                position: 'relative',
-                zIndex: 2,
-              }}
-            >
-              <button
-                onClick={() => setActiveTab('messages')}
-                className={`transition-colors font-semibold touch-manipulation ${
-                  activeTab === 'messages' ? 'text-primary' : ''
-                }`}
-                style={{
-                  WebkitTapHighlightColor: 'transparent',
-                  touchAction: 'manipulation',
-                }}
-              >
-                Messages
-              </button>
-              <span className="text-muted-foreground">|</span>
-              <button
-                onClick={() => setActiveTab('events')}
-                className={`transition-colors font-semibold touch-manipulation ${
-                  activeTab === 'events' ? 'text-primary' : ''
-                }`}
-                style={{
-                  WebkitTapHighlightColor: 'transparent',
-                  touchAction: 'manipulation',
-                }}
-              >
-                Events
-              </button>
-            </div>
 
-            {/* Content based on active tab */}
-            {activeTab === 'messages' ? (
-              <MessagesList
-                conversations={conversations}
-                selectedConversation={selectedConversation}
-                onConversationSelect={handleConversationSelect}
-                loading={loading}
-              />
-            ) : (
-              <EventsList loading={false} />
-            )}
-          </div>
+        {/* Content based on active tab */}
+        {activeTab === 'messages' ? (
+          <MessagesList
+            conversations={conversations}
+            selectedConversation={selectedConversation}
+            onConversationSelect={handleConversationSelect}
+            loading={loading}
+          />
+        ) : (
+          <EventsList loading={false} />
+        )}
+      </div>
 
-          {/* Right side - Chat interface or Events placeholder */}
-          <div
-            className={`${
-              showMobileChat ? 'flex' : 'hidden md:flex'
-            } flex-1 flex-col`}
-            style={{
-              height: '100%',
-              overflow: 'hidden',
-            }}
-          >
-            {activeTab === 'messages' ? (
-              selectedConversation ? (
-                <div className="flex flex-col h-full">
-                  {/* Mobile back button */}
-                  <div className="md:hidden flex items-center px-3 py-2 border-b">
-                    <button
-                      onClick={() => setSelectedConversation(null)}
-                      className={`flex items-center gap-2 text-sm font-semibold text-primary`}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-5 h-5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M15 18l-6-6 6-6" />
-                      </svg>
-                      Back
-                    </button>
-                  </div>
-                  <MessageChat
-                    conversation={selectedConversation}
-                    onNewMessage={handleNewMessage}
-                  />
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                  <div className="rounded-lg p-8 mb-6">
-                    <div className="mb-6">
-                      <svg
-                        width="96"
-                        height="96"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="text-gray-500 mx-auto"
-                      >
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        />
-                        <path
-                          d="M8 14s1.5 2 4 2 4-2 4-2"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                        <path
-                          d="M9 9h.01"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                        <path
-                          d="M15 9h.01"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </div>
-                    <h2 className="text-2xl font-bold mb-4 text-primary">
-                      Your messages
-                    </h2>
-                    <p className="mb-6 text-muted-foreground">
-                      Send a message to a user to start a chat.
-                    </p>
-                  </div>
-                </div>
-              )
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                <div className="rounded-lg p-8 mb-6">
-                  <div className="mb-6">
-                    <svg
-                      width="96"
-                      height="96"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-gray-500 mx-auto"
-                    >
-                      <rect
-                        x="3"
-                        y="4"
-                        width="18"
-                        height="18"
-                        rx="2"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      />
-                      <line
-                        x1="16"
-                        y1="2"
-                        x2="16"
-                        y2="6"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                      <line
-                        x1="8"
-                        y1="2"
-                        x2="8"
-                        y2="6"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                      <line
-                        x1="3"
-                        y1="10"
-                        x2="21"
-                        y2="10"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      />
-                      <rect
-                        x="7"
-                        y="14"
-                        width="4"
-                        height="4"
-                        rx="1"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </div>
-                  <h2 className="text-2xl font-bold mb-4 text-primary">
-                    Event Discussions
-                  </h2>
-                  <p className="mb-6 text-muted-foreground">
-                    Select an event to view its discussion thread.
-                  </p>
-                </div>
+      {/* Right side - Chat interface or Events placeholder */}
+      <div
+        className={`${
+          showMobileChat ? 'flex' : 'hidden md:flex'
+        } flex-1 flex-col`}
+        style={{
+          height: '100%',
+          overflow: 'hidden',
+        }}
+      >
+        {activeTab === 'messages' ? (
+          selectedConversation ? (
+            <div className="flex flex-col h-full">
+              {/* Mobile back button */}
+              <div className="md:hidden flex items-center px-3 py-2 border-b">
+                <button
+                  onClick={() => setSelectedConversation(null)}
+                  className={`flex items-center gap-2 text-sm font-semibold text-primary`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M15 18l-6-6 6-6" />
+                  </svg>
+                  Back
+                </button>
               </div>
-            )}
+              <MessageChat
+                conversation={selectedConversation}
+                onNewMessage={handleNewMessage}
+              />
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full text-center p-8">
+              <div className="rounded-lg p-8 mb-6">
+                <div className="mb-6">
+                  <svg
+                    width="96"
+                    height="96"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-gray-500 mx-auto"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d="M8 14s1.5 2 4 2 4-2 4-2"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M9 9h.01"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M15 9h.01"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold mb-4 text-primary">
+                  Your messages
+                </h2>
+                <p className="mb-6 text-muted-foreground">
+                  Send a message to a user to start a chat.
+                </p>
+              </div>
+            </div>
+          )
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-center p-8">
+            <div className="rounded-lg p-8 mb-6">
+              <div className="mb-6">
+                <svg
+                  width="96"
+                  height="96"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="text-gray-500 mx-auto"
+                >
+                  <rect
+                    x="3"
+                    y="4"
+                    width="18"
+                    height="18"
+                    rx="2"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <line
+                    x1="16"
+                    y1="2"
+                    x2="16"
+                    y2="6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                  <line
+                    x1="8"
+                    y1="2"
+                    x2="8"
+                    y2="6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                  <line
+                    x1="3"
+                    y1="10"
+                    x2="21"
+                    y2="10"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <rect
+                    x="7"
+                    y="14"
+                    width="4"
+                    height="4"
+                    rx="1"
+                    fill="currentColor"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold mb-4 text-primary">
+                Event Discussions
+              </h2>
+              <p className="mb-6 text-muted-foreground">
+                Select an event to view its discussion thread.
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

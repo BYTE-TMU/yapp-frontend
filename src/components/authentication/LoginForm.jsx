@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
-import { API_BASE_URL } from '../../services/config';
+import { API_BASE_URL } from '@/services/config';
 import EmailVerification from './EmailVerification';
 
 export default function LoginForm() {

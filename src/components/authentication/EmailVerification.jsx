@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { API_BASE_URL } from '../../services/config';
+import { API_BASE_URL } from '@/services/config';
 
 function EmailVerification({
   username,

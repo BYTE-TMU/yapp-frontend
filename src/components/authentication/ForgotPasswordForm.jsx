@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../services/config';
+import { API_BASE_URL } from '@/services/config';
 
 function ForgotPasswordForm() {
   const navigate = useNavigate();

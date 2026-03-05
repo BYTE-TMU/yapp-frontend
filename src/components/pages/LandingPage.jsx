@@ -28,7 +28,7 @@ const useReveal = (threshold = 0.15) => {
           observer.unobserve(entry.target);
         }
       },
-      { threshold }
+      { threshold },
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
@@ -135,7 +135,7 @@ const LandingPage = () => {
     const handleChange = (e) => {
       if (e.matches && !videoSrc) {
         import('../../assets/Make_it_feel_202602212226_rbw0t.mp4').then((mod) =>
-          setVideoSrc(mod.default)
+          setVideoSrc(mod.default),
         );
       }
     };
@@ -151,7 +151,8 @@ const LandingPage = () => {
   const [testimonialRef, testimonialRevealed] = useReveal();
   const [faqRef, faqRevealed] = useReveal();
   const [ctaRef, ctaRevealed] = useReveal();
-  const { containerProps: marqueeProps, trackRef: marqueeTrackRef } = useMarquee(0.5, 0.15);
+  const { containerProps: marqueeProps, trackRef: marqueeTrackRef } =
+    useMarquee(0.5, 0.15);
 
   const typingTexts = [
     'Connect with your campus community',
@@ -291,18 +292,33 @@ const LandingPage = () => {
       {/* Orange glowing blobs — keep 2 on mobile, all 6 on desktop */}
       <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
         <div className="absolute top-[25%] left-[5%] w-[350px] h-[350px] bg-orange-500/20 rounded-full blur-[100px] animate-float-gentle" />
-        <div className="hidden md:block absolute top-[40%] right-[10%] w-[300px] h-[300px] bg-orange-500/15 rounded-full blur-[90px] animate-float" style={{ animationDelay: '2s' }} />
-        <div className="hidden md:block absolute top-[60%] left-[40%] w-[250px] h-[250px] bg-orange-400/20 rounded-full blur-[80px] animate-float-gentle" style={{ animationDelay: '4s' }} />
-        <div className="absolute top-[75%] right-[30%] w-[300px] h-[300px] bg-orange-500/15 rounded-full blur-[100px] animate-float" style={{ animationDelay: '1s' }} />
-        <div className="hidden md:block absolute top-[55%] left-[70%] w-[200px] h-[200px] bg-orange-400/20 rounded-full blur-[70px] animate-float" style={{ animationDelay: '3s' }} />
-        <div className="hidden md:block absolute top-[88%] left-[15%] w-[280px] h-[280px] bg-orange-500/15 rounded-full blur-[90px] animate-float-gentle" style={{ animationDelay: '5s' }} />
+        <div
+          className="hidden md:block absolute top-[40%] right-[10%] w-[300px] h-[300px] bg-orange-500/15 rounded-full blur-[90px] animate-float"
+          style={{ animationDelay: '2s' }}
+        />
+        <div
+          className="hidden md:block absolute top-[60%] left-[40%] w-[250px] h-[250px] bg-orange-400/20 rounded-full blur-[80px] animate-float-gentle"
+          style={{ animationDelay: '4s' }}
+        />
+        <div
+          className="absolute top-[75%] right-[30%] w-[300px] h-[300px] bg-orange-500/15 rounded-full blur-[100px] animate-float"
+          style={{ animationDelay: '1s' }}
+        />
+        <div
+          className="hidden md:block absolute top-[55%] left-[70%] w-[200px] h-[200px] bg-orange-400/20 rounded-full blur-[70px] animate-float"
+          style={{ animationDelay: '3s' }}
+        />
+        <div
+          className="hidden md:block absolute top-[88%] left-[15%] w-[280px] h-[280px] bg-orange-500/15 rounded-full blur-[90px] animate-float-gentle"
+          style={{ animationDelay: '5s' }}
+        />
       </div>
 
       {/* Floating Pill Nav */}
       <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-3xl">
-        <div className="bg-white/[0.07] backdrop-blur-none md:backdrop-blur-[20px] rounded-full px-5 sm:px-6 py-3 flex items-center justify-between border border-white/[0.08] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)]">
-          <img src={YappLogo} alt="Yapp" className="h-10 w-auto" />
-          <div className="flex items-center gap-2 sm:gap-3">
+        <div className="bg-white/[0.07] backdrop-blur-[2px] rounded-full px-5 md:px-6 py-3 flex items-center justify-between border border-white/8 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)]">
+          <img src={YappLogo} alt="Yapp" className="h-8 w-auto" />
+          <div className="flex items-center gap-2 md:gap-3">
             <Link
               to="/login"
               className="text-gray-400 hover:text-white text-sm font-medium transition-colors px-3 py-1.5"
@@ -370,9 +386,9 @@ const LandingPage = () => {
             </div>
 
             <p className="text-gray-300 text-lg leading-relaxed max-w-lg mx-auto mb-10 px-4 drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
-              Yapp is the revolutionary campus social platform designed exclusively
-              for TMU students. Connect with your community, discover events, and
-              explore your campus like never before.
+              Yapp is the revolutionary campus social platform designed
+              exclusively for TMU students. Connect with your community,
+              discover events, and explore your campus like never before.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -413,7 +429,10 @@ const LandingPage = () => {
         </div>
 
         <div className="overflow-hidden select-none" {...marqueeProps}>
-          <div ref={marqueeTrackRef} className="flex w-max gap-4 will-change-transform">
+          <div
+            ref={marqueeTrackRef}
+            className="flex w-max gap-4 will-change-transform"
+          >
             {[...scenarios, ...scenarios].map((s, i) => (
               <div
                 key={i}
@@ -731,7 +750,9 @@ const LandingPage = () => {
               loading="lazy"
             />
             <div className="flex items-center gap-6 text-gray-600 text-sm">
-              <span>&copy; {new Date().getFullYear()} Yapp. All rights reserved.</span>
+              <span>
+                &copy; {new Date().getFullYear()} Yapp. All rights reserved.
+              </span>
               <Link
                 to="/login"
                 className="hover:text-gray-400 transition-colors"

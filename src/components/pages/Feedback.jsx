@@ -6,8 +6,6 @@ import {
   CheckCircle,
   ArrowLeft,
 } from 'lucide-react';
-import Sidebar from '../sidebar/Sidebar';
-import Header from '../header/Header';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../services/config';
 import { Button } from '../ui/button';
@@ -74,9 +72,7 @@ function Feedback() {
   // Show success animation first
   if (submitSuccess && !submitted) {
     return (
-      <div className="min-h-screen bg-black text-white flex flex-col md:flex-row">
-        <Header />
-        <Sidebar />
+      <div className="page-container flex flex-col md:flex-row">
         <div className="flex-1 p-8 flex justify-center items-center">
           <div className="text-center">
             <div className="animate-bounce">
@@ -94,9 +90,7 @@ function Feedback() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-black text-white flex flex-col md:flex-row">
-        <Header />
-        <Sidebar />
+      <div className="page-container flex flex-col md:flex-row">
         <div className="flex-1 p-8 flex justify-center">
           <div className="max-w-2xl w-full text-center">
             <div className="bg-linear-to-br from-green-500/20 to-blue-500/20 border border-green-500 rounded-xl p-10 shadow-2xl">
@@ -153,192 +147,178 @@ function Feedback() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row md:ml-64">
-      <Header />
-      <Sidebar />
-      <div className="flex-1 p-8 flex justify-center mb-16">
-        {/* Animated Background */}
-        <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+    <div className="page-container flex justify-center h-full">
+      <div className="max-w-2xl w-full h-full">
+        <div className="mb-8 text-center">
+          <h1 className={`text-3xl font-bold mb-2`}>Feedback</h1>
+          <p className={`text-muted-foreground`}>
+            Help us improve Yapp by sharing your thoughts, suggestions, or
+            reporting issues.
+          </p>
         </div>
-        <div className="max-w-2xl w-full">
-          <div className="mb-8 text-center">
-            <h1 className={`text-3xl font-bold mb-2`}>Feedback</h1>
-            <p className={`text-muted-foreground`}>
-              Help us improve Yapp by sharing your thoughts, suggestions, or
-              reporting issues.
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Feedback Type */}
+          <div>
+            <label className="block text-sm font-semibold mb-3">
+              Feedback Type
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {[
+                {
+                  value: 'general',
+                  label: 'General Feedback',
+                  desc: 'Share your thoughts',
+                },
+                {
+                  value: 'bug',
+                  label: 'Bug Report',
+                  desc: 'Report an issue',
+                },
+                {
+                  value: 'feature',
+                  label: 'Feature Request',
+                  desc: 'Suggest new features',
+                },
+              ].map((type) => (
+                <button
+                  key={type.value}
+                  type="button"
+                  onClick={() =>
+                    setFeedback((prev) => ({ ...prev, type: type.value }))
+                  }
+                  className={`p-4 border rounded-lg text-left transition-colors ${
+                    feedback.type === type.value
+                      ? 'border-primary bg-primary/20'
+                      : isDarkMode
+                        ? 'border-gray-600 hover:border-gray-500'
+                        : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                  style={{
+                    backgroundColor:
+                      feedback.type !== type.value && isDarkMode
+                        ? '#1c1c1c'
+                        : undefined,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (feedback.type !== type.value && isDarkMode) {
+                      e.target.style.backgroundColor = '#1f1f1f';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (feedback.type !== type.value && isDarkMode) {
+                      e.target.style.backgroundColor = '#1c1c1c';
+                    }
+                  }}
+                >
+                  <div className="font-semibold">{type.label}</div>
+                  <div className="text-sm text-gray-400">{type.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Rating */}
+          <div>
+            <label className="block text-sm font-semibold mb-3">
+              How would you rate your experience?
+            </label>
+            <div className="flex space-x-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => handleRatingClick(star)}
+                  className="transition-colors"
+                >
+                  <Star
+                    className={`w-8 h-8 ${
+                      star <= feedback.rating
+                        ? 'text-yellow-400 fill-current'
+                        : 'text-gray-400 hover:text-yellow-300'
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Subject */}
+          <div>
+            <label
+              htmlFor="subject"
+              className="block text-sm font-semibold mb-2"
+            >
+              Subject
+            </label>
+            <input
+              type="text"
+              id="subject"
+              value={feedback.subject}
+              onChange={(e) =>
+                setFeedback((prev) => ({ ...prev, subject: e.target.value }))
+              }
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none placeholder:text-muted-foreground focus:border-primary`}
+              placeholder="Brief summary of your feedback"
+              required
+            />
+          </div>
+
+          {/* Message */}
+          <div>
+            <label
+              htmlFor="message"
+              className="block text-sm font-semibold mb-2"
+            >
+              Message
+            </label>
+            <textarea
+              id="message"
+              value={feedback.message}
+              onChange={(e) =>
+                setFeedback((prev) => ({ ...prev, message: e.target.value }))
+              }
+              rows={6}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none resize-none placeholder:text-muted-foreground focus:border-primary`}
+              placeholder="Please provide detailed feedback..."
+              required
+            />
+          </div>
+
+          {/* Email (optional) */}
+          <div>
+            <label htmlFor="email" className="block text-sm font-semibold mb-2">
+              Email (Optional)
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={feedback.email}
+              onChange={(e) =>
+                setFeedback((prev) => ({ ...prev, email: e.target.value }))
+              }
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none placeholder:text-muted-foreground focus:border-primary`}
+              placeholder="your.email@example.com"
+            />
+            <p className="text-sm text-gray-400 mt-1">
+              Leave your email if you'd like us to follow up with you.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Feedback Type */}
-            <div>
-              <label className="block text-sm font-semibold mb-3">
-                Feedback Type
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {[
-                  {
-                    value: 'general',
-                    label: 'General Feedback',
-                    desc: 'Share your thoughts',
-                  },
-                  {
-                    value: 'bug',
-                    label: 'Bug Report',
-                    desc: 'Report an issue',
-                  },
-                  {
-                    value: 'feature',
-                    label: 'Feature Request',
-                    desc: 'Suggest new features',
-                  },
-                ].map((type) => (
-                  <button
-                    key={type.value}
-                    type="button"
-                    onClick={() =>
-                      setFeedback((prev) => ({ ...prev, type: type.value }))
-                    }
-                    className={`p-4 border rounded-lg text-left transition-colors ${
-                      feedback.type === type.value
-                        ? 'border-primary bg-primary/20'
-                        : isDarkMode
-                          ? 'border-gray-600 hover:border-gray-500'
-                          : 'border-gray-300 hover:border-gray-400'
-                    }`}
-                    style={{
-                      backgroundColor:
-                        feedback.type !== type.value && isDarkMode
-                          ? '#1c1c1c'
-                          : undefined,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (feedback.type !== type.value && isDarkMode) {
-                        e.target.style.backgroundColor = '#1f1f1f';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (feedback.type !== type.value && isDarkMode) {
-                        e.target.style.backgroundColor = '#1c1c1c';
-                      }
-                    }}
-                  >
-                    <div className="font-semibold">{type.label}</div>
-                    <div className="text-sm text-gray-400">{type.desc}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Rating */}
-            <div>
-              <label className="block text-sm font-semibold mb-3">
-                How would you rate your experience?
-              </label>
-              <div className="flex space-x-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => handleRatingClick(star)}
-                    className="transition-colors"
-                  >
-                    <Star
-                      className={`w-8 h-8 ${
-                        star <= feedback.rating
-                          ? 'text-yellow-400 fill-current'
-                          : 'text-gray-400 hover:text-yellow-300'
-                      }`}
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Subject */}
-            <div>
-              <label
-                htmlFor="subject"
-                className="block text-sm font-semibold mb-2"
-              >
-                Subject
-              </label>
-              <input
-                type="text"
-                id="subject"
-                value={feedback.subject}
-                onChange={(e) =>
-                  setFeedback((prev) => ({ ...prev, subject: e.target.value }))
-                }
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none placeholder:text-muted-foreground focus:border-primary`}
-                placeholder="Brief summary of your feedback"
-                required
-              />
-            </div>
-
-            {/* Message */}
-            <div>
-              <label
-                htmlFor="message"
-                className="block text-sm font-semibold mb-2"
-              >
-                Message
-              </label>
-              <textarea
-                id="message"
-                value={feedback.message}
-                onChange={(e) =>
-                  setFeedback((prev) => ({ ...prev, message: e.target.value }))
-                }
-                rows={6}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none resize-none placeholder:text-muted-foreground focus:border-primary`}
-                placeholder="Please provide detailed feedback..."
-                required
-              />
-            </div>
-
-            {/* Email (optional) */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-semibold mb-2"
-              >
-                Email (Optional)
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={feedback.email}
-                onChange={(e) =>
-                  setFeedback((prev) => ({ ...prev, email: e.target.value }))
-                }
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none placeholder:text-muted-foreground focus:border-primary`}
-                placeholder="your.email@example.com"
-              />
-              <p className="text-sm text-gray-400 mt-1">
-                Leave your email if you'd like us to follow up with you.
-              </p>
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                size="lg"
-                variant="default"
-                className="disabled:bg-gray-600 rounded-lg transition-colors flex items-center space-x-2"
-                disabled={isSubmitting}
-              >
-                <Send className="w-4 h-4" />
-                <span>
-                  {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
-                </span>
-              </Button>
-            </div>
-          </form>
-        </div>
+          {/* Submit Button */}
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              size="lg"
+              variant="default"
+              className="disabled:bg-gray-600 rounded-lg transition-colors flex items-center space-x-2"
+              disabled={isSubmitting}
+            >
+              <Send className="w-4 h-4" />
+              <span>{isSubmitting ? 'Submitting...' : 'Submit Feedback'}</span>
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );

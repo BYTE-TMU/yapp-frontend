@@ -1,4 +1,4 @@
-import { Badge } from '../ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { Users } from 'lucide-react';
 
 function AtendeesBadge({ event }) {

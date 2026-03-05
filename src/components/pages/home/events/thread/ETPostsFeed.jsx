@@ -41,7 +41,7 @@ const ETPostsFeed = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex flex-col items-center w-full">
       {posts.map((post) => (
         <ETPost
           key={post._id}

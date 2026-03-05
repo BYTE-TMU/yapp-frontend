@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import Sidebar from '@/components/sidebar/Sidebar';
 import PostItem from './posts/PostItem';
-import Header from '@/components/header/Header';
 import EventItem from './events/EventItem';
 import EventItemModal from './events/EventItemModal';
 import HomepageActivities from './activities/HomepageActivities';
@@ -160,13 +158,7 @@ function Home() {
 
   if (loading && posts.length === 0) {
     return (
-      <div
-        className="h-screen overflow-hidden font-bold bg-background"
-        style={{
-          fontFamily: 'Albert Sans',
-        }}
-      >
-        <Header />
+      <div className="h-screen overflow-hidden font-bold bg-background">
         <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <LoadingDots size={14} />
@@ -178,27 +170,8 @@ function Home() {
   }
 
   return (
-    <div
-      className="h-screen overflow-hidden font-bold bg-background"
-      style={{
-        fontFamily: 'Albert Sans',
-      }}
-    >
-      <Header />
-      <Sidebar />
-      <div
-        ref={mainContentRef}
-        className="h-full w-fill md:ml-64 overflow-y-auto p-6 pb-20 md:pb-6 scrollbar-custom"
-      >
-        {/* Animated Background */}
-        <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
-        <h1 className="text-xl md:text-2xl font-bold mb-6 text-foreground">
-          Home Feed
-        </h1>
-
+    <div className="">
+      <div ref={mainContentRef} className="page-container">
         {/* Events Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -226,20 +199,22 @@ function Home() {
                 <div className="flex items-center gap-2 text-sm">
                   <button
                     onClick={() => handleFeedTypeChange('recent')}
-                    className={`transition-colors ${feedType === 'recent'
-                      ? 'text-primary font-semibold'
-                      : 'text-muted-foreground hover:text-foreground'
-                      }`}
+                    className={`transition-colors ${
+                      feedType === 'recent'
+                        ? 'text-primary font-semibold'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
                   >
                     Recent
                   </button>
                   <span className="text-muted-foreground">|</span>
                   <button
                     onClick={() => handleFeedTypeChange('following')}
-                    className={`transition-colors ${feedType === 'following'
-                      ? 'text-primary font-semibold'
-                      : 'text-muted-foreground hover:text-foreground'
-                      }`}
+                    className={`transition-colors ${
+                      feedType === 'following'
+                        ? 'text-primary font-semibold'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
                   >
                     Following
                   </button>
@@ -292,7 +267,7 @@ function Home() {
           </div>
 
           {/* Activities Section - 40% width */}
-          <div className="w-full lg:w-2/5 mb-20">
+          <div className="w-full lg:w-2/5 md:mb-20">
             <h2 className="text-xl font-bold mb-6 text-foreground">
               Activities
             </h2>

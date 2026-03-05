@@ -481,7 +481,7 @@ function CreatePost() {
               uploadingImages ||
               (!content.trim() && selectedImages.length === 0)
             }
-            className="flex items-center space-x-2 px-8 py-4 bg-linear-to-r from-primary to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
+            className="flex items-center space-x-2 px-2 md:px-8 md:py-4 bg-linear-to-r from-primary to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-600 disabled:to-gray-700 disabled:opacity-50 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
           >
             {isSubmittingPost ? (
               <>
