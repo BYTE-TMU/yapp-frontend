@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import UserAvatar from '@/components/badges/UserAvatar';
 
-function ChatHeader({ conversation, getProfilePictureUrl, typingUsers = [] }) {
+function ChatHeader({ conversation, getProfilePictureUrl, typingUsers = [], onBack }) {
   const navigate = useNavigate();
 
   // Get typing status text
@@ -20,7 +20,27 @@ function ChatHeader({ conversation, getProfilePictureUrl, typingUsers = [] }) {
   const typingText = getTypingText();
 
   return (
-    <div className={`border-b p-4 flex items-center justify-between`}>
+    <div className={`border-b p-4 flex items-center justify-between shrink-0`}>
+      {/* Mobile back button */}
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="md:hidden flex items-center mr-3 text-primary shrink-0"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+      )}
       <div className="flex items-center flex-1 min-w-0">
         <div
           className="relative shrink-0 cursor-pointer"

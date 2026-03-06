@@ -295,7 +295,7 @@ function Messages() {
   }, [selectedConversation, showMobileChat]);
 
   return (
-    <div className="page-container flex flex-1">
+    <div className="w-full mt-16 md:mt-0 mb-0 md:mb-0 p-0 md:p-0 h-[calc(100dvh-7.5rem)] md:h-screen flex flex-1 overflow-hidden">
       {/* Left side - Conversations/Events list */}
       <div
         className={`${
@@ -304,8 +304,6 @@ function Messages() {
         style={{
           height: '100%',
           overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
           position: 'relative',
           zIndex: 1,
         }}
@@ -362,39 +360,18 @@ function Messages() {
       <div
         className={`${
           showMobileChat ? 'flex' : 'hidden md:flex'
-        } flex-1 flex-col`}
+        } flex-1 flex-col min-h-0`}
         style={{
-          height: '100%',
           overflow: 'hidden',
         }}
       >
         {activeTab === 'messages' ? (
           selectedConversation ? (
-            <div className="flex flex-col h-full">
-              {/* Mobile back button */}
-              <div className="md:hidden flex items-center px-3 py-2 border-b">
-                <button
-                  onClick={() => setSelectedConversation(null)}
-                  className={`flex items-center gap-2 text-sm font-semibold text-primary`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M15 18l-6-6 6-6" />
-                  </svg>
-                  Back
-                </button>
-              </div>
+            <div className="flex flex-col h-full min-h-0">
               <MessageChat
                 conversation={selectedConversation}
                 onNewMessage={handleNewMessage}
+                onBack={() => setSelectedConversation(null)}
               />
             </div>
           ) : (
