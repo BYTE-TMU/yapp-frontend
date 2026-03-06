@@ -413,7 +413,13 @@ const EventThread = () => {
       <div className="ml-64 h-full flex flex-col">
         {/* Fixed Header with Leave Button */}
         <div className="flex-shrink-0 p-6 pb-0">
-          <ETHeader threadInfo={threadInfo} onLeaveEvent={handleLeaveEvent} />
+          <ETHeader
+            threadInfo={threadInfo}
+            onLeaveEvent={handleLeaveEvent}
+            notifications={posts.filter(p => p.post_type?.endsWith('_notification'))}
+            getProfilePictureUrl={getProfilePictureUrl}
+            formatTime={formatTime}
+          />
         </div>
         
         {/* Fixed Input */}
