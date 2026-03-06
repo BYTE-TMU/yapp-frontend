@@ -299,14 +299,14 @@ function EventItem() {
                 originalIndex < currentIndex + 3;
 
               return (
-                <CarouselItem className="sm:basis-1/2 lg:basis-1/3">
+                <CarouselItem className="sm:basis-1/2 lg:basis-1/3 h-full">
                   <Card
                     key={event._id}
-                    className={`transition-all duration-500 ease-in-out cursor-pointer p-0`}
+                    className="transition-all duration-500 ease-in-out cursor-pointer p-0 flex flex-col h-full overflow-hidden"
                     onClick={() => handleEventClick(event, isExpanded)}
                   >
                     {/* Event Image */}
-                    <CardContent className="relative h-40 overflow-hidden w-full rounded-lg p-0">
+                    <CardContent className="relative h-44 overflow-hidden w-full rounded-t-lg p-0 shrink-0">
                       <img
                         src={getEventImage(event, originalIndex)}
                         alt={event.title}
@@ -321,7 +321,6 @@ function EventItem() {
 
                       {/* Delete Button for Event Owner */}
                       {canDeleteEvent(event) && (
-                        // <div className="absolute top-3 right-3 z-10">
                         <Button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -338,7 +337,6 @@ function EventItem() {
                             <X className="w-4 h-4" />
                           )}
                         </Button>
-                        // </div>
                       )}
 
                       {/* Date Badge */}
@@ -349,36 +347,40 @@ function EventItem() {
                     </CardContent>
 
                     {/* Event Content */}
-                    <CardHeader>
-                      <CardTitle className="text-lg font-bold">
-                        {event.title}
-                      </CardTitle>
-                      <CardDescription className="flex flex-col gap-1">
-                        {event.description}
-                        <div className="flex gap-2">
-                          {/* Time */}
-                          <div className={`flex gap-2 items-center text-xs`}>
-                            <Clock className="size-3" />
-                            <span>{formatEventTime(event.event_datetime)}</span>
-                          </div>
+                    <CardHeader className="flex-1 flex flex-col justify-between min-w-0">
+                      <div className="flex flex-col gap-1 min-w-0">
+                        <CardTitle className="text-lg font-bold line-clamp-1">
+                          {event.title}
+                        </CardTitle>
+                        <CardDescription className="line-clamp-1">
+                          {event.description}
+                        </CardDescription>
+                      </div>
+                      <div className="flex flex-col gap-1 mt-2 min-w-0">
+                        {/* Time */}
+                        <div className="flex gap-2 items-center text-xs text-muted-foreground">
+                          <Clock className="size-3 shrink-0" />
+                          <span>{formatEventTime(event.event_datetime)}</span>
+                        </div>
 
-                          {/* Location */}
+                        {/* Location — always reserve space so cards align */}
+                        <div className="flex gap-2 items-center text-xs text-muted-foreground min-w-0 h-4 overflow-hidden">
                           {event.location && (
-                            <div className="flex gap-2 items-center text-xs text-muted-foreground">
-                              <MapPin className="size-3 " />
-                              <span className="truncate">{event.location}</span>
-                            </div>
+                            <>
+                              <MapPin className="size-3 shrink-0" />
+                              <span className="truncate min-w-0 flex-1">{event.location}</span>
+                            </>
                           )}
                         </div>
-                        <div className="flex items-center  w-full justify-between">
-                          <UserBadge user={event} username={event.username} />
-                          <LikeBadge event={event} />
-                        </div>
-                      </CardDescription>
+                      </div>
+                      <div className="flex items-center w-full justify-between mt-3">
+                        <UserBadge user={event} username={event.username} />
+                        <LikeBadge event={event} />
+                      </div>
                     </CardHeader>
-                    <CardFooter className="items-center justify-center">
+                    <CardFooter className="items-center justify-center shrink-0">
                       <Button
-                        className={`px-2 py-1 rounded-full text-xs transition-all duration-200`}
+                        className="px-2 py-1 rounded-full text-xs transition-all duration-200"
                         variant="ghost"
                       >
                         Click to view details
