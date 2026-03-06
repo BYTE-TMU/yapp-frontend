@@ -16,6 +16,8 @@
     "components": "@/components",
     "utils": "@/utils/cnUtils",
     "ui": "@/components/ui",
+    "sidebar": "@/components/sidebar",
+    "pages": "@/components/pages",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },

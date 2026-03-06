@@ -1,37 +1,110 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // Add this import
-import Sidebar from '../sidebar/Sidebar';
-import Header from '../header/Header';
+import {
+  Search,
+  User,
+  UserPlus,
+  Users as UsersIcon,
+  Sparkles,
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../services/config';
 import UserAvatar from '../badges/UserAvatar';
 
 function Users() {
-  const navigate = useNavigate(); // Add this hook
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { isDarkMode } = useTheme();
 
-  // search function using debouncing; used AI for all this
+  // Recommendations state
+  const [recommendations, setRecommendations] = useState([]);
+  const [recLoading, setRecLoading] = useState(true);
+  const [followingIds, setFollowingIds] = useState(new Set());
+
+  // ─── Helpers ────────────────────────────────────────────────────────────────
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    };
+  };
+
+  const isLoggedIn = () => !!localStorage.getItem('token');
+
+  // ─── Fetch recommendations ──────────────────────────────────────────────────
+  const fetchRecommendations = useCallback(async () => {
+    if (!isLoggedIn()) {
+      setRecLoading(false);
+      return;
+    }
+    try {
+      setRecLoading(true);
+      const res = await fetch(`${API_BASE_URL}/users/recommendations?limit=8`, {
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setRecommendations(data.recommendations || []);
+      }
+    } catch (e) {
+      console.warn('Could not load recommendations', e);
+    } finally {
+      setRecLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRecommendations();
+  }, [fetchRecommendations]);
+
+  // ─── Follow / unfollow ──────────────────────────────────────────────────────
+  const handleFollow = async (userId, e) => {
+    e.stopPropagation();
+    if (!isLoggedIn()) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/${userId}/follow`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.following) {
+          setFollowingIds((prev) => new Set([...prev, userId]));
+        } else {
+          setFollowingIds((prev) => {
+            const s = new Set(prev);
+            s.delete(userId);
+            return s;
+          });
+        }
+        // Refresh recommendations after a short delay
+        setTimeout(fetchRecommendations, 400);
+      }
+    } catch (e) {
+      console.warn('Follow action failed', e);
+    }
+  };
+
+  // ─── User search (unchanged) ────────────────────────────────────────────────
   const debouncedSearch = useCallback(
     debounce(async (query) => {
       if (query.length < 2) {
         setUsers([]);
         return;
       }
-
       setLoading(true);
       setError('');
-
       try {
         const response = await fetch(
           `${API_BASE_URL}/users/search?q=${encodeURIComponent(query)}&limit=20`,
         );
         const data = await response.json();
-
         if (response.ok) {
           setUsers(data.users);
         } else {
@@ -44,268 +117,335 @@ function Users() {
       } finally {
         setLoading(false);
       }
-    }, 300), // 300ms delay
+    }, 300),
     [],
   );
 
-  // anytime the search changes the debounce gets called
   useEffect(() => {
     debouncedSearch(searchQuery);
   }, [searchQuery, debouncedSearch]);
 
-  const handleInputChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  const handleInputChange = (e) => setSearchQuery(e.target.value);
 
-  const handleUserClick = (userId) => {
-    // Actually navigate to the profile page
-    navigate(`/profile/${userId}`);
-  };
+  const handleUserClick = (userId) => navigate(`/profile/${userId}`);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString();
 
-  // function to get profile picture URL or default
-  const getProfilePictureUrl = (user) => {
-    if (user.profile_picture && user.profile_picture.trim() !== '') {
-      if (user.profile_picture.startsWith('http')) {
-        return user.profile_picture;
-      }
-      // Match the path from your Flask API routes
-      return `${API_BASE_URL}/uploads/profile_pictures/${user._id}/${user.profile_picture}`;
-    }
-    // Default profile picture with user's initial
-    const initial = user.username ? user.username[0].toUpperCase() : '?';
-    return `data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 48 48' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23e0e0e0'/%3E%3Ccircle cx='24' cy='18' r='8' fill='%23bdbdbd'/%3E%3Cellipse cx='24' cy='42' rx='16' ry='12' fill='%23bdbdbd'/%3E%3C/svg%3E`;
-  };
+  // ─── Theme tokens ───────────────────────────────────────────────────────────
+  const cardBg = isDarkMode ? '#171717' : '#ffffff';
+  const skeletonBg = isDarkMode ? '#1c1c1c' : '#f3f4f6';
+  const skeletonEl = isDarkMode ? '#374151' : '#d1d5db';
+  const borderColor = isDarkMode
+    ? 'rgba(255,255,255,0.07)'
+    : 'rgba(0,0,0,0.08)';
 
-  // Dynamic colors based on theme
-  const cardBgColor = isDarkMode ? '#171717' : '#ffffff';
-  const skeletonBgColor = isDarkMode ? '#1c1c1c' : '#f3f4f6';
-  const skeletonElementBg = isDarkMode ? '#374151' : '#d1d5db';
+  const showRecommendations = searchQuery.length === 0 && isLoggedIn();
 
   return (
-    <div
-      className="min-h-screen font-bold w-screen"
-      style={{
-        fontFamily: 'Albert Sans',
-      }}
-    >
-      <Header />
-      <Sidebar />
-      <div className="md:ml-64 p-6">
-        {/* Animated Background */}
-        <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+    <div className="page-container">
+      <h1 className="text-2xl font-bold mb-6">Search Users</h1>
+      {/* Search bar */}
+      <div className="mb-8">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleInputChange}
+            placeholder="Search for users..."
+            autoComplete="off"
+            className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none transition-colors placeholder:text-muted-foreground focus:border-primary`}
+            style={{ backgroundColor: isDarkMode ? '#171717' : '#ffffff' }}
+          />
         </div>
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">Search Users</h1>
+      </div>
 
-          {/* Search bar */}
-          <div className="mb-6">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={handleInputChange}
-                placeholder="Search for users..."
-                autoComplete="off"
-                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none transition-colors ${
-                  isDarkMode
-                    ? ' text-white placeholder-gray-400 focus:border-gray-400'
-                    : ' text-gray-900 placeholder-gray-500 focus:border-gray-500'
-                }`}
-                style={{
-                  backgroundColor: isDarkMode ? '#171717' : '#ffffff',
-                }}
-              />
-            </div>
+      {/* ── RECOMMENDATIONS ──────────────────────────────────────────────── */}
+      {showRecommendations && (
+        <div className="mb-10">
+          {/* Section header */}
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles size={18} className="text-orange-400" />
+            <h2
+              className={`text-lg font-bold ${isDarkMode ? 'text-gray-300' : 'text-white-900'}`}
+            >
+              People You Might Know
+            </h2>
           </div>
 
-          {/* Loading state with skeleton cards */}
-          {loading && (
-            <div className="space-y-4">
-              <h3
-                className={`text-lg font-bold ${
-                  isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}
-              >
-                Searching...
-              </h3>
-              <div className="space-y-3">
-                {[...Array(3)].map((_, index) => (
-                  <div
-                    key={index}
-                    className={`rounded-lg p-4 animate-pulse ${
-                      isDarkMode ? '' : 'border border-gray-200'
-                    }`}
-                    style={{ backgroundColor: cardBgColor }}
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div
-                        className="w-12 h-12 rounded-full"
-                        style={{ backgroundColor: skeletonElementBg }}
-                      ></div>
-                      <div className="flex-1">
-                        <div
-                          className="h-4 rounded w-32 mb-2"
-                          style={{ backgroundColor: skeletonElementBg }}
-                        ></div>
-                        <div
-                          className="h-3 rounded w-48 mb-1"
-                          style={{ backgroundColor: skeletonBgColor }}
-                        ></div>
-                        <div
-                          className="h-3 rounded w-24"
-                          style={{ backgroundColor: skeletonBgColor }}
-                        ></div>
-                      </div>
-                      <div
-                        className="w-24 h-8 rounded"
-                        style={{ backgroundColor: skeletonElementBg }}
-                      ></div>
-                    </div>
+          {recLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl p-4 animate-pulse"
+                  style={{
+                    backgroundColor: cardBg,
+                    border: `1px solid ${borderColor}`,
+                  }}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <div
+                      className="w-14 h-14 rounded-full"
+                      style={{ backgroundColor: skeletonEl }}
+                    />
+                    <div
+                      className="h-3 w-24 rounded"
+                      style={{ backgroundColor: skeletonEl }}
+                    />
+                    <div
+                      className="h-3 w-16 rounded"
+                      style={{ backgroundColor: skeletonBg }}
+                    />
+                    <div
+                      className="h-8 w-full rounded-lg"
+                      style={{ backgroundColor: skeletonBg }}
+                    />
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          )}
-
-          {/* Error state */}
-          {error && (
-            <div
-              className={`rounded-lg p-4 mb-6 ${
-                isDarkMode ? '' : 'border border-red-200'
-              }`}
-              style={{ backgroundColor: cardBgColor }}
-            >
-              <p className="text-red-400">{error}</p>
-            </div>
-          )}
-
-          {/* Minimum character message */}
-          {searchQuery.length > 0 && searchQuery.length < 2 && (
-            <div
-              className={`rounded-lg p-4 mb-6 ${
-                isDarkMode ? '' : 'border border-gray-200'
-              }`}
-              style={{ backgroundColor: cardBgColor }}
-            >
-              <p
-                className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}
-              >
-                Type at least 2 characters to search
+          ) : recommendations.length === 0 ? (
+            <div className="rounded-2xl p-6 flex flex-col items-center gap-2 border bg-accent">
+              <UsersIcon className="w-10 h-10 text-primary" />
+              <p className="text-sm text-muted-foreground text-center">
+                Follow more people to get recommendations
               </p>
             </div>
-          )}
-
-          {/* No results */}
-          {users.length === 0 && searchQuery.length >= 2 && !loading && (
-            <div className="text-center py-8">
-              <div
-                className={`rounded-lg p-6 ${
-                  isDarkMode ? '' : 'border border-gray-200'
-                }`}
-                style={{ backgroundColor: cardBgColor }}
-              >
-                <User
-                  className={`w-12 h-12 mx-auto mb-3 ${
-                    isDarkMode ? 'text-gray-500' : 'text-gray-400'
-                  }`}
-                />
-                <p
-                  className={`${
-                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                  }`}
-                >
-                  No users found for "{searchQuery}"
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Search results */}
-          {users.length > 0 && (
-            <div className="space-y-4">
-              <h3
-                className={`text-lg font-bold ${
-                  isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}
-              >
-                Search Results ({users.length})
-              </h3>
-              <div className="space-y-3">
-                {users.map((user) => (
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {recommendations.map((rec) => {
+                const isFollowing = followingIds.has(rec._id);
+                return (
                   <div
-                    key={user._id}
-                    onClick={() => handleUserClick(user._id)}
-                    className={`rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                      isDarkMode
-                        ? 'hover:bg-zinc-800'
-                        : 'hover:bg-gray-50 border border-gray-200'
-                    }`}
-                    style={{ backgroundColor: cardBgColor }}
+                    key={rec._id}
+                    onClick={() => handleUserClick(rec._id)}
+                    className="rounded-2xl p-4 cursor-pointer transition-all duration-200 group"
+                    style={{
+                      backgroundColor: cardBg,
+                      border: `1px solid ${borderColor}`,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.border = `1px solid ${isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)'}`;
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = isDarkMode
+                        ? '0 8px 24px rgba(0,0,0,0.4)'
+                        : '0 8px 24px rgba(0,0,0,0.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.border = `1px solid ${borderColor}`;
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   >
-                    <div className="flex items-center space-x-4">
-                      {/* Profile Picture */}
-                      <UserAvatar user={user} size="sm" />
+                    <div className="flex flex-col items-center text-center gap-2">
+                      {/* Avatar */}
+                      <div className="mb-1">
+                        <UserAvatar user={rec} size="lg" />
+                      </div>
 
-                      <div className="flex-1">
-                        <h4
-                          className={`font-bold ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                          }`}
-                        >
-                          @{user.username}
-                        </h4>
-                        {user.email && (
+                      {/* Name & username */}
+                      <div>
+                        {rec.full_name && (
                           <p
-                            className={`text-sm ${
-                              isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}
+                            className={`text-sm font-bold truncate max-w-[140px] ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
                           >
-                            {user.email}
+                            {rec.full_name}
                           </p>
                         )}
                         <p
-                          className={`text-xs ${
-                            isDarkMode ? 'text-gray-500' : 'text-gray-500'
-                          }`}
+                          className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}
                         >
-                          Joined: {formatDate(user.created_at)}
+                          @{rec.username}
                         </p>
                       </div>
 
-                      <div className="hidden md:block">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleUserClick(user._id);
+                      {/* Mutual badge */}
+                      {rec.mutual_count > 0 && (
+                        <span
+                          className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                          style={{
+                            backgroundColor: isDarkMode
+                              ? 'rgba(251,146,60,0.15)'
+                              : 'rgba(251,146,60,0.12)',
+                            color: '#f97316',
                           }}
-                          className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded-lg font-bold transition-colors"
                         >
-                          View Profile
-                        </button>
-                      </div>
+                          {rec.mutual_count} mutual{' '}
+                          {rec.mutual_count === 1
+                            ? 'connection'
+                            : 'connections'}
+                        </span>
+                      )}
+
+                      {/* Follow button */}
+                      <button
+                        onClick={(e) => handleFollow(rec._id, e)}
+                        className={`mt-1 w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${
+                          isFollowing
+                            ? isDarkMode
+                              ? 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            : 'bg-orange-500 hover:bg-orange-600 text-white'
+                        }`}
+                      >
+                        <UserPlus size={14} />
+                        {isFollowing ? 'Following' : 'Follow'}
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
           )}
         </div>
-      </div>
+      )}
+
+      {/* ── SEARCH STATES ─────────────────────────────────────────────────── */}
+      {loading && (
+        <div className="space-y-4">
+          <h3
+            className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+          >
+            Searching...
+          </h3>
+          <div className="space-y-3">
+            {[...Array(3)].map((_, index) => (
+              <div
+                key={index}
+                className={`rounded-lg p-4 animate-pulse ${isDarkMode ? '' : 'border border-gray-200'}`}
+                style={{ backgroundColor: cardBg }}
+              >
+                <div className="flex items-center space-x-4">
+                  <div
+                    className="w-12 h-12 rounded-full"
+                    style={{ backgroundColor: skeletonEl }}
+                  />
+                  <div className="flex-1">
+                    <div
+                      className="h-4 rounded w-32 mb-2"
+                      style={{ backgroundColor: skeletonEl }}
+                    />
+                    <div
+                      className="h-3 rounded w-48 mb-1"
+                      style={{ backgroundColor: skeletonBg }}
+                    />
+                    <div
+                      className="h-3 rounded w-24"
+                      style={{ backgroundColor: skeletonBg }}
+                    />
+                  </div>
+                  <div
+                    className="w-24 h-8 rounded"
+                    style={{ backgroundColor: skeletonEl }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div
+          className={`rounded-lg p-4 mb-6 ${isDarkMode ? '' : 'border border-red-200'}`}
+          style={{ backgroundColor: cardBg }}
+        >
+          <p className="text-red-400">{error}</p>
+        </div>
+      )}
+
+      {searchQuery.length > 0 && searchQuery.length < 2 && (
+        <div
+          className={`rounded-lg p-4 mb-6 ${isDarkMode ? '' : 'border border-gray-200'}`}
+          style={{ backgroundColor: cardBg }}
+        >
+          <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            Type at least 2 characters to search
+          </p>
+        </div>
+      )}
+
+      {users.length === 0 && searchQuery.length >= 2 && !loading && (
+        <div className="text-center py-8">
+          <div
+            className={`rounded-lg p-6 ${isDarkMode ? '' : 'border border-gray-200'}`}
+            style={{ backgroundColor: cardBg }}
+          >
+            <User
+              className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}
+            />
+            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              No users found for &ldquo;{searchQuery}&rdquo;
+            </p>
+          </div>
+        </div>
+      )}
+
+      {users.length > 0 && (
+        <div className="space-y-4">
+          <h3
+            className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+          >
+            Search Results ({users.length})
+          </h3>
+          <div className="space-y-3">
+            {users.map((user) => (
+              <div
+                key={user._id}
+                onClick={() => handleUserClick(user._id)}
+                className={`rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                  isDarkMode
+                    ? 'hover:bg-zinc-800'
+                    : 'hover:bg-gray-50 border border-gray-200'
+                }`}
+                style={{ backgroundColor: cardBg }}
+              >
+                <div className="flex items-center space-x-4">
+                  <UserAvatar user={user} size="sm" />
+                  <div className="flex-1">
+                    <h4
+                      className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+                    >
+                      @{user.username}
+                    </h4>
+                    {user.email && (
+                      <p
+                        className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                      >
+                        {user.email}
+                      </p>
+                    )}
+                    <p
+                      className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}
+                    >
+                      Joined: {formatDate(user.created_at)}
+                    </p>
+                  </div>
+                  <div className="hidden md:block">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleUserClick(user._id);
+                      }}
+                      className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded-lg font-bold transition-colors"
+                    >
+                      View Profile
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-// stuff for debounce (used ai for all ts wtf even is this)
+// Debounce helper
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {

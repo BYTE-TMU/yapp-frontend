@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import Sidebar from '../../sidebar/Sidebar.jsx';
-import Header from '../../header/Header';
 import WaypointModal from './WaypointModal.jsx';
 import WaypointHeader from './WaypointHeader.jsx';
 import WaypointMap from './WaypointMap.jsx';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../../services/config.js';
+import LoadingDots from '../../common/LoadingDots';
 import {
   showLoginRequired,
   showNoSavedWaypoints,
@@ -1061,108 +1060,76 @@ function Waypoint() {
   // Loading state
   if (loading) {
     return (
-      <div
-        className="h-screen overflow-hidden font-bold"
-        style={{
-          backgroundColor: isDarkMode ? '#121212' : '#ffffff',
-          fontFamily: 'Albert Sans',
-        }}
-      >
-        <Header />
-        <Sidebar />
-        <div className="ml-64 h-full overflow-y-auto p-6 pb-16 md:pb-6">
-          <div className="max-w-full mx-auto h-full flex items-center justify-center">
-            <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mb-4"></div>
-              <h2
-                className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-              >
-                Loading Waypoints...
-              </h2>
-              <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                Fetching campus community data
-              </p>
-            </div>
-          </div>
+      <div className="page-container flex items-center justify-center">
+        <div className="text-center flex flex-col items-center gap-4">
+          <LoadingDots size={12} />
+          <h2 className="text-xl font-bold">Loading Waypoints...</h2>
+          <p className="text-gray-400">Fetching campus community data</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      className="h-screen overflow-hidden font-bold"
-      style={{
-        fontFamily: 'Albert Sans',
-      }}
-    >
-      <Header />
-      <Sidebar />
-      <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6">
-        {/* Animated Background */}
-        <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
-        <div className="max-w-full mx-auto h-full flex flex-col">
-          {/* Header */}
-          <WaypointHeader
-            placementMode={placementMode}
-            onTogglePlacementMode={togglePlacementMode}
-            onRefresh={handleRefresh}
-            refreshing={refreshing}
-            waypointCount={waypoints.length}
-            error={error}
-            onClearError={() => setError(null)}
-            onOpenSavedWaypoints={fetchSavedWaypoints}
-            isNavigatingSaved={isNavigatingSaved}
-            currentSavedIndex={currentSavedIndex}
-            savedWaypointsCount={savedWaypoints.length}
-            onPreviousSaved={goToPreviousSaved}
-            onNextSaved={goToNextSaved}
-            onExitSavedNavigation={() => {
-              setIsNavigatingSaved(false);
-              setSavedWaypoints([]);
-              setCurrentSavedIndex(-1);
-            }}
-          />
+    <div className="page-container">
+      <div className="max-w-full mx-auto h-full flex flex-col">
+        {/* Header */}
+        <WaypointHeader
+          placementMode={placementMode}
+          onTogglePlacementMode={togglePlacementMode}
+          onRefresh={handleRefresh}
+          refreshing={refreshing}
+          waypointCount={waypoints.length}
+          error={error}
+          onClearError={() => setError(null)}
+          onOpenSavedWaypoints={fetchSavedWaypoints}
+          isNavigatingSaved={isNavigatingSaved}
+          currentSavedIndex={currentSavedIndex}
+          savedWaypointsCount={savedWaypoints.length}
+          onPreviousSaved={goToPreviousSaved}
+          onNextSaved={goToNextSaved}
+          onExitSavedNavigation={() => {
+            setIsNavigatingSaved(false);
+            setSavedWaypoints([]);
+            setCurrentSavedIndex(-1);
+          }}
+        />
 
-          {/* Map Container */}
-          <WaypointMap
-            waypoints={waypoints}
-            placementMode={placementMode}
-            refreshing={refreshing}
-            onMapClick={handleMapClick}
-            onJoinWaypoint={joinWaypoint}
-            onDeleteWaypoint={deleteWaypoint}
-            onLikeWaypoint={likeWaypoint}
-            onBookmarkWaypoint={bookmarkWaypoint}
-            onJoinEvent={joinEventFromWaypoint}
-            getCurrentUser={getCurrentUser}
-            TMU_COORDS={TMU_COORDS}
-            ZOOM_LEVEL={ZOOM_LEVEL}
-            targetWaypoint={targetWaypoint}
-            shouldOpenPopup={shouldOpenPopup}
-            // Navigation overlay props
-            isNavigatingSaved={isNavigatingSaved}
-            currentSavedWaypoint={savedWaypoints[currentSavedIndex]}
-            currentSavedIndex={currentSavedIndex}
-            savedWaypointsCount={savedWaypoints.length}
-            onPreviousSaved={goToPreviousSaved}
-            onNextSaved={goToNextSaved}
-          />
+        {/* Map Container */}
+        <WaypointMap
+          waypoints={waypoints}
+          placementMode={placementMode}
+          refreshing={refreshing}
+          onMapClick={handleMapClick}
+          onJoinWaypoint={joinWaypoint}
+          onDeleteWaypoint={deleteWaypoint}
+          onLikeWaypoint={likeWaypoint}
+          onBookmarkWaypoint={bookmarkWaypoint}
+          onJoinEvent={joinEventFromWaypoint}
+          getCurrentUser={getCurrentUser}
+          TMU_COORDS={TMU_COORDS}
+          ZOOM_LEVEL={ZOOM_LEVEL}
+          targetWaypoint={targetWaypoint}
+          shouldOpenPopup={shouldOpenPopup}
+          // Navigation overlay props
+          isNavigatingSaved={isNavigatingSaved}
+          currentSavedWaypoint={savedWaypoints[currentSavedIndex]}
+          currentSavedIndex={currentSavedIndex}
+          savedWaypointsCount={savedWaypoints.length}
+          onPreviousSaved={goToPreviousSaved}
+          onNextSaved={goToNextSaved}
+        />
 
-          {/* Waypoint Modal */}
-          <WaypointModal
-            isOpen={showCreateModal}
-            onClose={() => {
-              setShowCreateModal(false);
-              setNewPinLocation(null);
-            }}
-            onSubmit={handleCreatePin}
-            location={newPinLocation}
-          />
-        </div>
+        {/* Waypoint Modal */}
+        <WaypointModal
+          isOpen={showCreateModal}
+          onClose={() => {
+            setShowCreateModal(false);
+            setNewPinLocation(null);
+          }}
+          onSubmit={handleCreatePin}
+          location={newPinLocation}
+        />
       </div>
     </div>
   );

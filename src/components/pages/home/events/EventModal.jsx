@@ -12,8 +12,8 @@ import {
   Clock,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../../../services/config';
-import { formatEventDateTime } from '../../../../utils/dateTimeUtils';
+import { API_BASE_URL } from '@/services/config';
+import { formatEventDateTime } from '@/utils/dateTimeUtils';
 import UserBadge from '@/components/badges/UserBadge';
 import {
   showAttendanceUpdateError,

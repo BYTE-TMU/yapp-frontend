@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import MessagePerson from './MessagePerson';
 import { useTheme } from '../../contexts/ThemeContext';
 import { messageService } from '../../services/messageService';
+import LoadingDots from '../common/LoadingDots';
 
 function MessagesList({
   conversations,
@@ -96,8 +97,8 @@ function MessagesList({
     return (
       <div className="h-full flex flex-col">
         <div className="flex-1 flex items-center justify-center pb-20 md:pb-0">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+          <div className="flex flex-col items-center gap-3">
+            <LoadingDots />
             <p>Loading conversations...</p>
           </div>
         </div>
