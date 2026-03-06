@@ -20,6 +20,7 @@ function LocationSearchBar({ onSelect }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
   const debounceRef = useRef(null);
+  const selectingRef = useRef(false); // Guard: true while a result tap/click is in progress
 
   // Stop Leaflet from swallowing mouse/touch/scroll events on the search widget
   useEffect(() => {
@@ -86,8 +87,11 @@ function LocationSearchBar({ onSelect }) {
   }, [results, handleSelect]);
 
   const handleBlur = useCallback(() => {
-    // Small delay so mouseDown on a result can fire before the list disappears
-    setTimeout(() => setOpen(false), 150);
+    // Don't close if user is tapping/clicking a result — handleSelect will close instead
+    setTimeout(() => {
+      if (!selectingRef.current) setOpen(false);
+      selectingRef.current = false;
+    }, 300);
   }, []);
 
   return (
@@ -181,7 +185,8 @@ function LocationSearchBar({ onSelect }) {
             return (
               <li
                 key={i}
-                onMouseDown={() => handleSelect(result)}
+                onPointerDown={() => { selectingRef.current = true; }}
+                onClick={() => handleSelect(result)}
                 style={{
                   padding: '8px 12px',
                   cursor: 'pointer',
@@ -190,6 +195,8 @@ function LocationSearchBar({ onSelect }) {
                       ? '1px solid rgba(255,255,255,0.06)'
                       : 'none',
                   transition: 'background-color 0.12s',
+                  userSelect: 'none',
+                  WebkitTapHighlightColor: 'transparent',
                 }}
                 onMouseEnter={(e) =>
                   (e.currentTarget.style.backgroundColor =

@@ -136,3 +136,43 @@ export const slcIcon = L.divIcon({
     iconAnchor: [27, 30],
     popupAnchor: [0, -30]
 });
+
+// Search-result "create waypoint here" marker — pulsing green "+" pin
+export const searchCreateIcon = L.divIcon({
+    className: 'search-create-marker',
+    html: `
+        <div style="
+            position: relative;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        ">
+            <!-- Pulse ring -->
+            <div class="search-create-ring"></div>
+            <!-- Inner circle with + -->
+            <div style="
+                position: relative;
+                z-index: 2;
+                background-color: #22c55e;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                border: 3px solid white;
+                box-shadow: 0 3px 8px rgba(0,0,0,0.45);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px;
+                font-weight: 700;
+                color: white;
+                cursor: pointer;
+                line-height: 1;
+            ">+</div>
+        </div>
+    `,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -22]
+});

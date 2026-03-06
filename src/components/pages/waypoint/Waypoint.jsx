@@ -45,6 +45,7 @@ function Waypoint() {
   const [currentSavedIndex, setCurrentSavedIndex] = useState(-1);
   const [isNavigatingSaved, setIsNavigatingSaved] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false); // Prevent rapid navigation
+  const [searchedLocation, setSearchedLocation] = useState(null); // Location from search bar
   const { isDarkMode } = useTheme();
 
   // Reverse geocode the pin location whenever a new one is set.
@@ -412,6 +413,7 @@ function Waypoint() {
 
       setShowCreateModal(false);
       setNewPinLocation(null);
+      setSearchedLocation(null);
       setPlacementMode(false); // Exit placement mode after creating
     } catch (err) {
       console.error('Error creating waypoint:', err);
@@ -936,9 +938,9 @@ function Waypoint() {
 
   // Handle a result selected from the search bar:
   // The map flies to the location (done inside LocationSearchBar).
-  // We just activate placement mode so the user can click the exact spot to drop the waypoint.
-  const handleSearchSelect = () => {
-    setPlacementMode(true);
+  // We drop a pulsing marker at the searched coordinates so the user can click it to create a waypoint.
+  const handleSearchSelect = ({ lat, lng, address }) => {
+    setSearchedLocation({ lat, lng, address });
   };
 
   // Handle creating waypoint
@@ -1100,7 +1102,7 @@ function Waypoint() {
   if (loading) {
     return (
       <div
-        className="h-screen overflow-hidden font-bold"
+        className="flex flex-col h-screen overflow-hidden font-bold"
         style={{
           backgroundColor: isDarkMode ? '#121212' : '#ffffff',
           fontFamily: 'Albert Sans',
@@ -1108,7 +1110,7 @@ function Waypoint() {
       >
         <Header />
         <Sidebar />
-        <div className="ml-64 h-full overflow-y-auto p-6 pb-16 md:pb-6">
+        <div className="md:ml-64 flex-1 min-h-0 overflow-y-auto p-6 pb-16 md:pb-6">
           <div className="max-w-full mx-auto h-full flex items-center justify-center">
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mb-4"></div>
@@ -1129,20 +1131,20 @@ function Waypoint() {
 
   return (
     <div
-      className="h-screen overflow-hidden font-bold"
+      className="flex flex-col h-screen overflow-hidden font-bold"
       style={{
         fontFamily: 'Albert Sans',
       }}
     >
       <Header />
       <Sidebar />
-      <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6">
+      <div className="md:ml-64 flex-1 min-h-0 flex flex-col px-1 pt-2 md:p-6 pb-20 md:pb-6">
         {/* Animated Background */}
         <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
-        <div className="max-w-full mx-auto h-full flex flex-col">
+        <div className="w-full flex-1 min-h-0 flex flex-col">
           {/* Header */}
           <WaypointHeader
             placementMode={placementMode}
@@ -1182,6 +1184,7 @@ function Waypoint() {
             targetWaypoint={targetWaypoint}
             shouldOpenPopup={shouldOpenPopup}
             onSearchSelect={handleSearchSelect}
+            searchedPinLocation={searchedLocation}
             // Navigation overlay props
             isNavigatingSaved={isNavigatingSaved}
             currentSavedWaypoint={savedWaypoints[currentSavedIndex]}
@@ -1198,6 +1201,7 @@ function Waypoint() {
               setShowCreateModal(false);
               setNewPinLocation(null);
               setResolvedAddress(null);
+              setSearchedLocation(null);
             }}
             onSubmit={handleCreatePin}
             location={newPinLocation}

@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMapEvents, useMap } from 'react-leaflet';
 import { useEffect, useRef } from 'react';
-import { createCustomIcon, campusIcon, slcIcon } from './waypointIcons.js';
+import { createCustomIcon, campusIcon, slcIcon, searchCreateIcon } from './waypointIcons.js';
 import WaypointPopup from './WaypointPopup.jsx';
 import WaypointLegend from './WaypointLegend.jsx';
 import WaypointStats from './WaypointStats.jsx';
@@ -73,6 +73,7 @@ function WaypointMap({
     onPreviousSaved,
     onNextSaved,
     onSearchSelect = null,
+    searchedPinLocation = null,
 }) {
     // Get both current username and user ID
     const currentUsername = getCurrentUser();
@@ -98,14 +99,14 @@ function WaypointMap({
     const currentUserId = getCurrentUserId();
 
     return (
-        <div className="flex-1 relative rounded-lg overflow-hidden" style={{ backgroundColor: '#171717', minHeight: '400px' }}>
+        <div className="flex-1 relative md:rounded-lg overflow-hidden" style={{ backgroundColor: '#171717', minHeight: '300px' }}>
             <MapContainer
                 center={TMU_COORDS}
                 zoom={ZOOM_LEVEL}
                 style={{
                     height: '100%',
                     width: '100%',
-                    minHeight: '400px',
+                    minHeight: '300px',
                     cursor: placementMode ? 'crosshair' : 'grab'
                 }}
                 zoomControl={true}
@@ -198,6 +199,41 @@ function WaypointMap({
                         </Marker>
                     );
                 })}
+
+                {/* Search-result "create waypoint here" marker */}
+                {searchedPinLocation && (
+                    <Marker
+                        position={[searchedPinLocation.lat, searchedPinLocation.lng]}
+                        icon={searchCreateIcon}
+                        eventHandlers={{
+                            click: () => {
+                                onMapClick({
+                                    lat: searchedPinLocation.lat,
+                                    lng: searchedPinLocation.lng,
+                                    address: searchedPinLocation.address,
+                                });
+                            }
+                        }}
+                    >
+                        <Tooltip
+                            direction="top"
+                            offset={[0, -24]}
+                            opacity={1}
+                            permanent={true}
+                            interactive={false}
+                        >
+                            <div style={{
+                                fontFamily: 'Albert Sans, sans-serif',
+                                fontSize: '13px',
+                                fontWeight: '600',
+                                textAlign: 'center',
+                                padding: '2px 4px',
+                            }}>
+                                📍 Click to drop a waypoint here
+                            </div>
+                        </Tooltip>
+                    </Marker>
+                )}
 
                 {/* Handle map clicks */}
                 <MapClickHandler
