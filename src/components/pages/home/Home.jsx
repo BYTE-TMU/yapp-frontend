@@ -5,6 +5,8 @@ import Header from '@/components/header/Header';
 import EventItem from './events/EventItem';
 import EventItemModal from './events/EventItemModal';
 import HomepageActivities from './activities/HomepageActivities';
+import RefreshAnimation from '@/components/common/RefreshAnimation';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { API_BASE_URL } from '@/services/config';
 
 function Home() {
@@ -17,6 +19,7 @@ function Home() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [feedType, setFeedType] = useState('recent'); // 'recent' or 'following'
+  const [refreshing, setRefreshing] = useState(false); // For smooth feed type changes
   const mainContentRef = useRef(null);
 
   // Get current user info
@@ -62,9 +65,12 @@ function Home() {
     pageNum = 1,
     reset = false,
     feedTypeOverride = null,
+    isRefreshingFeed = false,
   ) => {
     try {
-      if (pageNum === 1) {
+      if (isRefreshingFeed) {
+        setRefreshing(true);
+      } else if (pageNum === 1) {
         setLoading(true);
       } else {
         setLoadingMore(true);
@@ -106,6 +112,10 @@ function Home() {
     } finally {
       setLoading(false);
       setLoadingMore(false);
+      // Keep refreshing state for a minimum duration for smooth animation
+      if (isRefreshingFeed) {
+        setTimeout(() => setRefreshing(false), 400);
+      }
     }
   };
 
@@ -131,10 +141,11 @@ function Home() {
 
   // Handle feed type changes
   const handleFeedTypeChange = (newFeedType) => {
+    if (newFeedType === feedType) return; // Prevent unnecessary refreshes
     setFeedType(newFeedType);
     setPage(1);
     setHasMore(true);
-    fetchPosts(1, true, newFeedType);
+    fetchPosts(1, true, newFeedType, true); // Pass true for isRefreshingFeed
   };
 
   useEffect(() => {
@@ -154,7 +165,7 @@ function Home() {
 
   const refreshPosts = () => {
     setPage(1);
-    fetchPosts(1, true);
+    fetchPosts(1, true, null, true); // Use refresh animation for manual refresh too
   };
 
   if (loading && posts.length === 0) {
@@ -167,8 +178,11 @@ function Home() {
       >
         <Header />
         {/* <Sidebar /> */}
-        <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6">
-          <p className="text-foreground">Loading posts...</p>
+        <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <LoadingSpinner size="lg" />
+            <p className="text-muted-foreground">Loading posts...</p>
+          </div>
         </div>
       </div>
     );
@@ -258,36 +272,44 @@ function Home() {
               </div>
             )}
 
-            {posts.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">
-                  No posts yet. Be the first to create one!
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {posts.map((post) => (
-                  <PostItem key={post._id} post={post} />
-                ))}
-              </div>
-            )}
+            {/* Wrap posts in RefreshAnimation for smooth transitions */}
+            <RefreshAnimation isRefreshing={refreshing}>
+              {posts.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">
+                    No posts yet. Be the first to create one!
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {posts.map((post) => (
+                    <PostItem key={post._id} post={post} />
+                  ))}
+                </div>
+              )}
 
-            {hasMore && !loadingMore && (
-              <div className="text-center mt-8">
-                <button
-                  onClick={loadMorePosts}
-                  className="px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold transition-colors"
-                >
-                  Load More Posts
-                </button>
-              </div>
-            )}
+              {hasMore && !loadingMore && posts.length > 0 && (
+                <div className="text-center mt-8">
+                  <button
+                    onClick={loadMorePosts}
+                    className="px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold transition-colors"
+                  >
+                    Load More Posts
+                  </button>
+                </div>
+              )}
 
-            {loadingMore && (
-              <p className="text-center mt-8 text-muted-foreground">
-                Loading more posts...
-              </p>
-            )}
+              {loadingMore && (
+                <div className="flex justify-center mt-8">
+                  <div className="flex items-center gap-2">
+                    <LoadingSpinner size="sm" />
+                    <p className="text-muted-foreground">
+                      Loading more posts...
+                    </p>
+                  </div>
+                </div>
+              )}
+            </RefreshAnimation>
           </div>
 
           {/* Activities Section - 40% width */}
