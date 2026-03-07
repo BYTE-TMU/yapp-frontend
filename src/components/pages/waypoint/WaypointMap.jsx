@@ -184,7 +184,7 @@ function WaypointMap({
                             </Tooltip>
 
                             {/* Popup for click (detailed info) */}
-                            <Popup maxWidth={250}>
+                            <Popup maxWidth={250} maxHeight={450} autoPan={true} autoPanPaddingBottomRight={[10, 80]}>
                                 <WaypointPopup
                                     waypoint={waypoint}
                                     isOwner={waypoint.isOwner}
