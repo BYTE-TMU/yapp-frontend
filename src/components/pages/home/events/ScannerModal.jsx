@@ -115,7 +115,7 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
                 if (response.ok) {
                     if (data.already_checked_in) {
                         showAlreadyCheckedIn(data.username);
-                        setLastResult({ type: 'info', username: data.username, profile_picture: data.profile_picture, message: 'Already checked in' });
+                        setLastResult({ type: 'warning', username: data.username, profile_picture: data.profile_picture, message: 'Ticket already scanned' });
                     } else {
                         showCheckInSuccess(data.username);
                         setLastResult({ type: 'success', username: data.username, profile_picture: data.profile_picture, message: 'Checked in!' });
@@ -314,9 +314,9 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
                                     <div className="w-16 h-16 mx-auto bg-green-500 rounded-full flex items-center justify-center animate-in zoom-in duration-300">
                                         <span className="text-3xl text-white font-bold">✓</span>
                                     </div>
-                                ) : lastResult.type === 'info' ? (
-                                    <div className="w-16 h-16 mx-auto bg-blue-500 rounded-full flex items-center justify-center animate-in zoom-in duration-300">
-                                        <span className="text-2xl text-white">ℹ</span>
+                                ) : lastResult.type === 'warning' ? (
+                                    <div className="w-16 h-16 mx-auto bg-amber-500 rounded-full flex items-center justify-center animate-in zoom-in duration-300">
+                                        <span className="text-2xl text-white">⚠</span>
                                     </div>
                                 ) : (
                                     <div className="w-16 h-16 mx-auto bg-destructive rounded-full flex items-center justify-center animate-in zoom-in duration-300">

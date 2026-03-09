@@ -427,6 +427,7 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   if (!isOpen || !event) return null;
 
   const dateTime = formatEventDateTime(event.event_datetime);
+  const isHost = currentUser && String(event.user_id) === String(currentUser.sub || currentUser._id || currentUser.id || currentUser.user_id);
 
   const mainContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -610,8 +611,8 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                   {/* Check-in section */}
                   {!isPastEvent && (
                     <div className="flex space-x-3">
-                      {/* My Ticket button — for attending users */}
-                      {isAttending && (
+                      {/* My Ticket button — for attending users and host */}
+                      {(isAttending || isHost) && (
                         <button
                           onClick={() => setShowTicketModal(true)}
                           className="flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg font-medium transition-colors"
@@ -709,8 +710,6 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
       </div>
     </div>
   );
-
-  const isHost = currentUser && String(event.user_id) === String(currentUser.sub || currentUser._id || currentUser.id || currentUser.user_id);
 
   return (
     <>

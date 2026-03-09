@@ -197,7 +197,7 @@ export const showCheckInSuccess = (username) => {
 };
 
 export const showAlreadyCheckedIn = (username) => {
-    toast.info(`${username} is already checked in`);
+    toast.warning(`${username}'s ticket has already been scanned`);
 };
 
 export const showCheckInError = (message) => {
