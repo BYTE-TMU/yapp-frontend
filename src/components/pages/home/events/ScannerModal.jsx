@@ -86,28 +86,6 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
             },
         };
 
-        // Enumerate cameras and pick the rear one by device ID – this is the
-        // most reliable way to guarantee the back-facing camera on phones/tablets.
-        // Falls back to facingMode constraints if enumeration fails.
-        let cameraIdOrConfig = { facingMode: { exact: 'environment' } };
-        try {
-            const cameras = await Html5Qrcode.getCameras();
-            if (cameras && cameras.length > 0) {
-                // Prefer a camera whose label clearly indicates rear/back/environment
-                const rearCamera = cameras.find((c) =>
-                    /back|rear|environment/i.test(c.label)
-                );
-                if (rearCamera) {
-                    cameraIdOrConfig = rearCamera.id;
-                } else if (cameras.length > 1) {
-                    // On most phones the last camera in the list is the rear one
-                    cameraIdOrConfig = cameras[cameras.length - 1].id;
-                }
-            }
-        } catch (enumError) {
-            console.warn('Camera enumeration failed, using facingMode constraint:', enumError);
-        }
-
         const onScanSuccess = async (decodedText) => {
             if (processingRef.current) return;
             processingRef.current = true;
@@ -154,10 +132,12 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
             const html5QrCode = new Html5Qrcode('qr-scanner-region');
             html5QrCodeRef.current = html5QrCode;
 
-            // Try rear camera first (phones), fall back to front camera (laptops)
+            // Try rear camera first (phones), fall back to front camera (laptops).
+            // html5-qrcode's start() accepts { facingMode: "environment" } as
+            // its own config format — it builds proper constraints internally.
             try {
                 await html5QrCode.start(
-                    cameraIdOrConfig,
+                    { facingMode: 'environment' },
                     scanConfig,
                     onScanSuccess,
                     () => { }
