@@ -91,11 +91,11 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
             if (processingRef.current) return;
             processingRef.current = true;
 
-            // Pause the scanner immediately so the camera feed doesn't freeze
-            // to a black frame on mobile while we await the API response.
+            // Pause scanning but keep the video feed visible so users see the
+            // result overlay on top of the live camera view instead of a black frame.
             try {
                 if (html5QrCodeRef.current?.getState() === 2) {
-                    await html5QrCodeRef.current.pause(/* pauseVideo */ true);
+                    await html5QrCodeRef.current.pause(/* pauseVideo */ false);
                 }
             } catch { /* ignore – some browsers don't support pause */ }
 
