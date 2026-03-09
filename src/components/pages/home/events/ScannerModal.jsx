@@ -86,10 +86,11 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
             },
         };
 
-        // Use relaxed facingMode (not 'exact') so devices without a camera explicitly
-        // labelled "environment" still work and gracefully fall back.
+        // Use exact facingMode so phones/tablets always open the rear camera.
+        // If no rear camera is found (e.g. laptops), startScanner falls back to
+        // facingMode: 'user' in the catch block below.
         const videoConstraints = {
-            facingMode: 'environment',
+            facingMode: { exact: 'environment' },
             width: { ideal: 1280 },
             height: { ideal: 720 },
         };
