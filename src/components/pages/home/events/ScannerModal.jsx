@@ -24,7 +24,6 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
     const processingRef = useRef(false);
     const startingRef = useRef(false);
     const freeScanModeRef = useRef(false);
-    const startScannerRef = useRef(null);
 
     // Keep ref in sync so startScanner always reads the latest value without
     // needing freeScanMode in its dependency array.
@@ -91,13 +90,11 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
             if (processingRef.current) return;
             processingRef.current = true;
 
-            // Pause scanning but keep the video feed visible so users see the
-            // result overlay on top of the live camera view instead of a black frame.
-            try {
-                if (html5QrCodeRef.current?.getState() === 2) {
-                    await html5QrCodeRef.current.pause(/* pauseVideo */ false);
-                }
-            } catch { /* ignore – some browsers don't support pause */ }
+            // Note: we intentionally do NOT call html5QrCodeRef.current.pause()
+            // because the library's pause() always renders an internal dark overlay
+            // (scannerPausedUiElement) that causes a black screen on mobile.
+            // Instead, processingRef alone prevents duplicate scans while the
+            // result overlay is shown on top of the live camera feed.
 
             try {
                 const token = localStorage.getItem('token');
@@ -131,31 +128,14 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
                 setTimeout(() => {
                     setLastResult(null);
                     setResultFading(false);
-                    // Resume scanner for the next scan
-                    try {
-                        if (html5QrCodeRef.current?.getState() === 3) {
-                            html5QrCodeRef.current.resume();
-                        }
-                    } catch {
-                        // If resume fails, do a full restart
-                        stopScanner();
-                        setTimeout(() => startScannerRef.current?.(), 200);
-                    }
+                    processingRef.current = false;
                 }, 3000);
             } catch (err) {
                 console.error('Check-in error:', err);
                 showCheckInError('Network error');
-                // Resume scanner even on network error
-                try {
-                    if (html5QrCodeRef.current?.getState() === 3) {
-                        html5QrCodeRef.current.resume();
-                    }
-                } catch {
-                    stopScanner();
-                    setTimeout(() => startScannerRef.current?.(), 200);
-                }
-            } finally {
-                setTimeout(() => { processingRef.current = false; }, 2000);
+                // No result overlay for network errors — unlock immediately
+                // so the user can try scanning again.
+                processingRef.current = false;
             }
         };
 
@@ -210,11 +190,6 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
         }
     }, [eventId, onSwitchToList, stopScanner]);
 
-    // Keep ref in sync so onScanSuccess can restart after result display
-    useEffect(() => {
-        startScannerRef.current = startScanner;
-    }, [startScanner]);
-
     const handleRetry = useCallback(async () => {
         await stopScanner();
         startScanner();
@@ -236,6 +211,7 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
             stopScanner();
             setLastResult(null);
             setCameraError(null);
+            processingRef.current = false;
         }
     }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
