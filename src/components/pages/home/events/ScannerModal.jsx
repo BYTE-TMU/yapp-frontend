@@ -24,6 +24,7 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
     const processingRef = useRef(false);
     const startingRef = useRef(false);
     const freeScanModeRef = useRef(false);
+    const startScannerRef = useRef(null);
 
     // Keep ref in sync so startScanner always reads the latest value without
     // needing freeScanMode in its dependency array.
@@ -90,6 +91,14 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
             if (processingRef.current) return;
             processingRef.current = true;
 
+            // Pause the scanner immediately so the camera feed doesn't freeze
+            // to a black frame on mobile while we await the API response.
+            try {
+                if (html5QrCodeRef.current?.getState() === 2) {
+                    await html5QrCodeRef.current.pause(/* pauseVideo */ true);
+                }
+            } catch { /* ignore – some browsers don't support pause */ }
+
             try {
                 const token = localStorage.getItem('token');
                 const response = await fetch(`${API_BASE_URL}/events/${eventId}/checkin`, {
@@ -119,10 +128,32 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
 
                 setResultFading(false);
                 setTimeout(() => setResultFading(true), 2500);
-                setTimeout(() => { setLastResult(null); setResultFading(false); }, 3000);
+                setTimeout(() => {
+                    setLastResult(null);
+                    setResultFading(false);
+                    // Resume scanner for the next scan
+                    try {
+                        if (html5QrCodeRef.current?.getState() === 3) {
+                            html5QrCodeRef.current.resume();
+                        }
+                    } catch {
+                        // If resume fails, do a full restart
+                        stopScanner();
+                        setTimeout(() => startScannerRef.current?.(), 200);
+                    }
+                }, 3000);
             } catch (err) {
                 console.error('Check-in error:', err);
                 showCheckInError('Network error');
+                // Resume scanner even on network error
+                try {
+                    if (html5QrCodeRef.current?.getState() === 3) {
+                        html5QrCodeRef.current.resume();
+                    }
+                } catch {
+                    stopScanner();
+                    setTimeout(() => startScannerRef.current?.(), 200);
+                }
             } finally {
                 setTimeout(() => { processingRef.current = false; }, 2000);
             }
@@ -177,7 +208,12 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
         } finally {
             startingRef.current = false;
         }
-    }, [eventId, onSwitchToList]);
+    }, [eventId, onSwitchToList, stopScanner]);
+
+    // Keep ref in sync so onScanSuccess can restart after result display
+    useEffect(() => {
+        startScannerRef.current = startScanner;
+    }, [startScanner]);
 
     const handleRetry = useCallback(async () => {
         await stopScanner();
