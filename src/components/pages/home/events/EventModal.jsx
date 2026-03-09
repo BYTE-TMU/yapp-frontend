@@ -10,16 +10,22 @@ import {
   Map,
   MessageCircle,
   Clock,
+  Ticket,
+  ScanLine,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '@/services/config';
 import { formatEventDateTime } from '@/utils/dateTimeUtils';
 import UserBadge from '@/components/badges/UserBadge';
+import TicketQRModal from './TicketQRModal';
+import ScannerModal from './ScannerModal';
+import AttendeeManagementPanel from './AttendeeManagementPanel';
 import {
   showAttendanceUpdateError,
   showEventLikeError,
   showNetworkError,
   showLocationNotAvailableError,
+  showCameraDenied,
 } from '@/utils/toastNotifications';
 
 const EventModal = ({ event, isOpen, onClose, currentUser }) => {
@@ -35,6 +41,9 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
     attend: false,
   });
   const [isPastEvent, setIsPastEvent] = useState(false);
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  const [showScannerModal, setShowScannerModal] = useState(false);
+  const [showManagementPanel, setShowManagementPanel] = useState(false);
 
   const navigate = useNavigate();
 
@@ -394,6 +403,11 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
       setActionLoading({ like: false, attend: false });
       setIsPastEvent(false);
 
+      // Close sub-modals
+      setShowTicketModal(false);
+      setShowScannerModal(false);
+      setShowManagementPanel(false);
+
       // Fetch new data
       fetchEventDetails();
     }
@@ -413,8 +427,9 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   if (!isOpen || !event) return null;
 
   const dateTime = formatEventDateTime(event.event_datetime);
+  const isHost = currentUser && String(event.user_id) === String(currentUser.sub || currentUser._id || currentUser.id || currentUser.user_id);
 
-  return (
+  const mainContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         className="bg-card rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-2xl relative border border-border"
@@ -563,11 +578,10 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                     <button
                       onClick={toggleAttendance}
                       disabled={actionLoading.attend}
-                      className={`w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
-                        isAttending
-                          ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20'
-                          : 'bg-primary text-primary-foreground hover:bg-primary/90'
-                      }`}
+                      className={`w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 ${isAttending
+                        ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20'
+                        : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                        }`}
                     >
                       {actionLoading.attend ? (
                         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -594,16 +608,59 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                     </button>
                   )}
 
+                  {/* Check-in section */}
+                  {!isPastEvent && (
+                    <div className="flex space-x-3">
+                      {/* My Ticket button — for attending users and host */}
+                      {(isAttending || isHost) && (
+                        <button
+                          onClick={() => setShowTicketModal(true)}
+                          className="flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg font-medium transition-colors"
+                        >
+                          <Ticket className="w-5 h-5" />
+                          <span>My Ticket</span>
+                        </button>
+                      )}
+
+                      {/* Manage Check-Ins — for event host */}
+                      {currentUser && String(event.user_id) === String(currentUser.sub || currentUser._id || currentUser.id || currentUser.user_id) && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              // Check if a camera exists WITHOUT opening a stream.
+                              // getUserMedia would grab the camera and block html5-qrcode.
+                              const devices = await navigator.mediaDevices.enumerateDevices();
+                              const hasCamera = devices.some(d => d.kind === 'videoinput');
+                              if (hasCamera) {
+                                setShowScannerModal(true);
+                              } else {
+                                showCameraDenied();
+                                setShowManagementPanel(true);
+                              }
+                            } catch {
+                              // Can't enumerate — fall back to manual list
+                              showCameraDenied();
+                              setShowManagementPanel(true);
+                            }
+                          }}
+                          className="flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg font-medium transition-colors"
+                        >
+                          <ScanLine className="w-5 h-5" />
+                          <span>Check-Ins</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+
                   {/* Secondary action buttons */}
                   <div className="flex space-x-3">
                     <button
                       onClick={toggleLike}
                       disabled={actionLoading.like}
-                      className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
-                        isLiked
-                          ? 'bg-destructive/10 text-destructive hover:bg-destructive/20'
-                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                      }`}
+                      className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 ${isLiked
+                        ? 'bg-destructive/10 text-destructive hover:bg-destructive/20'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                        }`}
                     >
                       {actionLoading.like ? (
                         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -652,6 +709,42 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {mainContent}
+
+      {/* Ticket QR Modal (attendee) */}
+      <TicketQRModal
+        isOpen={showTicketModal}
+        onClose={() => setShowTicketModal(false)}
+        eventId={event._id}
+        eventTitle={event.title}
+      />
+
+      {/* Scanner Modal (mobile host) */}
+      <ScannerModal
+        isOpen={showScannerModal}
+        onClose={() => setShowScannerModal(false)}
+        eventId={event._id}
+        onSwitchToList={() => {
+          setShowScannerModal(false);
+          setShowManagementPanel(true);
+        }}
+      />
+
+      {/* Attendee Management Panel (desktop host) */}
+      <AttendeeManagementPanel
+        isOpen={showManagementPanel}
+        onClose={() => setShowManagementPanel(false)}
+        eventId={event._id}
+        onSwitchToScanner={isHost ? () => {
+          setShowManagementPanel(false);
+          setShowScannerModal(true);
+        } : null}
+      />
+    </>
   );
 };
 
