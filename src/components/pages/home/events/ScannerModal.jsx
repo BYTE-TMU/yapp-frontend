@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Camera, List, RefreshCw } from 'lucide-react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { X, Camera, List, RefreshCw, Maximize2, Square } from 'lucide-react';
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { API_BASE_URL } from '@/services/config';
 import {
     showCheckInSuccess,
@@ -18,10 +18,18 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
     const [cameraError, setCameraError] = useState(null);
     const [lastResult, setLastResult] = useState(null);
     const [resultFading, setResultFading] = useState(false);
+    const [freeScanMode, setFreeScanMode] = useState(false);
     const scannerRef = useRef(null);
     const html5QrCodeRef = useRef(null);
     const processingRef = useRef(false);
     const startingRef = useRef(false);
+    const freeScanModeRef = useRef(false);
+
+    // Keep ref in sync so startScanner always reads the latest value without
+    // needing freeScanMode in its dependency array.
+    useEffect(() => {
+        freeScanModeRef.current = freeScanMode;
+    }, [freeScanMode]);
 
     const stopScanner = useCallback(async () => {
         if (html5QrCodeRef.current) {
@@ -61,13 +69,29 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
         startingRef.current = true;
         setCameraError(null);
 
+        // Responsive qrbox: fit the container width with padding, clamped 260–380 px.
+        const containerWidth = scannerRef.current?.offsetWidth ?? 320;
+        const boxSize = Math.min(Math.max(containerWidth - 60, 260), 380);
+        const isFreeScan = freeScanModeRef.current;
+
         const scanConfig = {
-            fps: 15,
-            qrbox: { width: 320, height: 320 },
+            fps: 24,
+            // Free-scan mode omits qrbox so the entire camera frame is decoded,
+            // which is much more forgiving of angle, distance, and off-centre codes.
+            ...(isFreeScan ? {} : { qrbox: { width: boxSize, height: boxSize } }),
             disableFlip: false,
+            formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
             experimentalFeatures: {
                 useBarCodeDetectorIfSupported: true,
             },
+        };
+
+        // Use relaxed facingMode (not 'exact') so devices without a camera explicitly
+        // labelled "environment" still work and gracefully fall back.
+        const videoConstraints = {
+            facingMode: 'environment',
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
         };
 
         const onScanSuccess = async (decodedText) => {
@@ -119,7 +143,7 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
             // Try rear camera first (phones), fall back to front camera (laptops)
             try {
                 await html5QrCode.start(
-                    { facingMode: { exact: 'environment' } },
+                    videoConstraints,
                     scanConfig,
                     onScanSuccess,
                     () => { }
@@ -166,6 +190,14 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
         startScanner();
     }, [stopScanner, startScanner]);
 
+    const handleToggleFreeScan = useCallback(async () => {
+        const next = !freeScanModeRef.current;
+        setFreeScanMode(next);
+        freeScanModeRef.current = next;
+        await stopScanner();
+        setTimeout(() => startScanner(), 150);
+    }, [stopScanner, startScanner]);
+
     useEffect(() => {
         if (isOpen) {
             const timer = setTimeout(startScanner, 300);
@@ -201,6 +233,19 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
                     </div>
                     <div className="flex items-center space-x-2">
                         <button
+                            onClick={handleToggleFreeScan}
+                            className={`p-1.5 rounded-full transition-colors ${
+                                freeScanMode
+                                    ? 'bg-primary/20 text-primary'
+                                    : 'hover:bg-muted text-muted-foreground'
+                            }`}
+                            title={freeScanMode ? 'Switch to guided scan' : 'Switch to full-frame scan'}
+                        >
+                            {freeScanMode
+                                ? <Square className="w-5 h-5" />
+                                : <Maximize2 className="w-5 h-5" />}
+                        </button>
+                        <button
                             onClick={() => { stopScanner(); onSwitchToList?.(); }}
                             className="p-1.5 hover:bg-muted rounded-full transition-colors"
                             title="Switch to list view"
@@ -226,17 +271,28 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
                         style={{ minHeight: '320px' }}
                     />
 
-                    {/* Corner-bracket targeting reticle */}
+                    {/* Reticle overlay — changes based on scan mode */}
                     {scanning && !lastResult && (
-                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                            <div className="relative w-56 h-56">
-                                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-lg" />
-                                <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-lg" />
-                                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary rounded-bl-lg" />
-                                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary rounded-br-lg" />
-                                <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary/60 animate-bounce" style={{ animationDuration: '2s' }} />
+                        freeScanMode ? (
+                            // Full-frame dashed border for free-scan mode
+                            <div className="absolute inset-0 pointer-events-none">
+                                <div className="absolute inset-4 border-2 border-dashed border-primary/60 rounded-lg" />
+                                <span className="absolute top-6 left-1/2 -translate-x-1/2 text-xs font-medium text-primary/80 bg-black/50 px-2 py-0.5 rounded-full">
+                                    Full Frame
+                                </span>
                             </div>
-                        </div>
+                        ) : (
+                            // Corner-bracket targeting reticle for guided mode
+                            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                                <div className="relative w-56 h-56">
+                                    <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-lg" />
+                                    <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-lg" />
+                                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary rounded-bl-lg" />
+                                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary rounded-br-lg" />
+                                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary/60 animate-bounce" style={{ animationDuration: '2s' }} />
+                                </div>
+                            </div>
+                        )
                     )}
 
                     {/* Error state */}
@@ -298,7 +354,9 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
                             {cameraError
                                 ? 'Camera unavailable'
                                 : scanning
-                                    ? "Point camera at attendee's QR code"
+                                    ? freeScanMode
+                                        ? 'Full frame active — point at QR code anywhere in view'
+                                        : 'Hold steady — adjust angle or distance if needed'
                                     : 'Starting camera…'}
                         </p>
                         {(cameraError || !scanning) && (

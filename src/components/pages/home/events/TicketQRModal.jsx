@@ -106,10 +106,10 @@ const TicketQRModal = ({ isOpen, onClose, eventId, eventTitle }) => {
                             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                         </div>
                     ) : ticketToken ? (
-                        <div className="bg-white p-4 rounded-xl shadow-inner">
+                        <div className="bg-white p-5 rounded-xl shadow-inner">
                             <QRCodeSVG
                                 value={ticketToken}
-                                size={240}
+                                size={280}
                                 level="H"
                                 includeMargin={true}
                                 bgColor="#ffffff"
@@ -142,6 +142,9 @@ const TicketQRModal = ({ isOpen, onClose, eventId, eventTitle }) => {
 
                     <p className="text-xs text-muted-foreground text-center">
                         Show this QR code to the event host for check-in
+                    </p>
+                    <p className="text-xs text-muted-foreground/70 text-center">
+                        Increase screen brightness for easier scanning
                     </p>
                 </div>
             </div>
