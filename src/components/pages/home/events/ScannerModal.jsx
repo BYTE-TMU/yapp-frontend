@@ -86,14 +86,27 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
             },
         };
 
-        // Use exact facingMode so phones/tablets always open the rear camera.
-        // If no rear camera is found (e.g. laptops), startScanner falls back to
-        // facingMode: 'user' in the catch block below.
-        const videoConstraints = {
-            facingMode: { exact: 'environment' },
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-        };
+        // Enumerate cameras and pick the rear one by device ID – this is the
+        // most reliable way to guarantee the back-facing camera on phones/tablets.
+        // Falls back to facingMode constraints if enumeration fails.
+        let cameraIdOrConfig = { facingMode: { exact: 'environment' } };
+        try {
+            const cameras = await Html5Qrcode.getCameras();
+            if (cameras && cameras.length > 0) {
+                // Prefer a camera whose label clearly indicates rear/back/environment
+                const rearCamera = cameras.find((c) =>
+                    /back|rear|environment/i.test(c.label)
+                );
+                if (rearCamera) {
+                    cameraIdOrConfig = rearCamera.id;
+                } else if (cameras.length > 1) {
+                    // On most phones the last camera in the list is the rear one
+                    cameraIdOrConfig = cameras[cameras.length - 1].id;
+                }
+            }
+        } catch (enumError) {
+            console.warn('Camera enumeration failed, using facingMode constraint:', enumError);
+        }
 
         const onScanSuccess = async (decodedText) => {
             if (processingRef.current) return;
@@ -144,7 +157,7 @@ const ScannerModal = ({ isOpen, onClose, eventId, onSwitchToList }) => {
             // Try rear camera first (phones), fall back to front camera (laptops)
             try {
                 await html5QrCode.start(
-                    videoConstraints,
+                    cameraIdOrConfig,
                     scanConfig,
                     onScanSuccess,
                     () => { }
