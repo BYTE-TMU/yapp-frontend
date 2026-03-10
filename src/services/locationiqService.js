@@ -56,15 +56,15 @@ export async function reverseGeocode(lat, lng) {
  * Uses LocationIQ's autocomplete API (1 request credit per call).
  *
  * @param {string} query  - The search string typed by the user
- * @returns {Promise<Array>} Array of LocationIQ autocomplete result objects
+ * @returns {Promise<{error: boolean, results: Array}>} Result shape with error flag and results array
  */
 export async function searchAddress(query) {
   if (!LOCATIONIQ_API_KEY || LOCATIONIQ_API_KEY === 'your_locationiq_api_key_here') {
     console.warn('LocationIQ API key not configured. Set VITE_LOCATIONIQ_API_KEY in .env');
-    return [];
+    return { error: true, results: [] };
   }
 
-  if (!query || query.trim().length < 2) return [];
+  if (!query || query.trim().length < 2) return { error: false, results: [] };
 
   try {
     const url = `https://us1.locationiq.com/v1/autocomplete?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(query.trim())}&limit=5&format=json&countrycodes=ca`;
@@ -72,13 +72,13 @@ export async function searchAddress(query) {
 
     if (!response.ok) {
       console.warn('Address search failed:', response.status);
-      return [];
+      return { error: true, results: [] };
     }
 
     const data = await response.json();
-    return Array.isArray(data) ? data : [];
+    return { error: false, results: Array.isArray(data) ? data : [] };
   } catch (err) {
     console.warn('Address search error:', err);
-    return [];
+    return { error: true, results: [] };
   }
 }

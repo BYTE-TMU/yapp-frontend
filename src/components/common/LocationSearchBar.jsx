@@ -18,6 +18,7 @@ function LocationSearchBar({ onSelect }) {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [searchError, setSearchError] = useState(false);
   const containerRef = useRef(null);
   const debounceRef = useRef(null);
   const selectingRef = useRef(false); // Guard: true while a result tap/click is in progress
@@ -34,6 +35,7 @@ function LocationSearchBar({ onSelect }) {
   const handleInputChange = useCallback((e) => {
     const value = e.target.value;
     setQuery(value);
+    setSearchError(false);
 
     clearTimeout(debounceRef.current);
 
@@ -46,11 +48,18 @@ function LocationSearchBar({ onSelect }) {
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
       try {
-        const data = await searchAddress(value);
-        setResults(data);
-        setOpen(data.length > 0);
+        const { error, results: data } = await searchAddress(value);
+        if (error) {
+          setSearchError(true);
+          setResults([]);
+          setOpen(false);
+        } else {
+          setResults(data);
+          setOpen(data.length > 0);
+        }
       } catch (err) {
         console.warn('Location search error:', err);
+        setSearchError(true);
         setResults([]);
       } finally {
         setLoading(false);
@@ -157,6 +166,22 @@ function LocationSearchBar({ onSelect }) {
           </span>
         )}
       </div>
+
+      {/* Error message */}
+      {searchError && !loading && (
+        <div style={{
+          backgroundColor: 'rgba(18, 18, 18, 0.97)',
+          border: '1px solid rgba(255,80,80,0.3)',
+          borderRadius: '8px',
+          marginTop: '4px',
+          padding: '8px 12px',
+          fontSize: '12px',
+          color: '#ff6b6b',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.45)',
+        }}>
+          Location search unavailable. Please try again.
+        </div>
+      )}
 
       {/* Dropdown */}
       {open && results.length > 0 && (
