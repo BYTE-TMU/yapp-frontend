@@ -68,12 +68,14 @@ export default function LoginForm() {
         setMsg('Login success');
 
         // Check if user has completed onboarding
-        const onboardingComplete = localStorage.getItem('onboarding_complete');
-        if (onboardingComplete) {
-          // Returning user - go to home
+        const profileRes = await fetch(`${API_BASE_URL}/users/me`, {
+          headers: { Authorization: `Bearer ${data.token}` }
+        });
+        const profileData = await profileRes.json();
+        
+        if (profileData.profile?.onboarding_completed) {
           navigate('/home');
         } else {
-          // New user - go to onboarding
           navigate('/onboarding');
         }
       } else if (res.status === 403 && data.requires_verification) {
