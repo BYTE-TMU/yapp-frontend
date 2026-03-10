@@ -12,7 +12,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../../../contexts/ThemeContext';
 
-const ETHeader = ({ threadInfo, onLeaveEvent, notifications = [], getProfilePictureUrl, formatTime }) => {
+const ETHeader = ({ threadInfo, onLeaveEvent, notifications = [], chatPostCount, getProfilePictureUrl, formatTime }) => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
   const [showLeaveModal, setShowLeaveModal] = useState(false);
@@ -89,7 +89,7 @@ const ETHeader = ({ threadInfo, onLeaveEvent, notifications = [], getProfilePict
                 <div className="flex items-center space-x-1">
                   <MessageCircle className="w-3 h-3 md:w-4 md:h-4" />
                   <span className="font-normal">
-                    {threadInfo.thread_stats.total_posts} posts
+                    {chatPostCount ?? threadInfo.thread_stats.total_posts} posts
                   </span>
                 </div>
                 <div className="flex items-center space-x-1">

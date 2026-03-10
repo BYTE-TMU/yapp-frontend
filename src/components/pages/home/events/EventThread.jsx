@@ -491,6 +491,7 @@ const EventThread = () => {
             threadInfo={threadInfo}
             onLeaveEvent={handleLeaveEvent}
             notifications={posts.filter(p => p.post_type?.endsWith('_notification'))}
+            chatPostCount={posts.filter(p => !p.post_type?.endsWith('_notification')).length}
             getProfilePictureUrl={getProfilePictureUrl}
             formatTime={formatTime}
           />
