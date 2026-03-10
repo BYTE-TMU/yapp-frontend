@@ -136,7 +136,8 @@ const ETHeader = ({ threadInfo, onLeaveEvent, notifications = [], chatPostCount,
                         return (
                           <div
                             key={notif._id}
-                            className="px-4 py-3 border-b last:border-b-0 border-border"
+                            className="px-4 py-3 border-b last:border-b-0 border-border cursor-pointer hover:bg-background/50 transition-colors"
+                            onClick={() => navigate(`/profile/${notif.user_id}`)}
                           >
                             <div className="flex items-center space-x-3">
                               <div className={`p-1.5 rounded-full ${isJoin ? 'bg-green-600' : 'bg-red-600'}`}>
