@@ -6,8 +6,9 @@ import { getCurrentUserIdentifier, getProfilePictureUrl, fetchUserInfo } from '.
 import ChatHeader from './ChatHeader';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
+import { showOfflineError, showSendMessageError } from '../../utils/toastNotifications';
 
-function MessageChat({ conversation, onNewMessage }) {
+function MessageChat({ conversation, onNewMessage, onBack }) {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
@@ -110,7 +111,8 @@ function MessageChat({ conversation, onNewMessage }) {
             // Get older messages from API with pagination
             const olderMessages = await messageService.getMessages(
                 conversation._id, 
-                { page: currentPage + 1, limit: messagesPerPage }
+                currentPage + 1,
+                messagesPerPage
             );
             
             if (olderMessages.length === 0) {
@@ -733,9 +735,9 @@ function MessageChat({ conversation, onNewMessage }) {
             
             // Show error to user based on connection status
             if (connectionStatus === 'disconnected') {
-                alert('You are offline. Please check your connection and try again.');
+                showOfflineError();
             } else {
-                alert('Failed to send message. Please try again.');
+                showSendMessageError();
             }
             
             // Return the message content so it can be restored in the input
@@ -792,7 +794,7 @@ function MessageChat({ conversation, onNewMessage }) {
     }
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full min-h-0 flex-1">
             {/* Connection Status Banner */}
             {showOfflineMessage && (
                 <div className="bg-yellow-600 text-white px-4 py-2 text-sm flex items-center justify-between">
@@ -816,6 +818,7 @@ function MessageChat({ conversation, onNewMessage }) {
                 getProfilePictureUrl={getProfilePictureUrl} 
                 connectionStatus={connectionStatus}
                 typingUsers={typingUsers}
+                onBack={onBack}
             />
             
             <MessageList 

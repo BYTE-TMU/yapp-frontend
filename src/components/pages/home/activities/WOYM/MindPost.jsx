@@ -1,11 +1,12 @@
 // MindPost.jsx
-import { useState } from 'react';
-import { API_BASE_URL } from '../../../../../services/config';
-import { useTheme } from '../../../../../contexts/ThemeContext';
-import { getProfilePictureUrl, getDefaultProfilePicture } from '../../../../../utils/profileUtils';
+import { useTheme } from '@/contexts/ThemeContext';
+import {
+  getProfilePictureUrl,
+  getDefaultProfilePicture,
+} from '@/utils/profileUtils';
 
 export default function MindPost({ post, onDelete, isDeleting }) {
-  const { isDarkMode } = useTheme(); // Add this hook
+  const { isDarkMode } = useTheme();
 
   // format the date
   const formatDate = (dateString) => {
@@ -25,7 +26,7 @@ export default function MindPost({ post, onDelete, isDeleting }) {
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
     });
   };
 
@@ -44,33 +45,22 @@ export default function MindPost({ post, onDelete, isDeleting }) {
         onError={(e) => {
           e.target.src = getDefaultProfilePicture();
         }}
-        className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+        className="w-10 h-10 rounded-full object-cover shrink-0"
       />
 
       {/* Post Content */}
       <div className="flex-1 min-w-0 relative">
         {/* Username */}
-        <div className={`text-sm mb-1 font-medium ml-2 ${
-          isDarkMode ? 'text-gray-300' : 'text-gray-600'
-        }`}>
+        <div className={`text-sm mb-1 font-medium ml-2 text-muted-foreground`}>
           @{post.username || 'Unknown User'}
         </div>
 
         {/* Speech Bubble */}
-        <div 
-          className={`relative rounded-2xl px-4 py-3 shadow-md max-w-lg ml-2 ${
-            isDarkMode ? 'text-white' : 'text-gray-900'
-          }`} 
-          style={{ backgroundColor: bubbleColor }}
+        <div
+          className={`relative rounded-2xl px-4 py-3 shadow-md max-w-lg ml-2 bg-border`}
         >
           {/* Tail */}
-          <div 
-            className="absolute -left-2 bottom-2 w-0 h-0 border-l-[10px] border-l-transparent" 
-            style={{ 
-              borderTopColor: bubbleColor, 
-              borderTopWidth: '10px' 
-            }}
-          ></div>
+          <div className="absolute -left-2 bottom-2 w-0 h-0 border-l-10 border-t-10 border-l-transparent border"></div>
 
           {/* Delete Button */}
           {post.is_own_post && (
@@ -85,9 +75,11 @@ export default function MindPost({ post, onDelete, isDeleting }) {
               title="Delete this post"
             >
               {isDeleting ? (
-                <div className={`animate-spin rounded-full h-4 w-4 border-b-2 ${
-                  isDarkMode ? 'border-red-400' : 'border-red-500'
-                }`}></div>
+                <div
+                  className={`animate-spin rounded-full h-4 w-4 border-b-2 ${
+                    isDarkMode ? 'border-red-400' : 'border-red-500'
+                  }`}
+                ></div>
               ) : (
                 <svg
                   className="w-4 h-4"
@@ -107,14 +99,16 @@ export default function MindPost({ post, onDelete, isDeleting }) {
           )}
 
           {/* Post Content */}
-          <p className="text-base leading-snug whitespace-pre-wrap break-words pr-8">
+          <p className="text-base leading-snug whitespace-pre-wrap wrap-break-word pr-8">
             {post.content}
           </p>
 
           {/* Timestamp */}
-          <div className={`text-xs mt-2 text-right ${
-            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-          }`}>
+          <div
+            className={`text-xs mt-2 text-right ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}
+          >
             {formatDate(post.created_at)}
           </div>
         </div>

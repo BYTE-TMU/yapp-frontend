@@ -19,14 +19,13 @@ const PageTransition = ({ children }) => {
 
   return (
     <div 
-      className={`transition-all duration-600 ${
+      className={`transition-opacity duration-600 ${
         isVisible 
-          ? 'opacity-100 blur-0' 
-          : 'opacity-0 blur-sm'
+          ? 'opacity-100' 
+          : 'opacity-0'
       }`}
       style={{
         minHeight: '100vh',
-        filter: isVisible ? 'blur(0px)' : 'blur(8px)',
         transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
       }}
     >

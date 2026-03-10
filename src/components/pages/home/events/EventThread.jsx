@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Sidebar from '../../../sidebar/Sidebar';
-import Header from '../../../header/Header';
 import ETHeader from './thread/ETHeader';
 import ETInput from './thread/ETInput';
 import ETPostsFeed from './thread/ETPostsFeed';
 import { API_BASE_URL } from '../../../../services/config';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import {
+  showLeaveEventError,
+  showNetworkError,
+  showPostMessageError,
+  showDeleteConfirmation,
+} from '../../../../utils/toastNotifications';
+import LoadingDots from '../../../common/LoadingDots';
 
 const EventThread = () => {
   const { eventId } = useParams();
@@ -27,7 +32,7 @@ const EventThread = () => {
     const getCurrentUser = () => {
       const token = localStorage.getItem('token');
       if (!token) return null;
-      
+
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         return payload;
@@ -49,7 +54,7 @@ const EventThread = () => {
   const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
     return {
-      'Authorization': `Bearer ${token}`
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   };
 
@@ -63,16 +68,23 @@ const EventThread = () => {
 
   const fetchThreadInfo = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/eventthreads/${eventId}/info`, {
-        headers: getAuthHeaders()
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/eventthreads/${eventId}/info`,
+        {
+          credentials: 'include',
+          headers: getAuthHeaders(),
+        },
+      );
 
       if (response.ok) {
         const data = await response.json();
         setThreadInfo(data);
       } else if (response.status === 403) {
         const errorData = await response.json();
-        setError(errorData.error || 'You must be attending this event to view the thread');
+        setError(
+          errorData.error ||
+            'You must be attending this event to view the thread',
+        );
       } else {
         throw new Error('Failed to fetch thread info');
       }
@@ -85,16 +97,23 @@ const EventThread = () => {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/eventthreads/${eventId}/posts?limit=50&sort_order=-1`, {
-        headers: getAuthHeaders()
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/eventthreads/${eventId}/posts?limit=50&sort_order=-1`,
+        {
+          credentials: 'include',
+          headers: getAuthHeaders(),
+        },
+      );
 
       if (response.ok) {
         const data = await response.json();
         setPosts(data.posts);
       } else if (response.status === 403) {
         const errorData = await response.json();
-        setError(errorData.error || 'You must be attending this event to view the thread');
+        setError(
+          errorData.error ||
+            'You must be attending this event to view the thread',
+        );
       } else {
         throw new Error('Failed to fetch posts');
       }
@@ -110,10 +129,11 @@ const EventThread = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/events/${eventId}/attend`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          ...getAuthHeaders()
-        }
+          ...getAuthHeaders(),
+        },
       });
 
       if (response.ok) {
@@ -123,131 +143,157 @@ const EventThread = () => {
           return true; // Success
         } else {
           console.error('Unexpected response when leaving event:', data);
-          alert('Error leaving event. Please try again.');
+          showLeaveEventError();
           return false;
         }
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to leave event');
+        showLeaveEventError();
         return false;
       }
     } catch (err) {
       console.error('Error leaving event:', err);
-      alert('Network error. Please try again.');
+      showNetworkError();
       return false;
     }
   };
 
   const handlePostSubmit = async (e, selectedImages = []) => {
     e.preventDefault();
-    
-    if ((!newPostContent.trim() && selectedImages.length === 0) || posting) return;
+
+    if ((!newPostContent.trim() && selectedImages.length === 0) || posting)
+      return;
 
     setPosting(true);
     try {
       // Create FormData for multipart upload if images are selected
       const formData = new FormData();
       formData.append('content', newPostContent.trim());
-      formData.append('post_type', selectedImages.length > 0 ? 'image' : 'text');
-      
+      formData.append(
+        'post_type',
+        selectedImages.length > 0 ? 'image' : 'text',
+      );
+
       if (replyingTo) {
         formData.append('reply_to', replyingTo._id);
       }
-      
+
       // Append multiple images
       selectedImages.forEach((image, index) => {
-        formData.append('image', image);  // All with same name for getlist()
+        formData.append('image', image); // All with same name for getlist()
       });
 
-      const response = await fetch(`${API_BASE_URL}/eventthreads/${eventId}/posts`, {
-        method: 'POST',
-        headers: getAuthHeaders(), // Don't set Content-Type for FormData
-        body: formData
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/eventthreads/${eventId}/posts`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: getAuthHeaders(), // Don't set Content-Type for FormData
+          body: formData,
+        },
+      );
 
       if (response.ok) {
         const data = await response.json();
-        
+
         // Use the complete post data from the server response
         const newPost = data.post;
-        
+
         // Add any missing fields that the frontend expects
-        newPost.profile_picture = newPost.profile_picture || currentUser.profile_picture;
-        newPost.user_full_name = newPost.user_full_name || currentUser.full_name;
+        newPost.profile_picture =
+          newPost.profile_picture || currentUser.profile_picture;
+        newPost.user_full_name =
+          newPost.user_full_name || currentUser.full_name;
         newPost.is_liked_by_user = false;
         newPost.replies = newPost.replies || [];
-        
+
         // The server should already include secure_image_urls if images were uploaded
         if (!newPost.secure_image_urls) {
           newPost.secure_image_urls = [];
         }
 
         if (replyingTo) {
-          setPosts(prevPosts => 
-            prevPosts.map(post => 
-              post._id === replyingTo._id 
-                ? { ...post, replies: [newPost, ...post.replies], replies_count: post.replies_count + 1 }
-                : post
-            )
+          setPosts((prevPosts) =>
+            prevPosts.map((post) =>
+              post._id === replyingTo._id
+                ? {
+                    ...post,
+                    replies: [newPost, ...post.replies],
+                    replies_count: post.replies_count + 1,
+                  }
+                : post,
+            ),
           );
         } else {
-          setPosts(prevPosts => [newPost, ...prevPosts]);
+          setPosts((prevPosts) => [newPost, ...prevPosts]);
         }
 
         setNewPostContent('');
         setReplyingTo(null);
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to post message');
+        showPostMessageError();
       }
     } catch (err) {
       console.error('Error posting message:', err);
-      alert('Network error. Please try again.');
+      showNetworkError();
     } finally {
       setPosting(false);
     }
   };
 
-  const handleLikePost = async (postId, isReply = false, parentPostId = null) => {
+  const handleLikePost = async (
+    postId,
+    isReply = false,
+    parentPostId = null,
+  ) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/eventthreads/posts/${postId}/like`, {
-        method: 'POST',
-        headers: getAuthHeaders()
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/eventthreads/posts/${postId}/like`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: getAuthHeaders(),
+        },
+      );
 
       if (response.ok) {
         const data = await response.json();
-        
+
         if (isReply && parentPostId) {
-          setPosts(prevPosts =>
-            prevPosts.map(post =>
+          setPosts((prevPosts) =>
+            prevPosts.map((post) =>
               post._id === parentPostId
                 ? {
                     ...post,
-                    replies: post.replies.map(reply =>
+                    replies: post.replies.map((reply) =>
                       reply._id === postId
                         ? {
                             ...reply,
                             is_liked_by_user: data.liked,
-                            likes_count: data.liked ? reply.likes_count + 1 : Math.max(0, reply.likes_count - 1)
+                            likes_count: data.liked
+                              ? reply.likes_count + 1
+                              : Math.max(0, reply.likes_count - 1),
                           }
-                        : reply
-                    )
+                        : reply,
+                    ),
                   }
-                : post
-            )
+                : post,
+            ),
           );
         } else {
-          setPosts(prevPosts =>
-            prevPosts.map(post =>
+          setPosts((prevPosts) =>
+            prevPosts.map((post) =>
               post._id === postId
                 ? {
                     ...post,
                     is_liked_by_user: data.liked,
-                    likes_count: data.liked ? post.likes_count + 1 : Math.max(0, post.likes_count - 1)
+                    likes_count: data.liked
+                      ? post.likes_count + 1
+                      : Math.max(0, post.likes_count - 1),
                   }
-                : post
-            )
+                : post,
+            ),
           );
         }
       }
@@ -256,30 +302,43 @@ const EventThread = () => {
     }
   };
 
-  const handleDeletePost = async (postId, isReply = false, parentPostId = null) => {
-    if (!window.confirm('Are you sure you want to delete this post?')) return;
+  const handleDeletePost = async (
+    postId,
+    isReply = false,
+    parentPostId = null,
+  ) => {
+    const confirmed = await showDeleteConfirmation('post');
+    if (!confirmed) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/eventthreads/posts/${postId}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/eventthreads/posts/${postId}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: getAuthHeaders(),
+        },
+      );
 
       if (response.ok) {
         if (isReply && parentPostId) {
-          setPosts(prevPosts =>
-            prevPosts.map(post =>
+          setPosts((prevPosts) =>
+            prevPosts.map((post) =>
               post._id === parentPostId
                 ? {
                     ...post,
-                    replies: post.replies.filter(reply => reply._id !== postId),
-                    replies_count: Math.max(0, post.replies_count - 1)
+                    replies: post.replies.filter(
+                      (reply) => reply._id !== postId,
+                    ),
+                    replies_count: Math.max(0, post.replies_count - 1),
                   }
-                : post
-            )
+                : post,
+            ),
           );
         } else {
-          setPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
+          setPosts((prevPosts) =>
+            prevPosts.filter((post) => post._id !== postId),
+          );
         }
       }
     } catch (err) {
@@ -287,40 +346,57 @@ const EventThread = () => {
     }
   };
 
-  const handleEditPost = async (postId, newContent, isReply = false, parentPostId = null) => {
+  const handleEditPost = async (
+    postId,
+    newContent,
+    isReply = false,
+    parentPostId = null,
+  ) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/eventthreads/posts/${postId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeaders()
+      const response = await fetch(
+        `${API_BASE_URL}/eventthreads/posts/${postId}`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeaders(),
+          },
+          body: JSON.stringify({ content: newContent }),
         },
-        body: JSON.stringify({ content: newContent })
-      });
+      );
 
       if (response.ok) {
         if (isReply && parentPostId) {
-          setPosts(prevPosts =>
-            prevPosts.map(post =>
+          setPosts((prevPosts) =>
+            prevPosts.map((post) =>
               post._id === parentPostId
                 ? {
                     ...post,
-                    replies: post.replies.map(reply =>
+                    replies: post.replies.map((reply) =>
                       reply._id === postId
-                        ? { ...reply, content: newContent, updated_at: new Date().toISOString() }
-                        : reply
-                    )
+                        ? {
+                            ...reply,
+                            content: newContent,
+                            updated_at: new Date().toISOString(),
+                          }
+                        : reply,
+                    ),
                   }
-                : post
-            )
+                : post,
+            ),
           );
         } else {
-          setPosts(prevPosts =>
-            prevPosts.map(post =>
+          setPosts((prevPosts) =>
+            prevPosts.map((post) =>
               post._id === postId
-                ? { ...post, content: newContent, updated_at: new Date().toISOString() }
-                : post
-            )
+                ? {
+                    ...post,
+                    content: newContent,
+                    updated_at: new Date().toISOString(),
+                  }
+                : post,
+            ),
           );
         }
       }
@@ -349,31 +425,39 @@ const EventThread = () => {
     } else if (diffInHours < 24) {
       return `${Math.floor(diffInHours)}h ago`;
     } else {
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
     }
   };
 
   const canEditOrDelete = (post) => {
-    return currentUser && (
-      currentUser._id === post.user_id || 
-      currentUser.id === post.user_id || 
-      currentUser.sub === post.user_id
+    return (
+      currentUser &&
+      (currentUser._id === post.user_id ||
+        currentUser.id === post.user_id ||
+        currentUser.sub === post.user_id)
     );
   };
 
   if (error) {
     return (
-      <div className="h-screen overflow-hidden font-bold" style={{
-        backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
-        fontFamily: 'Albert Sans'
-      }}>
-        <Header />
-        <Sidebar />
-        <div className="ml-64 h-full overflow-y-auto p-6">
+      <div
+        className="h-screen overflow-hidden font-bold"
+        style={{
+          backgroundColor: isDarkMode ? '#121212' : '#ffffff',
+        }}
+      >
+        <div className="ml-0 md:ml-64 h-full overflow-y-auto p-4 md:p-6">
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <div className={`text-lg mb-4 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>{error}</div>
-              <button 
+              <div
+                className={`text-lg mb-4 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}
+              >
+                {error}
+              </div>
+              <button
                 onClick={() => navigate(-1)}
                 className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-bold transition-colors"
               >
@@ -388,15 +472,10 @@ const EventThread = () => {
 
   if (!threadInfo) {
     return (
-      <div className="h-screen overflow-hidden font-bold" style={{
-        backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
-        fontFamily: 'Albert Sans'
-      }}>
-        <Header />
-        <Sidebar />
-        <div className="ml-64 h-full overflow-y-auto p-6">
+      <div className="h-screen overflow-hidden font-bold">
+        <div className="ml-0 md:ml-64 h-full overflow-y-auto p-4 md:p-6">
           <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+            <LoadingDots />
           </div>
         </div>
       </div>
@@ -404,15 +483,10 @@ const EventThread = () => {
   }
 
   return (
-    <div className="h-screen overflow-hidden font-bold" style={{
-      backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
-      fontFamily: 'Albert Sans'
-    }}>
-      <Header />
-      <Sidebar />
-      <div className="ml-64 h-full flex flex-col">
+    <div className="page-container overflow-hidden">
+      <div className="h-full flex flex-col">
         {/* Fixed Header with Leave Button */}
-        <div className="flex-shrink-0 p-6 pb-0">
+        <div className="shrink-0 p-3 md:p-6 pb-0">
           <ETHeader
             threadInfo={threadInfo}
             onLeaveEvent={handleLeaveEvent}
@@ -421,9 +495,9 @@ const EventThread = () => {
             formatTime={formatTime}
           />
         </div>
-        
+
         {/* Fixed Input */}
-        <div className="flex-shrink-0 px-6 pb-4">
+        <div className="shrink-0 px-3 md:px-6 pb-4">
           <ETInput
             newPostContent={newPostContent}
             setNewPostContent={setNewPostContent}
@@ -437,9 +511,9 @@ const EventThread = () => {
         </div>
 
         {/* Scrollable Posts Feed */}
-        <div 
+        <div
           ref={mainContentRef}
-          className="flex-1 overflow-y-auto px-6 pb-6 scrollbar-custom"
+          className="flex-1 overflow-y-auto px-3 md:px-6 pb-6 scrollbar-custom w-full"
         >
           <ETPostsFeed
             posts={posts}

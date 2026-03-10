@@ -22,6 +22,7 @@ function SavedWaypointsNavigator({
 
             const response = await fetch(`${API_BASE_URL}/waypoint/my-bookmarks`, {
                 method: 'GET',
+                credentials: 'include',
                 headers: getAuthHeaders()
             });
 

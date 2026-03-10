@@ -1,8 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, MapPin, Users, Heart, Share2, UserPlus, Map, MessageCircle, Clock } from 'lucide-react';
+import {
+  X,
+  Calendar,
+  MapPin,
+  Users,
+  Heart,
+  Share2,
+  UserPlus,
+  Map,
+  MessageCircle,
+  Clock,
+  Ticket,
+  ScanLine,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../../../services/config';
-import { formatEventDateTime } from '../../../../utils/dateTimeUtils';
+import { API_BASE_URL } from '@/services/config';
+import { formatEventDateTime } from '@/utils/dateTimeUtils';
+import UserBadge from '@/components/badges/UserBadge';
+import TicketQRModal from './TicketQRModal';
+import ScannerModal from './ScannerModal';
+import AttendeeManagementPanel from './AttendeeManagementPanel';
+import {
+  showAttendanceUpdateError,
+  showEventLikeError,
+  showNetworkError,
+  showLocationNotAvailableError,
+  showCameraDenied,
+} from '@/utils/toastNotifications';
 
 const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   const [eventDetails, setEventDetails] = useState(null);
@@ -12,24 +36,30 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   const [attendingFriends, setAttendingFriends] = useState([]);
   const [totalAttendees, setTotalAttendees] = useState(0);
   const [likesCount, setLikesCount] = useState(0);
-  const [actionLoading, setActionLoading] = useState({ like: false, attend: false });
+  const [actionLoading, setActionLoading] = useState({
+    like: false,
+    attend: false,
+  });
   const [isPastEvent, setIsPastEvent] = useState(false);
-  
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  const [showScannerModal, setShowScannerModal] = useState(false);
+  const [showManagementPanel, setShowManagementPanel] = useState(false);
+
   const navigate = useNavigate();
 
   // Check if event is in the past
   const checkIfEventPast = (eventDateTime) => {
     if (!eventDateTime) return false;
-    
+
     const eventDate = new Date(eventDateTime);
     const now = new Date();
-    
+
     return eventDate <= now;
   };
 
   const fetchEventDetails = async () => {
     if (!event || !isOpen || !currentUser) return;
-    
+
     setLoading(true);
     try {
       // Check if event is past
@@ -37,9 +67,13 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
       setIsPastEvent(pastCheck);
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/events/${event._id}/details`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/events/${event._id}/details`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
+        },
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -54,12 +88,9 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         setEventDetails(event);
         setTotalAttendees(event.attendees_count || 0);
         setLikesCount(event.likes_count || 0);
-        
+
         // Fetch attendance and like status separately
-        await Promise.all([
-          fetchAttendanceStatus(),
-          fetchLikeStatus()
-        ]);
+        await Promise.all([fetchAttendanceStatus(), fetchLikeStatus()]);
       }
     } catch (error) {
       console.error('Error fetching event details:', error);
@@ -67,12 +98,9 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
       setEventDetails(event);
       setTotalAttendees(event.attendees_count || 0);
       setLikesCount(event.likes_count || 0);
-      
+
       // Try to fetch attendance and like status separately
-      await Promise.all([
-        fetchAttendanceStatus(),
-        fetchLikeStatus()
-      ]);
+      await Promise.all([fetchAttendanceStatus(), fetchLikeStatus()]);
     } finally {
       setLoading(false);
     }
@@ -81,9 +109,13 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   const fetchAttendanceStatus = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/events/${event._id}/attend-status`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/events/${event._id}/attend-status`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
+        },
+      );
       if (response.ok) {
         const data = await response.json();
         setIsAttending(data.attending || false);
@@ -96,9 +128,13 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   const fetchLikeStatus = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/events/${event._id}/like-status`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/events/${event._id}/like-status`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
+        },
+      );
       if (response.ok) {
         const data = await response.json();
         setIsLiked(data.liked || false);
@@ -111,9 +147,13 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   const refreshFriendsAttending = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/events/${event._id}/details`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/events/${event._id}/details`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
+        },
+      );
       if (response.ok) {
         const data = await response.json();
         setAttendingFriends(data.attending_friends || []);
@@ -125,20 +165,26 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
 
   const toggleAttendance = async () => {
     if (actionLoading.attend || isPastEvent) return;
-    
-    setActionLoading(prev => ({ ...prev, attend: true }));
+
+    setActionLoading((prev) => ({ ...prev, attend: true }));
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/events/${event._id}/attend`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
+      const response = await fetch(
+        `${API_BASE_URL}/events/${event._id}/attend`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
+        },
+      );
+
       if (response.ok) {
         const data = await response.json();
         setIsAttending(data.attending);
-        setTotalAttendees(prev => data.attending ? prev + 1 : Math.max(0, prev - 1));
-        
+        setTotalAttendees((prev) =>
+          data.attending ? prev + 1 : Math.max(0, prev - 1),
+        );
+
         // Refresh friends attending list since attendance changed
         await refreshFriendsAttending();
 
@@ -151,40 +197,43 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         }
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to update attendance');
+        showAttendanceUpdateError();
       }
     } catch (error) {
       console.error('Error toggling attendance:', error);
-      alert('Network error. Please try again.');
+      showNetworkError();
     } finally {
-      setActionLoading(prev => ({ ...prev, attend: false }));
+      setActionLoading((prev) => ({ ...prev, attend: false }));
     }
   };
 
   const toggleLike = async () => {
     if (actionLoading.like) return;
-    
-    setActionLoading(prev => ({ ...prev, like: true }));
+
+    setActionLoading((prev) => ({ ...prev, like: true }));
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/events/${event._id}/like`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setIsLiked(data.liked);
-        setLikesCount(prev => data.liked ? prev + 1 : Math.max(0, prev - 1));
+        setLikesCount((prev) =>
+          data.liked ? prev + 1 : Math.max(0, prev - 1),
+        );
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to update like');
+        showEventLikeError();
       }
     } catch (error) {
       console.error('Error toggling like:', error);
-      alert('Network error. Please try again.');
+      showNetworkError();
     } finally {
-      setActionLoading(prev => ({ ...prev, like: false }));
+      setActionLoading((prev) => ({ ...prev, like: false }));
     }
   };
 
@@ -195,38 +244,40 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   };
 
   const handleViewOnMap = () => {
-      const coordinates = getEventCoordinates();
-      
-      if (!coordinates) {
-          alert('Location coordinates not available for this event');
-          return;
-      }
+    const coordinates = getEventCoordinates();
 
-      // Store event data in sessionStorage to pass to waypoint map
-      const eventMapData = {
-          eventId: event._id,
-          title: event.title.trim(), // Make sure title is clean
-          description: event.description,
-          latitude: coordinates.lat,
-          longitude: coordinates.lng,
-          eventDate: event.event_date || event.event_datetime?.split('T')[0],
-          eventTime: event.event_time || event.event_datetime?.split('T')[1]?.substring(0, 5),
-          location: event.location,
-          navigateToEvent: true,
-          // Add some debug info
-          debug: {
-              originalTitle: event.title,
-              cleanTitle: event.title.trim(),
-              coordinates: coordinates
-          }
-      };
-      
-      console.log('Storing event map data:', eventMapData);
-      sessionStorage.setItem('navigateToEvent', JSON.stringify(eventMapData));
-      
-      // Close modal and navigate to waypoint map
-      onClose();
-      navigate('/waypoint');
+    if (!coordinates) {
+      showLocationNotAvailableError();
+      return;
+    }
+
+    // Store event data in sessionStorage to pass to waypoint map
+    const eventMapData = {
+      eventId: event._id,
+      title: event.title.trim(), // Make sure title is clean
+      description: event.description,
+      latitude: coordinates.lat,
+      longitude: coordinates.lng,
+      eventDate: event.event_date || event.event_datetime?.split('T')[0],
+      eventTime:
+        event.event_time ||
+        event.event_datetime?.split('T')[1]?.substring(0, 5),
+      location: event.location,
+      navigateToEvent: true,
+      // Add some debug info
+      debug: {
+        originalTitle: event.title,
+        cleanTitle: event.title.trim(),
+        coordinates: coordinates,
+      },
+    };
+
+    console.log('Storing event map data:', eventMapData);
+    sessionStorage.setItem('navigateToEvent', JSON.stringify(eventMapData));
+
+    // Close modal and navigate to waypoint map
+    onClose();
+    navigate('/waypoint');
   };
 
   const getProfilePictureUrl = (profilePicture) => {
@@ -238,7 +289,6 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
     return "data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23e0e0e0'/%3E%3Ccircle cx='50' cy='35' r='15' fill='%23bdbdbd'/%3E%3Cellipse cx='50' cy='85' rx='25' ry='20' fill='%23bdbdbd'/%3E%3C/svg%3E";
   };
 
-
   const getEventIcon = (index) => {
     const icons = ['🎉', '🎵', '🎨', '🏃', '🍕', '📚', '🎬', '🎪', '🎯', '🎮'];
     return icons[index % icons.length];
@@ -247,31 +297,45 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   // Check if event has location coordinates - UPDATED FUNCTION
   const hasLocationCoordinates = () => {
     const currentEvent = eventDetails || event;
-    
+
     console.log('Checking coordinates for event:', currentEvent);
-    
+
     // Check for direct latitude/longitude properties (primary method now)
-    if (currentEvent.latitude !== null && currentEvent.latitude !== undefined && 
-        currentEvent.longitude !== null && currentEvent.longitude !== undefined) {
-      console.log('Found direct lat/lng:', currentEvent.latitude, currentEvent.longitude);
+    if (
+      currentEvent.latitude !== null &&
+      currentEvent.latitude !== undefined &&
+      currentEvent.longitude !== null &&
+      currentEvent.longitude !== undefined
+    ) {
+      console.log(
+        'Found direct lat/lng:',
+        currentEvent.latitude,
+        currentEvent.longitude,
+      );
       return true;
     }
-    
+
     // Check for alternative lat/lng properties (fallback)
     if (currentEvent.lat && currentEvent.lng) {
       console.log('Found alt lat/lng:', currentEvent.lat, currentEvent.lng);
       return true;
     }
-    
+
     // Check if location string contains coordinates (lat, lng format) - legacy fallback
     if (currentEvent.location && typeof currentEvent.location === 'string') {
-      const coordMatch = currentEvent.location.match(/(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/);
+      const coordMatch = currentEvent.location.match(
+        /(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/,
+      );
       if (coordMatch) {
-        console.log('Found coordinates in location string:', coordMatch[1], coordMatch[2]);
+        console.log(
+          'Found coordinates in location string:',
+          coordMatch[1],
+          coordMatch[2],
+        );
         return true;
       }
     }
-    
+
     console.log('No coordinates found');
     return false;
   };
@@ -279,34 +343,49 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   // Get coordinates from various possible formats - UPDATED FUNCTION
   const getEventCoordinates = () => {
     const currentEvent = eventDetails || event;
-    
+
     console.log('Getting coordinates from event:', currentEvent);
-    
+
     // Direct latitude/longitude properties (primary method now)
-    if (currentEvent.latitude !== null && currentEvent.latitude !== undefined && 
-        currentEvent.longitude !== null && currentEvent.longitude !== undefined) {
-      const coords = { lat: parseFloat(currentEvent.latitude), lng: parseFloat(currentEvent.longitude) };
+    if (
+      currentEvent.latitude !== null &&
+      currentEvent.latitude !== undefined &&
+      currentEvent.longitude !== null &&
+      currentEvent.longitude !== undefined
+    ) {
+      const coords = {
+        lat: parseFloat(currentEvent.latitude),
+        lng: parseFloat(currentEvent.longitude),
+      };
       console.log('Returning direct coordinates:', coords);
       return coords;
     }
-    
+
     // Alternative lat/lng properties (fallback)
     if (currentEvent.lat && currentEvent.lng) {
-      const coords = { lat: parseFloat(currentEvent.lat), lng: parseFloat(currentEvent.lng) };
+      const coords = {
+        lat: parseFloat(currentEvent.lat),
+        lng: parseFloat(currentEvent.lng),
+      };
       console.log('Returning alt coordinates:', coords);
       return coords;
     }
-    
+
     // Parse from location string if it contains coordinates (legacy fallback)
     if (currentEvent.location && typeof currentEvent.location === 'string') {
-      const coordMatch = currentEvent.location.match(/(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/);
+      const coordMatch = currentEvent.location.match(
+        /(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/,
+      );
       if (coordMatch) {
-        const coords = { lat: parseFloat(coordMatch[1]), lng: parseFloat(coordMatch[2]) };
+        const coords = {
+          lat: parseFloat(coordMatch[1]),
+          lng: parseFloat(coordMatch[2]),
+        };
         console.log('Returning parsed coordinates:', coords);
         return coords;
       }
     }
-    
+
     console.log('No coordinates could be extracted');
     return null;
   };
@@ -323,7 +402,12 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
       setLikesCount(0);
       setActionLoading({ like: false, attend: false });
       setIsPastEvent(false);
-      
+
+      // Close sub-modals
+      setShowTicketModal(false);
+      setShowScannerModal(false);
+      setShowManagementPanel(false);
+
       // Fetch new data
       fetchEventDetails();
     }
@@ -343,32 +427,42 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
   if (!isOpen || !event) return null;
 
   const dateTime = formatEventDateTime(event.event_datetime);
+  const isHost = currentUser && String(event.user_id) === String(currentUser.sub || currentUser._id || currentUser.id || currentUser.user_id);
 
-  return (
+  const mainContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-2xl relative"
+        className="bg-card rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-2xl relative border border-border"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-2xl z-10">
+        <div className="sticky top-0 bg-card border-b border-border p-6 flex items-center justify-between rounded-t-2xl z-10">
           <div className="flex items-center space-x-3">
             <div className="text-4xl">{getEventIcon(0)}</div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-2xl font-bold text-gray-900">{event.title}</h2>
+                <h2 className="text-2xl font-bold text-foreground">
+                  {event.title}
+                </h2>
                 {isPastEvent && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                     <Clock className="w-3 h-3 mr-1" />
                     Past Event
                   </span>
                 )}
               </div>
-              <p className="text-gray-600">Hosted by @{event.host_username || event.username || 'Unknown'}</p>
+              <p className="flex gap-2 text-muted-foreground items-center">
+                Hosted by{' '}
+                <UserBadge
+                  user={event}
+                  username={event.username}
+                  withImage={false}
+                />
+              </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
-            <X className="w-6 h-6 text-gray-500" />
+          <button onClick={onClose} className="p-2 hover:bg-muted rounded-full">
+            <X className="w-6 h-6 text-muted-foreground" />
           </button>
         </div>
 
@@ -376,18 +470,22 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         <div className="p-6 space-y-6">
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : (
             <>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
-                  <Calendar className="w-5 h-5 text-gray-500 mt-1" />
+                  <Calendar className="w-5 h-5 text-muted-foreground mt-1" />
                   <div>
-                    <p className={`font-semibold ${isPastEvent ? 'text-gray-500' : 'text-gray-900'}`}>
+                    <p
+                      className={`font-semibold ${isPastEvent ? 'text-muted-foreground' : 'text-foreground'}`}
+                    >
                       {dateTime.date}
                     </p>
-                    <p className={`${isPastEvent ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p
+                      className={`${isPastEvent ? 'text-muted-foreground' : 'text-muted-foreground'}`}
+                    >
                       {dateTime.time}
                     </p>
                   </div>
@@ -395,15 +493,17 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
 
                 {event.location && (
                   <div className="flex items-start space-x-3">
-                    <MapPin className="w-5 h-5 text-gray-500 mt-1" />
+                    <MapPin className="w-5 h-5 text-muted-foreground mt-1" />
                     <div className="flex-1">
-                      <p className="font-semibold text-gray-900">Location</p>
+                      <p className="font-semibold text-foreground">Location</p>
                       <div className="flex items-center justify-between">
-                        <p className="text-gray-600">{event.location}</p>
+                        <p className="text-muted-foreground">
+                          {event.location}
+                        </p>
                         {hasLocationCoordinates() && (
                           <button
                             onClick={handleViewOnMap}
-                            className="flex items-center space-x-1 px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-medium transition-colors"
+                            className="flex items-center space-x-1 px-3 py-1 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-sm font-medium transition-colors"
                           >
                             <Map className="w-4 h-4" />
                             <span>View on Map</span>
@@ -415,10 +515,12 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                 )}
 
                 <div className="flex items-start space-x-3">
-                  <Users className="w-5 h-5 text-gray-500 mt-1" />
+                  <Users className="w-5 h-5 text-muted-foreground mt-1" />
                   <div>
-                    <p className="font-semibold text-gray-900">
-                      {totalAttendees} {totalAttendees === 1 ? 'person' : 'people'} {isPastEvent ? 'attended' : 'attending'}
+                    <p className="font-semibold text-foreground">
+                      {totalAttendees}{' '}
+                      {totalAttendees === 1 ? 'person' : 'people'}{' '}
+                      {isPastEvent ? 'attended' : 'attending'}
                     </p>
                   </div>
                 </div>
@@ -426,32 +528,40 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
 
               {event.description && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">About this event</h3>
-                  <p className="text-gray-700 leading-relaxed">{event.description}</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    About this event
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {event.description}
+                  </p>
                 </div>
               )}
 
               {attendingFriends.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                    Friends {isPastEvent ? 'who attended' : 'attending'} ({attendingFriends.length})
+                  <h3 className="text-lg font-semibold text-foreground mb-3">
+                    Friends {isPastEvent ? 'who attended' : 'attending'} (
+                    {attendingFriends.length})
                   </h3>
                   <div className="flex flex-wrap gap-3">
                     {attendingFriends.slice(0, 8).map((friend) => (
-                      <div key={friend._id} className="flex items-center space-x-2 bg-gray-50 rounded-full pr-3 py-1">
+                      <div
+                        key={friend._id}
+                        className="flex items-center space-x-2 bg-muted rounded-full pr-3 py-1"
+                      >
                         <img
                           src={getProfilePictureUrl(friend.profile_picture)}
                           alt={friend.username}
                           className="w-8 h-8 rounded-full object-cover"
                         />
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-sm font-medium text-foreground">
                           {friend.full_name || friend.username}
                         </span>
                       </div>
                     ))}
                     {attendingFriends.length > 8 && (
-                      <div className="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full">
-                        <span className="text-xs font-medium text-gray-600">
+                      <div className="flex items-center justify-center w-8 h-8 bg-muted rounded-full">
+                        <span className="text-xs font-medium text-muted-foreground">
                           +{attendingFriends.length - 8}
                         </span>
                       </div>
@@ -462,32 +572,26 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
 
               {/* Action buttons - only show if user is logged in */}
               {currentUser && (
-                <div className="space-y-3 pt-4 border-t border-gray-200">
+                <div className="space-y-3 pt-4 border-t border-border">
                   {/* Main action button - Join/Attending (disabled for past events) */}
                   {!isPastEvent ? (
                     <button
                       onClick={toggleAttendance}
                       disabled={actionLoading.attend}
-                      className={`w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
-                        isAttending
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
-                      }`}
+                      className={`w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 ${isAttending
+                        ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20'
+                        : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                        }`}
                     >
                       {actionLoading.attend ? (
                         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
                       ) : (
                         <UserPlus className="w-5 h-5" />
                       )}
-                      <span>
-                        {isAttending 
-                          ? 'Attending' 
-                          : 'Join Event'
-                        }
-                      </span>
+                      <span>{isAttending ? 'Attending' : 'Join Event'}</span>
                     </button>
                   ) : (
-                    <div className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-gray-100 text-gray-500 rounded-lg font-semibold">
+                    <div className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-muted text-muted-foreground rounded-lg font-semibold">
                       <Clock className="w-5 h-5" />
                       <span>Event has ended</span>
                     </div>
@@ -497,11 +601,55 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                   {isAttending && (
                     <button
                       onClick={handleViewThread}
-                      className="w-full flex items-center justify-center space-x-2 py-2 px-4 bg-orange-100 text-orange-700 hover:bg-orange-200 rounded-lg font-medium transition-colors"
+                      className="w-full flex items-center justify-center space-x-2 py-2 px-4 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg font-medium transition-colors"
                     >
                       <MessageCircle className="w-5 h-5" />
                       <span>View Event Discussion</span>
                     </button>
+                  )}
+
+                  {/* Check-in section */}
+                  {!isPastEvent && (
+                    <div className="flex space-x-3">
+                      {/* My Ticket button — for attending users and host */}
+                      {(isAttending || isHost) && (
+                        <button
+                          onClick={() => setShowTicketModal(true)}
+                          className="flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg font-medium transition-colors"
+                        >
+                          <Ticket className="w-5 h-5" />
+                          <span>My Ticket</span>
+                        </button>
+                      )}
+
+                      {/* Manage Check-Ins — for event host */}
+                      {currentUser && String(event.user_id) === String(currentUser.sub || currentUser._id || currentUser.id || currentUser.user_id) && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              // Check if a camera exists WITHOUT opening a stream.
+                              // getUserMedia would grab the camera and block html5-qrcode.
+                              const devices = await navigator.mediaDevices.enumerateDevices();
+                              const hasCamera = devices.some(d => d.kind === 'videoinput');
+                              if (hasCamera) {
+                                setShowScannerModal(true);
+                              } else {
+                                showCameraDenied();
+                                setShowManagementPanel(true);
+                              }
+                            } catch {
+                              // Can't enumerate — fall back to manual list
+                              showCameraDenied();
+                              setShowManagementPanel(true);
+                            }
+                          }}
+                          className="flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg font-medium transition-colors"
+                        >
+                          <ScanLine className="w-5 h-5" />
+                          <span>Check-Ins</span>
+                        </button>
+                      )}
+                    </div>
                   )}
 
                   {/* Secondary action buttons */}
@@ -509,21 +657,22 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                     <button
                       onClick={toggleLike}
                       disabled={actionLoading.like}
-                      className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
-                        isLiked
-                          ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
+                      className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold transition-colors disabled:opacity-50 ${isLiked
+                        ? 'bg-destructive/10 text-destructive hover:bg-destructive/20'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                        }`}
                     >
                       {actionLoading.like ? (
                         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
                       ) : (
-                        <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+                        <Heart
+                          className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`}
+                        />
                       )}
                       <span>{likesCount}</span>
                     </button>
 
-                    <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg font-semibold transition-colors">
+                    <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-muted text-muted-foreground hover:bg-muted/80 rounded-lg font-semibold transition-colors">
                       <Share2 className="w-5 h-5" />
                       <span>Share</span>
                     </button>
@@ -531,19 +680,27 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
                 </div>
               )}
 
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-muted/50 rounded-lg p-4">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">{totalAttendees}</p>
-                    <p className="text-sm text-gray-600">{isPastEvent ? 'Attended' : 'Attending'}</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {totalAttendees}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {isPastEvent ? 'Attended' : 'Attending'}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">{likesCount}</p>
-                    <p className="text-sm text-gray-600">Likes</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {likesCount}
+                    </p>
+                    <p className="text-sm text-muted-foreground">Likes</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">{attendingFriends.length}</p>
-                    <p className="text-sm text-gray-600">Friends</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {attendingFriends.length}
+                    </p>
+                    <p className="text-sm text-muted-foreground">Friends</p>
                   </div>
                 </div>
               </div>
@@ -552,6 +709,42 @@ const EventModal = ({ event, isOpen, onClose, currentUser }) => {
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {mainContent}
+
+      {/* Ticket QR Modal (attendee) */}
+      <TicketQRModal
+        isOpen={showTicketModal}
+        onClose={() => setShowTicketModal(false)}
+        eventId={event._id}
+        eventTitle={event.title}
+      />
+
+      {/* Scanner Modal (mobile host) */}
+      <ScannerModal
+        isOpen={showScannerModal}
+        onClose={() => setShowScannerModal(false)}
+        eventId={event._id}
+        onSwitchToList={() => {
+          setShowScannerModal(false);
+          setShowManagementPanel(true);
+        }}
+      />
+
+      {/* Attendee Management Panel (desktop host) */}
+      <AttendeeManagementPanel
+        isOpen={showManagementPanel}
+        onClose={() => setShowManagementPanel(false)}
+        eventId={event._id}
+        onSwitchToScanner={isHost ? () => {
+          setShowManagementPanel(false);
+          setShowScannerModal(true);
+        } : null}
+      />
+    </>
   );
 };
 

@@ -63,6 +63,7 @@ const FollowerModal = ({ isOpen, onClose, userId, isOwnProfile }) => {
 
       const response = await fetch(url, {
         method: 'GET',
+        credentials: 'include',
         headers: getAuthHeaders(),
       });
 
@@ -92,6 +93,7 @@ const FollowerModal = ({ isOpen, onClose, userId, isOwnProfile }) => {
     try {
       const response = await fetch(`${API_BASE_URL}/users/${followerId}/follow`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAuthHeaders(),
       });
       
