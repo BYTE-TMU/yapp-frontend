@@ -220,12 +220,6 @@ function Home() {
                   </button>
                 </div>
               </div>
-              <button
-                onClick={refreshPosts}
-                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold transition-colors"
-              >
-                Refresh
-              </button>
             </div>
 
             {error && (
