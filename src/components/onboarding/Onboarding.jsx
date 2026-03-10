@@ -191,12 +191,13 @@ function Onboarding() {
 
   const markOnboardingComplete = async () => {
     const token = localStorage.getItem('token');
-    await fetch(`${API_BASE_URL}/users/me/onboarding-complete`, {
-      method: 'PUT',
+    await fetch(`${API_BASE_URL}/users/me/onboarding`, {
+      method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ onboarding_completed: true }),
     });
   };
 
