@@ -18,6 +18,8 @@ const ETPostsFeed = ({
 }) => {
   const { isDarkMode } = useTheme();
 
+  const chatPosts = posts.filter(post => !post.post_type?.endsWith('_notification'));
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -26,7 +28,7 @@ const ETPostsFeed = ({
     );
   }
 
-  if (posts.length === 0) {
+  if (chatPosts.length === 0) {
     return (
       <div className="text-center py-12">
         <MessageCircle className={`w-12 h-12 mx-auto mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'
@@ -42,7 +44,7 @@ const ETPostsFeed = ({
 
   return (
     <div className="space-y-4 flex flex-col items-center w-full">
-      {posts.map((post) => (
+      {chatPosts.map((post) => (
         <ETPost
           key={post._id}
           post={post}
