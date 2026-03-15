@@ -76,6 +76,15 @@ function WaypointPopup({ waypoint, isOwner, onLike, onBookmark, onDelete, onJoin
         }
     };
 
+    const openDirections = () => {
+        const [lat, lng] = waypoint.coords;
+        const isApple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+        const url = isApple
+            ? `https://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`
+            : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+    };
+
     const handleJoinEvent = async () => {
         if (!currentUserId) {
             showLoginRequired('join events');
@@ -109,6 +118,14 @@ function WaypointPopup({ waypoint, isOwner, onLike, onBookmark, onDelete, onJoin
                     </button>
                 )}
             </div>
+
+            {/* Human-readable address */}
+            {waypoint.address && (
+                <p className="m-0 mb-2 text-gray-500 text-xs flex items-center gap-1">
+                    <span>📍</span>
+                    <span>{waypoint.address}</span>
+                </p>
+            )}
 
             {/* Event-specific information */}
             {isEventWaypoint && eventDetails && (
@@ -162,6 +179,15 @@ function WaypointPopup({ waypoint, isOwner, onLike, onBookmark, onDelete, onJoin
             
             {/* Action buttons */}
             <div className="space-y-2">
+                {/* Get Directions button */}
+                {waypoint.coords?.[0] && waypoint.coords?.[1] && (
+                    <button
+                        onClick={openDirections}
+                        className="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-md text-sm font-bold cursor-pointer transition-all duration-200"
+                    >
+                        🧭 Get Directions
+                    </button>
+                )}
                 {/* Join Event Button (only for event waypoints and if user is not the owner) */}
                 {isEventWaypoint && !isOwner && (
                     <button 

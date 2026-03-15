@@ -41,9 +41,25 @@ VITE_API_URL=http://localhost:5000
 
 # Production
 VITE_API_URL=https://yap-backend.up.railway.app
+
+# LocationIQ (required for map search + reverse geocoding)
+# Get a free key at https://locationiq.com — set referrer restrictions in the dashboard
+VITE_LOCATIONIQ_API_KEY=your_locationiq_api_key_here
 ```
 
 **Note:** Vite requires `VITE_` prefix for environment variables to be exposed to the client.
+
+### LocationIQ Integration
+
+The frontend uses LocationIQ directly for two features:
+
+| Feature | Service | Component |
+|---|---|---|
+| Address autocomplete in map picker | `/v1/autocomplete` | `LocationSearchBar.jsx` |
+| Reverse geocode on pin drop | `/v1/reverse` | `locationiqService.js` |
+| Map tile rendering | Tile CDN | `EventLocationMap.jsx`, `WaypointMap.jsx` |
+
+`VITE_LOCATIONIQ_API_KEY` is embedded in all three request paths. To restrict usage to your domain, configure HTTP Referrer restrictions in the LocationIQ dashboard. The `searchAddress` service function returns `{ error: boolean, results: [] }` — consumers must check the `error` field and show user-visible feedback instead of silently treating failures as empty results.
 
 ## Authentication System
 

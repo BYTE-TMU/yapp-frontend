@@ -30,6 +30,11 @@ function WaypointNavigationOverlay({
                     <div className="text-lg font-bold text-gray-900 truncate" title={currentWaypoint.title}>
                         {currentWaypoint.title}
                     </div>
+                    {currentWaypoint.address && (
+                        <div className="text-xs text-gray-500 truncate" title={currentWaypoint.address}>
+                            📍 {currentWaypoint.address}
+                        </div>
+                    )}
                     <div className="text-sm text-gray-600 truncate" title={currentWaypoint.description}>
                         {currentWaypoint.description}
                     </div>

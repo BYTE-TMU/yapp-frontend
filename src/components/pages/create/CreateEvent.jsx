@@ -27,16 +27,6 @@ function CreateEvent() {
   // Get today's date for minimum date validation
   const today = new Date().toISOString().split('T')[0];
 
-  // Calculate hours until event (for waypoint expiration)
-  const calculateHoursUntilEvent = (eventDate, eventTime) => {
-    const eventDateTime = new Date(`${eventDate}T${eventTime}`);
-    const now = new Date();
-    const diffInHours = Math.ceil((eventDateTime - now) / (1000 * 60 * 60));
-
-    // Set waypoint to expire 2 hours after event time, with minimum of 1 hour and max of 168 hours (7 days)
-    return Math.min(Math.max(diffInHours + 2, 1), 168);
-  };
-
   // Format date display
   const formatDateDisplay = (dateString) => {
     if (!dateString) return 'Select date';
@@ -65,9 +55,16 @@ function CreateEvent() {
   // Handle location selection from map
   const handleLocationSelect = (locationData) => {
     setEventLocation(locationData);
-    // Auto-populate location title with the address if no title is set
-    if (!locationTitle && locationData.address) {
-      setLocationTitle(locationData.address);
+    // Auto-populate location title with the address.
+    // Also update if the current value is still a raw coordinate string (not yet edited by user).
+    if (locationData.address) {
+      setLocationTitle((prev) => {
+        const isRawCoords = /^-?\d+\.\d+,\s*-?\d+\.\d+$/.test(prev);
+        if (!prev || isRawCoords) {
+          return locationData.address;
+        }
+        return prev;
+      });
     }
   };
 
@@ -212,37 +209,10 @@ function CreateEvent() {
       const data = await response.json();
 
       if (response.ok) {
-        // If event has a location, also create a waypoint
-        if (eventLocation) {
-          try {
-            const waypointData = {
-              title: `📅 ${eventTitle}`,
-              description: `Event on ${eventDate} at ${eventTime}\n\n${eventDescription}`,
-              type: 'event',
-              latitude: eventLocation.lat,
-              longitude: eventLocation.lng,
-              expires_in_hours: calculateHoursUntilEvent(eventDate, eventTime),
-            };
-
-            await fetch(`${API_BASE_URL}/waypoint/create`, {
-              method: 'POST',
-              credentials: 'include',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify(waypointData),
-            });
-
-            setEventMessage(
-              'Event created successfully and added to the campus map! 🗺️',
-            );
-          } catch (waypointError) {
-            console.error('Failed to create waypoint:', waypointError);
-            setEventMessage(
-              'Event created successfully! (Note: Could not add to campus map)',
-            );
-          }
+        if (data.waypoint_created) {
+          setEventMessage(
+            'Event created successfully and added to the campus map! 🗺️',
+          );
         } else {
           setEventMessage('Event created successfully!');
         }
@@ -259,7 +229,7 @@ function CreateEvent() {
       } else {
         setEventError(data.error || 'Failed to create event');
       }
-    } catch (err) {
+    } catch (_err) {
       setEventError('Network error. Please try again.');
     } finally {
       setIsSubmittingEvent(false);
