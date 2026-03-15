@@ -50,7 +50,13 @@ export default function LoginForm() {
         }),
       });
 
-      const data = await res.json();
+      let data = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Body wasn't JSON (e.g. HTML 500 page from server)
+        data = {};
+      }
 
       if (res.ok) {
         // store the token in localStorage
@@ -68,12 +74,14 @@ export default function LoginForm() {
         setMsg('Login success');
 
         // Check if user has completed onboarding
-        const onboardingComplete = localStorage.getItem('onboarding_complete');
-        if (onboardingComplete) {
-          // Returning user - go to home
+        const profileRes = await fetch(`${API_BASE_URL}/users/me`, {
+          headers: { Authorization: `Bearer ${data.token}` }
+        });
+        const profileData = await profileRes.json();
+        
+        if (profileData.profile?.onboarding_completed) {
           navigate('/home');
         } else {
-          // New user - go to onboarding
           navigate('/onboarding');
         }
       } else if (res.status === 403 && data.requires_verification) {
@@ -82,7 +90,8 @@ export default function LoginForm() {
         setShowVerification(true);
         setMsg(''); // Clear any previous messages
       } else {
-        setMsg(data.error || 'Login failed');
+        const errMsg = typeof data.error === 'string' ? data.error : 'Login failed';
+        setMsg(errMsg);
       }
     } catch {
       setMsg('Server error');
@@ -251,7 +260,7 @@ export default function LoginForm() {
             {msg && (
               <div
                 className={`text-center text-sm mt-4 p-3 rounded-lg transition-all duration-300 ${
-                  msg.includes('success')
+                  typeof msg === 'string' && msg.includes('success')
                     ? 'text-green-500 bg-green-500/10 border border-green-500/20'
                     : 'text-destructive bg-destructive/10 border border-destructive/20'
                 }`}

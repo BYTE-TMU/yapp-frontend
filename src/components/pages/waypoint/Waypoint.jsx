@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { reverseGeocode } from '../../../services/locationiqService';
 import WaypointModal from './WaypointModal.jsx';
 import WaypointHeader from './WaypointHeader.jsx';
 import WaypointMap from './WaypointMap.jsx';
@@ -29,6 +30,8 @@ function Waypoint() {
   const [waypoints, setWaypoints] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newPinLocation, setNewPinLocation] = useState(null);
+  const [resolvedAddress, setResolvedAddress] = useState(null);
+  const [addressLoading, setAddressLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -41,7 +44,56 @@ function Waypoint() {
   const [currentSavedIndex, setCurrentSavedIndex] = useState(-1);
   const [isNavigatingSaved, setIsNavigatingSaved] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false); // Prevent rapid navigation
+  const [searchedLocation, setSearchedLocation] = useState(null); // Location from search bar
   const { isDarkMode } = useTheme();
+
+  // Filter state — all types shown by default
+  const ALL_TYPES = ['food', 'study', 'group', 'social', 'event', 'other'];
+  const [activeFilters, setActiveFilters] = useState(new Set(ALL_TYPES));
+
+  const handleToggleFilter = (type) => {
+    setActiveFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) {
+        // Don't allow deselecting the last type
+        if (next.size === 1) return prev;
+        next.delete(type);
+      } else {
+        next.add(type);
+      }
+      return next;
+    });
+  };
+
+  const handleClearFilters = () => setActiveFilters(new Set(ALL_TYPES));
+
+  // Derived: waypoints filtered by active types
+  const filteredWaypoints = waypoints.filter((w) => activeFilters.has(w.type ?? 'other'));
+
+  // Reverse geocode the pin location whenever a new one is set.
+  // If the location already carries an address (e.g. from the search bar) skip the API call.
+  useEffect(() => {
+    if (!newPinLocation) {
+      setResolvedAddress(null);
+      return;
+    }
+    // Address pre-filled from autocomplete — no need to reverse-geocode
+    if (newPinLocation.address) {
+      setResolvedAddress(newPinLocation.address);
+      setAddressLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setResolvedAddress(null);
+    setAddressLoading(true);
+    reverseGeocode(newPinLocation.lat, newPinLocation.lng).then((addr) => {
+      if (!cancelled) {
+        setResolvedAddress(addr);
+        setAddressLoading(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [newPinLocation]);
 
   // TMU Campus coordinates
   const TMU_COORDS = [43.6577, -79.3788];
@@ -243,6 +295,8 @@ function Waypoint() {
             isOwner: currentUsername && waypoint.username === currentUsername,
             liked_users: waypoint.liked_users || [],
             bookmarked_users: waypoint.bookmarked_users || [],
+            // Human-readable address from reverse geocoding
+            address: waypoint.address || null,
             // Event-specific fields
             isAttending: isAttending,
             attendeesCount: attendeesCount,
@@ -364,6 +418,7 @@ function Waypoint() {
           type: waypointData.type,
           latitude: newPinLocation.lat,
           longitude: newPinLocation.lng,
+          address: waypointData.address || resolvedAddress || null,
           expires_in_hours: 24, // Optional: expire after 24 hours
         }),
       });
@@ -380,6 +435,7 @@ function Waypoint() {
 
       setShowCreateModal(false);
       setNewPinLocation(null);
+      setSearchedLocation(null);
       setPlacementMode(false); // Exit placement mode after creating
     } catch (err) {
       console.error('Error creating waypoint:', err);
@@ -902,6 +958,13 @@ function Waypoint() {
     setShowCreateModal(true);
   };
 
+  // Handle a result selected from the search bar:
+  // The map flies to the location (done inside LocationSearchBar).
+  // We drop a pulsing marker at the searched coordinates so the user can click it to create a waypoint.
+  const handleSearchSelect = ({ lat, lng, address }) => {
+    setSearchedLocation({ lat, lng, address });
+  };
+
   // Handle creating waypoint
   const handleCreatePin = (pinData) => {
     createWaypoint(pinData);
@@ -1071,65 +1134,86 @@ function Waypoint() {
   }
 
   return (
-    <div className="page-container">
-      <div className="max-w-full mx-auto h-full flex flex-col">
-        {/* Header */}
-        <WaypointHeader
-          placementMode={placementMode}
-          onTogglePlacementMode={togglePlacementMode}
-          onRefresh={handleRefresh}
-          refreshing={refreshing}
-          waypointCount={waypoints.length}
-          error={error}
-          onClearError={() => setError(null)}
-          onOpenSavedWaypoints={fetchSavedWaypoints}
-          isNavigatingSaved={isNavigatingSaved}
-          currentSavedIndex={currentSavedIndex}
-          savedWaypointsCount={savedWaypoints.length}
-          onPreviousSaved={goToPreviousSaved}
-          onNextSaved={goToNextSaved}
-          onExitSavedNavigation={() => {
-            setIsNavigatingSaved(false);
-            setSavedWaypoints([]);
-            setCurrentSavedIndex(-1);
-          }}
-        />
+    <div
+      className="flex flex-col h-screen overflow-hidden font-bold"
+      style={{
+        fontFamily: 'Albert Sans',
+      }}
+    >
+      <div className="flex-1 min-h-0 flex flex-col px-1 pt-2 md:px-6 md:pt-4 pb-20 md:pb-6">
+        {/* Animated Background */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
+        <div className="w-full flex-1 min-h-0 flex flex-col">
+          {/* Header */}
+          <WaypointHeader
+            placementMode={placementMode}
+            onTogglePlacementMode={togglePlacementMode}
+            onRefresh={handleRefresh}
+            refreshing={refreshing}
+            waypointCount={filteredWaypoints.length}
+            error={error}
+            onClearError={() => setError(null)}
+            onOpenSavedWaypoints={fetchSavedWaypoints}
+            isNavigatingSaved={isNavigatingSaved}
+            currentSavedIndex={currentSavedIndex}
+            savedWaypointsCount={savedWaypoints.length}
+            onPreviousSaved={goToPreviousSaved}
+            onNextSaved={goToNextSaved}
+            onExitSavedNavigation={() => {
+              setIsNavigatingSaved(false);
+              setSavedWaypoints([]);
+              setCurrentSavedIndex(-1);
+            }}
+          />
 
-        {/* Map Container */}
-        <WaypointMap
-          waypoints={waypoints}
-          placementMode={placementMode}
-          refreshing={refreshing}
-          onMapClick={handleMapClick}
-          onJoinWaypoint={joinWaypoint}
-          onDeleteWaypoint={deleteWaypoint}
-          onLikeWaypoint={likeWaypoint}
-          onBookmarkWaypoint={bookmarkWaypoint}
-          onJoinEvent={joinEventFromWaypoint}
-          getCurrentUser={getCurrentUser}
-          TMU_COORDS={TMU_COORDS}
-          ZOOM_LEVEL={ZOOM_LEVEL}
-          targetWaypoint={targetWaypoint}
-          shouldOpenPopup={shouldOpenPopup}
-          // Navigation overlay props
-          isNavigatingSaved={isNavigatingSaved}
-          currentSavedWaypoint={savedWaypoints[currentSavedIndex]}
-          currentSavedIndex={currentSavedIndex}
-          savedWaypointsCount={savedWaypoints.length}
-          onPreviousSaved={goToPreviousSaved}
-          onNextSaved={goToNextSaved}
-        />
+          {/* Map Container */}
+          <WaypointMap
+            waypoints={filteredWaypoints}
+            placementMode={placementMode}
+            refreshing={refreshing}
+            onMapClick={handleMapClick}
+            onJoinWaypoint={joinWaypoint}
+            onDeleteWaypoint={deleteWaypoint}
+            onLikeWaypoint={likeWaypoint}
+            onBookmarkWaypoint={bookmarkWaypoint}
+            onJoinEvent={joinEventFromWaypoint}
+            getCurrentUser={getCurrentUser}
+            TMU_COORDS={TMU_COORDS}
+            ZOOM_LEVEL={ZOOM_LEVEL}
+            targetWaypoint={targetWaypoint}
+            shouldOpenPopup={shouldOpenPopup}
+            onSearchSelect={handleSearchSelect}
+            searchedPinLocation={searchedLocation}
+            activeFilters={activeFilters}
+            onToggleFilter={handleToggleFilter}
+            onClearFilters={handleClearFilters}
+            // Navigation overlay props
+            isNavigatingSaved={isNavigatingSaved}
+            currentSavedWaypoint={savedWaypoints[currentSavedIndex]}
+            currentSavedIndex={currentSavedIndex}
+            savedWaypointsCount={savedWaypoints.length}
+            onPreviousSaved={goToPreviousSaved}
+            onNextSaved={goToNextSaved}
+          />
 
-        {/* Waypoint Modal */}
-        <WaypointModal
-          isOpen={showCreateModal}
-          onClose={() => {
-            setShowCreateModal(false);
-            setNewPinLocation(null);
-          }}
-          onSubmit={handleCreatePin}
-          location={newPinLocation}
-        />
+          {/* Waypoint Modal */}
+          <WaypointModal
+            isOpen={showCreateModal}
+            onClose={() => {
+              setShowCreateModal(false);
+              setNewPinLocation(null);
+              setResolvedAddress(null);
+              setSearchedLocation(null);
+            }}
+            onSubmit={handleCreatePin}
+            location={newPinLocation}
+            address={resolvedAddress}
+            addressLoading={addressLoading}
+          />
+        </div>
       </div>
     </div>
   );

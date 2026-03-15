@@ -5,8 +5,6 @@ import {
   RefreshCw,
   AlertCircle,
   Bookmark,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { cn } from '@/utils/cnUtils';
@@ -31,109 +29,86 @@ function WaypointHeader({
   const { isDarkMode } = useTheme();
 
   return (
-    <div className="mb-6 shrink-0">
-      <div className="flex flex-col md:flex-row items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <MapPin className="w-8 h-8 text-orange-400" />
+    <div className="mb-2 md:mb-4 shrink-0">
+      <div className="flex flex-row items-center justify-between gap-2">
+        {/* Left: title */}
+        <div className="flex items-center space-x-2">
+          <MapPin className="w-6 h-6 md:w-8 md:h-8 text-orange-400 shrink-0" />
           <div>
-            <h1 className="text-3xl font-bold">Waypoint</h1>
-            <p className="text-xs md:text-sm font-normal text-muted-foreground">
+            <h1 className="text-xl md:text-3xl font-bold leading-tight">Waypoint</h1>
+            <p className="text-xs font-normal text-muted-foreground hidden sm:block">
               Real-time campus community map
             </p>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row items-center gap-2 mt-6 md:mt-0">
-          {/* Saved Navigation Controls (shown when navigating) */}
+
+        {/* Right: action buttons */}
+        <div className="flex flex-row flex-wrap items-center justify-end gap-2">
           {isNavigatingSaved ? (
             <>
-              <div className="flex items-center space-x-2 px-4 py-2 bg-purple-600 rounded-lg text-white">
-                <Bookmark className="w-4 h-4" />
+              <div className="flex items-center space-x-1 px-2 py-1.5 md:px-4 md:py-2 bg-purple-600 rounded-lg text-white text-xs md:text-sm">
+                <Bookmark className="w-3 h-3 md:w-4 md:h-4" />
                 <span className="font-semibold">
-                  Navigating Saved ({currentSavedIndex + 1} of{' '}
-                  {savedWaypointsCount})
+                  {currentSavedIndex + 1}/{savedWaypointsCount}
+                  <span className="hidden sm:inline"> saved</span>
                 </span>
               </div>
-
               <button
                 onClick={onExitSavedNavigation}
-                className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                className="flex items-center space-x-1 px-2 py-1.5 md:px-4 md:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-xs md:text-sm"
               >
-                <X className="w-4 h-4" />
-                <span>Exit Navigation</span>
+                <X className="w-3 h-3 md:w-4 md:h-4" />
+                <span className="hidden sm:inline">Exit</span>
+                <span className="sm:hidden">✕</span>
               </button>
             </>
           ) : (
             <>
-              {/* Saved Waypoints Button */}
-              <div className="flex items-center space-x-2">
-                <Button onClick={onOpenSavedWaypoints} variant="outline">
-                  <Bookmark className="w-4 h-4 text-purple-400" />
-                  <span>Saved</span>
-                </Button>
-
-                <Button
-                  onClick={onRefresh}
-                  disabled={refreshing}
-                  variant="outline"
-                >
-                  <RefreshCw
-                    className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
-                  />
-                  <span>Refresh</span>
-                </Button>
-              </div>
-              {/* Placement Mode Toggle */}
+              <Button onClick={onOpenSavedWaypoints} variant="outline" size="sm" className="h-8 px-2 md:px-3">
+                <Bookmark className="w-3.5 h-3.5 text-purple-400" />
+                <span className="hidden sm:inline ml-1">Saved</span>
+              </Button>
+              <Button
+                onClick={onRefresh}
+                disabled={refreshing}
+                variant="outline"
+                size="sm"
+                className="h-8 px-2 md:px-3"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline ml-1">Refresh</span>
+              </Button>
               <Button
                 onClick={onTogglePlacementMode}
                 variant="outline"
+                size="sm"
                 className={cn(
-                  'flex items-center space-x-2 px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105 ',
+                  'h-8 px-2 md:px-3 font-bold transition-all',
                   placementMode
                     ? 'bg-primary shadow-lg shadow-primary/25'
                     : 'hover:bg-primary bg-primary',
                 )}
               >
                 {placementMode ? (
-                  <>
-                    <X className="w-4 h-4" />
-                    <span>Cancel Placement</span>
-                  </>
+                  <><X className="w-3.5 h-3.5" /><span className="hidden sm:inline ml-1">Cancel</span></>
                 ) : (
-                  <>
-                    <Target className="w-4 h-4" />
-                    <span>Place Waypoint</span>
-                  </>
+                  <><Target className="w-3.5 h-3.5" /><span className="ml-1">Place</span></>
                 )}
               </Button>
             </>
           )}
-
-          <div
-            className={`text-center md:text-right text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}
-          >
-            <div>
-              {isNavigatingSaved ? (
-                <span className="text-purple-400 font-semibold">
-                  🔖 Navigating saved waypoints
-                </span>
-              ) : placementMode ? (
-                <span className="text-primary font-semibold">
-                  🎯 Click map to place waypoint
-                </span>
-              ) : (
-                <span>📍 Enable placement mode to add waypoints</span>
-              )}
-            </div>
-            <div>🗺️ {waypointCount} active waypoints</div>
-            {isNavigatingSaved && (
-              <div
-                className={`text-xs ${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}
-              >
-                Use ← → keys or buttons to navigate
-              </div>
-            )}
-          </div>
         </div>
+      </div>
+
+      {/* Status text */}
+      <div className={`hidden sm:flex sm:items-center sm:gap-3 mt-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+        {isNavigatingSaved ? (
+          <span className="text-purple-400 font-semibold">🔖 Navigating saved waypoints · use ← → keys or buttons</span>
+        ) : placementMode ? (
+          <span className="text-primary font-semibold">🎯 Click anywhere on the map to place a waypoint</span>
+        ) : (
+          <span>📍 Enable placement mode to add waypoints · 🗺️ {waypointCount} active</span>
+        )}
       </div>
 
       {/* Error Banner */}

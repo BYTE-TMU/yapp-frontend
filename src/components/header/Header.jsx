@@ -10,7 +10,7 @@ import {
   Send,
 } from 'lucide-react';
 import YappLogoDark from '@/assets/Yapp White logo.png';
-import YappLogoLight from '@/assets/yapp_light_mode.png';
+import YappLogoLight from '@/assets/light_mode_logo2.png';
 
 function Header() {
   const location = useLocation();
@@ -47,11 +47,10 @@ function Header() {
           ) : isActive('/profile') ? (
             <Link
               to="/settings"
-              className={`p-2 rounded-lg transition-colors ${
-                isActive('/settings')
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+              className={`p-2 rounded-lg transition-colors ${isActive('/settings')
+                ? 'text-primary'
+                : 'text-muted-foreground hover:text-foreground'
+                }`}
               aria-label="Settings"
             >
               <Settings className="w-6 h-6" />
@@ -59,11 +58,10 @@ function Header() {
           ) : (
             <Link
               to="/messages"
-              className={`p-2 rounded-lg transition-colors ${
-                isActive('/messages')
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+              className={`p-2 rounded-lg transition-colors ${isActive('/messages')
+                ? 'text-primary'
+                : 'text-muted-foreground hover:text-foreground'
+                }`}
               aria-label="Messages"
             >
               <Send className="w-6 h-6" />
@@ -83,13 +81,12 @@ function Header() {
           <Link
             key={path}
             to={path}
-            className={`flex flex-col items-center justify-center py-1 px-2 rounded-lg transition-colors ${
-              isCreate
-                ? ''
-                : isActive(path)
-                  ? 'text-primary'
-                  : 'text-foreground hover:text-primary'
-            }`}
+            className={`flex flex-col items-center justify-center py-1 px-2 rounded-lg transition-colors ${isCreate
+              ? ''
+              : isActive(path)
+                ? 'text-primary'
+                : 'text-foreground hover:text-primary'
+              }`}
           >
             {isCreate ? (
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary shadow-lg shadow-primary/30">

@@ -1,21 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, X } from 'lucide-react';
-function WaypointModal({ isOpen, onClose, onSubmit, location }) {
+function WaypointModal({ isOpen, onClose, onSubmit, location, address, addressLoading }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState('food');
+  const [locationName, setLocationName] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // Pre-fill locationName whenever the geocoded address resolves
+  useEffect(() => {
+    if (address) {
+      setLocationName(address);
+    }
+  }, [address]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (title.trim() && description.trim() && !submitting) {
       setSubmitting(true);
       try {
-        await onSubmit({ title, description, type });
+        await onSubmit({ title, description, type, address: locationName.trim() || null });
         // Reset form
         setTitle('');
         setDescription('');
         setType('food');
+        setLocationName('');
       } finally {
         setSubmitting(false);
       }
@@ -27,6 +36,7 @@ function WaypointModal({ isOpen, onClose, onSubmit, location }) {
       setTitle('');
       setDescription('');
       setType('food');
+      setLocationName('');
       onClose();
     }
   };
@@ -136,6 +146,30 @@ function WaypointModal({ isOpen, onClose, onSubmit, location }) {
                 {description.length}/500
               </span>
             </div>
+          </div>
+
+          {/* Location Name Input */}
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-foreground">
+              Location Name{' '}
+              <span className="font-normal text-muted-foreground">(optional)</span>
+            </label>
+            {addressLoading ? (
+              <div className="w-full px-4 py-3 border border-border rounded-lg bg-muted text-muted-foreground text-sm flex items-center space-x-2">
+                <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                <span>Resolving address…</span>
+              </div>
+            ) : (
+              <input
+                type="text"
+                value={locationName}
+                onChange={(e) => setLocationName(e.target.value)}
+                placeholder="e.g., SLC Building, 2nd Floor"
+                maxLength={200}
+                className="w-full px-4 py-3 border border-border rounded-lg bg-muted text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                disabled={submitting}
+              />
+            )}
           </div>
 
           {/* Duration Info */}
