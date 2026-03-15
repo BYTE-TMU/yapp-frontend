@@ -189,21 +189,31 @@ function Onboarding() {
     }
   };
 
+  const markOnboardingComplete = async () => {
+    const token = localStorage.getItem('token');
+    await fetch(`${API_BASE_URL}/users/me/onboarding`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ onboarding_completed: true }),
+    });
+  };
+
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep((prev) => prev - 1);
     }
   };
 
-  const handleComplete = () => {
-    // Mark onboarding as complete
-    localStorage.setItem('onboarding_complete', 'true');
+  const handleComplete = async () => {
+    await markOnboardingComplete();
     navigate('/home');
   };
-
-  const handleSkip = () => {
-    // Allow skipping but still mark as complete
-    localStorage.setItem('onboarding_complete', 'true');
+  
+  const handleSkip = async () => {
+    await markOnboardingComplete();
     navigate('/home');
   };
 
