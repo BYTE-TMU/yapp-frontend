@@ -49,9 +49,9 @@ function Sidebar() {
         <li>
           <Link
             to="/home"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/home')
-              ? 'bg-primary/20 border border-primary/30 text-primary shadow-lg shadow-primary/25'
-              : 'text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/home')
+              ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
+              : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
           >
             <Home className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex-shrink-0" />
@@ -61,9 +61,9 @@ function Sidebar() {
         <li>
           <Link
             to="/users"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/users')
-              ? 'bg-primary/20 border border-primary/30 text-primary shadow-lg shadow-primary/25'
-              : 'text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/users')
+              ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
+              : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
           >
             <Users className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex-shrink-0" />
@@ -73,9 +73,9 @@ function Sidebar() {
         <li>
           <Link
             to="/messages"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/messages')
-              ? 'bg-primary/20 border border-primary/30 text-primary shadow-lg shadow-primary/25'
-              : 'text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/messages')
+              ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
+              : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
           >
             <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex-shrink-0" />
@@ -85,9 +85,9 @@ function Sidebar() {
         <li>
           <Link
             to="/waypoint"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/waypoint')
-              ? 'bg-primary/20 border border-primary/30 text-primary shadow-lg shadow-primary/25'
-              : 'text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/waypoint')
+              ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
+              : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
           >
             <MapPin className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex-shrink-0" />
@@ -97,9 +97,9 @@ function Sidebar() {
         <li>
           <Link
             to="/profile"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/profile')
-              ? 'bg-primary/20 border border-primary/30 text-primary shadow-lg shadow-primary/25'
-              : 'text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/profile')
+              ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
+              : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
           >
             <User className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex-shrink-0" />
@@ -109,9 +109,9 @@ function Sidebar() {
         <li>
           <Link
             to="/settings"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/settings')
-              ? 'bg-primary/20 border border-primary/30 text-primary shadow-lg shadow-primary/25'
-              : 'text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/settings')
+              ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
+              : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
           >
             <Settings className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex-shrink-0" />
@@ -121,9 +121,9 @@ function Sidebar() {
         <li>
           <Link
             to="/feedback"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/feedback')
-              ? 'bg-primary/20 border border-primary/30 text-primary shadow-lg shadow-primary/25'
-              : 'text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/feedback')
+              ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
+              : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
           >
             <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex-shrink-0" />

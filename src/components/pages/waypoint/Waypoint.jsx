@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import Sidebar from '../../sidebar/Sidebar.jsx';
-import Header from '../../header/Header';
 import { reverseGeocode } from '../../../services/locationiqService';
 import WaypointModal from './WaypointModal.jsx';
 import WaypointHeader from './WaypointHeader.jsx';
@@ -1142,11 +1140,9 @@ function Waypoint() {
         fontFamily: 'Albert Sans',
       }}
     >
-      <Header />
-      <Sidebar />
-      <div className="md:ml-64 flex-1 min-h-0 flex flex-col px-1 pt-2 md:p-6 pb-20 md:pb-6">
+      <div className="flex-1 min-h-0 flex flex-col px-1 pt-2 md:px-6 md:pt-4 pb-20 md:pb-6">
         {/* Animated Background */}
-        <div className="fixed inset-0 md:ml-64 overflow-hidden pointer-events-none">
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-tr from-orange-600/20 to-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
