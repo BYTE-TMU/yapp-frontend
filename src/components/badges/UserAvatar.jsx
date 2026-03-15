@@ -2,9 +2,15 @@ import {
   getDefaultProfilePicture,
   getProfilePictureUrl,
 } from '@/utils/profileUtils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Avatar,
+  AvatarBadge,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/avatar';
 import { cn } from '@/utils/cnUtils';
 import { cva } from 'class-variance-authority';
+import { Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const avatarVariants = cva(
@@ -25,33 +31,77 @@ const avatarVariants = cva(
   },
 );
 
-function UserAvatar({ user, size, className, redirectOnClick }) {
+function UserAvatar({
+  user,
+  size,
+  className,
+  redirectOnClick,
+  showCameraBadge = false,
+  onCameraBadgeClick,
+}) {
   const navigate = useNavigate();
   const handleProfilePhotoClick = (e) => {
     e.stopPropagation();
     navigate(`/profile/${user.user_id}`);
   };
+  const handleCameraBadgeClick = (e) => {
+    e.stopPropagation();
+    onCameraBadgeClick?.(e);
+  };
+
+  const badge = showCameraBadge ? (
+    <AvatarBadge
+      onClick={handleCameraBadgeClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCameraBadgeClick(e);
+        }
+      }}
+      className="cursor-pointer !size-8 hover:opacity-90 transition-opacity"
+      aria-label="Change profile picture"
+      role="button"
+      tabIndex={0}
+    >
+      <Camera className="!w-4 !h-4" />
+    </AvatarBadge>
+  ) : null;
+
   if (redirectOnClick) {
     return (
       <Avatar
-        className={cn(avatarVariants({ size }), className)}
+        className={cn(
+          avatarVariants({ size }),
+          showCameraBadge && 'overflow-visible',
+          className
+        )}
         onClick={handleProfilePhotoClick}
       >
         <AvatarImage
           src={getProfilePictureUrl(user.profile_picture)}
           alt={user.username}
+          className="rounded-full"
         />
         <AvatarFallback>{getDefaultProfilePicture()}</AvatarFallback>
+        {badge}
       </Avatar>
     );
   }
   return (
-    <Avatar className={cn(avatarVariants({ size }), className)}>
+    <Avatar
+      className={cn(
+        avatarVariants({ size }),
+        showCameraBadge && 'overflow-visible',
+        className
+      )}
+    >
       <AvatarImage
         src={getProfilePictureUrl(user.profile_picture)}
         alt={user.username}
+        className="rounded-full"
       />
       <AvatarFallback>{getDefaultProfilePicture()}</AvatarFallback>
+      {badge}
     </Avatar>
   );
 }

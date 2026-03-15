@@ -7,7 +7,6 @@ import FollowingModal from './FollowingModal';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Camera,
   MapPin,
   Globe,
   Calendar,
@@ -22,8 +21,8 @@ import {
 import LoadingDots from '@/components/common/LoadingDots';
 
 import { API_BASE_URL } from '../../../services/config';
-import UserAvatar from '@/components/badges/UserAvatar';
 import { Button } from '@/components/ui/button';
+import UserAvatar from '@/components/badges/UserAvatar';
 
 const Profile = () => {
   const { userId } = useParams(); // Get userId from URL
@@ -381,22 +380,17 @@ const Profile = () => {
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-6">
               {/* Profile Picture */}
               <div className="relative">
-                <UserAvatar user={profile} size="lg" />
+                <UserAvatar
+                  user={profile}
+                  size="lg"
+                  showCameraBadge={isOwnProfile && !uploadingImage}
+                  onCameraBadgeClick={openFilePicker}
+                />
+
                 {uploadingImage && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center z-20">
                     <span className="text-white text-sm">Uploading...</span>
                   </div>
-                )}
-
-                {/* Upload button for own profile - CHANGED TO ORANGE */}
-                {isOwnProfile && (
-                  <button
-                    onClick={openFilePicker}
-                    disabled={uploadingImage}
-                    className="absolute bottom-2 right-2 p-2 text-white rounded-full transition-colors bg-primary hover:opacity-90 disabled:bg-muted"
-                  >
-                    <Camera className="w-4 h-4" />
-                  </button>
                 )}
 
                 {/* Hidden file input */}
