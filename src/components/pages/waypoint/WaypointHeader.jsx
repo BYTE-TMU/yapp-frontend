@@ -5,8 +5,6 @@ import {
   RefreshCw,
   AlertCircle,
   Bookmark,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { cn } from '@/utils/cnUtils';
@@ -31,8 +29,9 @@ function WaypointHeader({
   const { isDarkMode } = useTheme();
 
   return (
-    <div className="mb-2 md:mb-6 shrink-0">
+    <div className="mb-2 md:mb-4 shrink-0">
       <div className="flex flex-row items-center justify-between gap-2">
+        {/* Left: title */}
         <div className="flex items-center space-x-2">
           <MapPin className="w-6 h-6 md:w-8 md:h-8 text-orange-400 shrink-0" />
           <div>
@@ -42,8 +41,9 @@ function WaypointHeader({
             </p>
           </div>
         </div>
+
+        {/* Right: action buttons */}
         <div className="flex flex-row flex-wrap items-center justify-end gap-2">
-          {/* Saved Navigation Controls (shown when navigating) */}
           {isNavigatingSaved ? (
             <>
               <div className="flex items-center space-x-1 px-2 py-1.5 md:px-4 md:py-2 bg-purple-600 rounded-lg text-white text-xs md:text-sm">
@@ -100,8 +100,8 @@ function WaypointHeader({
         </div>
       </div>
 
-      {/* Status text – hidden on small screens */}
-      <div className={`hidden sm:block mt-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+      {/* Status text */}
+      <div className={`hidden sm:flex sm:items-center sm:gap-3 mt-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
         {isNavigatingSaved ? (
           <span className="text-purple-400 font-semibold">🔖 Navigating saved waypoints · use ← → keys or buttons</span>
         ) : placementMode ? (

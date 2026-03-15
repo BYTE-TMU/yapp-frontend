@@ -49,6 +49,29 @@ function Waypoint() {
   const [searchedLocation, setSearchedLocation] = useState(null); // Location from search bar
   const { isDarkMode } = useTheme();
 
+  // Filter state — all types shown by default
+  const ALL_TYPES = ['food', 'study', 'group', 'social', 'event', 'other'];
+  const [activeFilters, setActiveFilters] = useState(new Set(ALL_TYPES));
+
+  const handleToggleFilter = (type) => {
+    setActiveFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) {
+        // Don't allow deselecting the last type
+        if (next.size === 1) return prev;
+        next.delete(type);
+      } else {
+        next.add(type);
+      }
+      return next;
+    });
+  };
+
+  const handleClearFilters = () => setActiveFilters(new Set(ALL_TYPES));
+
+  // Derived: waypoints filtered by active types
+  const filteredWaypoints = waypoints.filter((w) => activeFilters.has(w.type ?? 'other'));
+
   // Reverse geocode the pin location whenever a new one is set.
   // If the location already carries an address (e.g. from the search bar) skip the API call.
   useEffect(() => {
@@ -1134,7 +1157,7 @@ function Waypoint() {
             onTogglePlacementMode={togglePlacementMode}
             onRefresh={handleRefresh}
             refreshing={refreshing}
-            waypointCount={waypoints.length}
+            waypointCount={filteredWaypoints.length}
             error={error}
             onClearError={() => setError(null)}
             onOpenSavedWaypoints={fetchSavedWaypoints}
@@ -1152,7 +1175,7 @@ function Waypoint() {
 
           {/* Map Container */}
           <WaypointMap
-            waypoints={waypoints}
+            waypoints={filteredWaypoints}
             placementMode={placementMode}
             refreshing={refreshing}
             onMapClick={handleMapClick}
@@ -1168,6 +1191,9 @@ function Waypoint() {
             shouldOpenPopup={shouldOpenPopup}
             onSearchSelect={handleSearchSelect}
             searchedPinLocation={searchedLocation}
+            activeFilters={activeFilters}
+            onToggleFilter={handleToggleFilter}
+            onClearFilters={handleClearFilters}
             // Navigation overlay props
             isNavigatingSaved={isNavigatingSaved}
             currentSavedWaypoint={savedWaypoints[currentSavedIndex]}

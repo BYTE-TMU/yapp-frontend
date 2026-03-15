@@ -1,11 +1,136 @@
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMapEvents, useMap } from 'react-leaflet';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createCustomIcon, campusIcon, slcIcon, searchCreateIcon } from './waypointIcons.js';
 import WaypointPopup from './WaypointPopup.jsx';
 import WaypointLegend from './WaypointLegend.jsx';
 import WaypointStats from './WaypointStats.jsx';
 import WaypointNavigationOverlay from './WaypointNavigationOverlay.jsx';
 import LocationSearchBar from '../../common/LocationSearchBar.jsx';
+
+const FILTER_TYPES = [
+    { id: 'food',   emoji: '🍕', label: 'Food',   color: '#f59e0b' },
+    { id: 'study',  emoji: '📚', label: 'Study',  color: '#3b82f6' },
+    { id: 'group',  emoji: '👥', label: 'Groups', color: '#10b981' },
+    { id: 'social', emoji: '🎉', label: 'Social', color: '#8b5cf6' },
+    { id: 'event',  emoji: '📅', label: 'Events', color: '#ef4444' },
+    { id: 'other',  emoji: '📍', label: 'Other',  color: '#6b7280' },
+];
+
+function FilterOverlay({ activeFilters, onToggleFilter, onClearFilters }) {
+    const [open, setOpen] = useState(false);
+    const hasActiveFilter = activeFilters && activeFilters.size < FILTER_TYPES.length;
+
+    return (
+        <div
+            style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                zIndex: 1100,
+                fontFamily: 'Albert Sans, sans-serif',
+            }}
+        >
+            {/* Toggle button */}
+            <button
+                onClick={() => setOpen((o) => !o)}
+                title="Filter waypoints"
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '7px 11px',
+                    borderRadius: '8px',
+                    border: hasActiveFilter ? '1px solid rgba(251,146,60,0.6)' : '1px solid rgba(255,255,255,0.15)',
+                    backgroundColor: 'rgba(18,18,18,0.96)',
+                    color: hasActiveFilter ? '#fb923c' : '#e5e5e5',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.45)',
+                    backdropFilter: 'blur(4px)',
+                    transition: 'all 0.15s',
+                    whiteSpace: 'nowrap',
+                }}
+            >
+                <span style={{ fontSize: '14px' }}>🔍</span>
+                <span>Filter</span>
+                {hasActiveFilter && (
+                    <span style={{
+                        background: '#fb923c',
+                        color: '#000',
+                        fontSize: '10px',
+                        fontWeight: '700',
+                        borderRadius: '999px',
+                        width: '16px',
+                        height: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}>
+                        {activeFilters.size}
+                    </span>
+                )}
+            </button>
+
+            {/* Dropdown */}
+            {open && (
+                <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    marginTop: '6px',
+                    padding: '10px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    backgroundColor: 'rgba(18,18,18,0.97)',
+                    boxShadow: '0 6px 20px rgba(0,0,0,0.55)',
+                    backdropFilter: 'blur(6px)',
+                    minWidth: '180px',
+                    width: 'max-content',
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Show types</span>
+                        <button
+                            onClick={() => { onClearFilters(); }}
+                            style={{ fontSize: '11px', color: '#fb923c', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                        >
+                            {hasActiveFilter ? 'Reset' : 'All shown'}
+                        </button>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                        {FILTER_TYPES.map(({ id, emoji, label, color }) => {
+                            const active = activeFilters?.has(id) ?? true;
+                            return (
+                                <button
+                                    key={id}
+                                    onClick={() => onToggleFilter(id)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        padding: '6px 8px',
+                                        borderRadius: '8px',
+                                        border: active ? `1px solid ${color}66` : '1px solid rgba(255,255,255,0.08)',
+                                        backgroundColor: active ? `${color}22` : 'transparent',
+                                        color: active ? '#e5e5e5' : 'rgba(255,255,255,0.25)',
+                                        fontSize: '12px',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.12s',
+                                        fontFamily: 'Albert Sans, sans-serif',
+                                    }}
+                                >
+                                    <span>{emoji}</span>
+                                    <span>{label}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
 
 // Component to handle map clicks
 function MapClickHandler({ placementMode, onMapClick }) {
@@ -74,6 +199,9 @@ function WaypointMap({
     onNextSaved,
     onSearchSelect = null,
     searchedPinLocation = null,
+    activeFilters = null,
+    onToggleFilter = null,
+    onClearFilters = null,
 }) {
     // Get both current username and user ID
     const currentUsername = getCurrentUser();
@@ -250,6 +378,16 @@ function WaypointMap({
 
             {/* Map Legend */}
             <WaypointLegend />
+
+            {/* Filter overlay — top-right of the map */}
+            {onToggleFilter && (
+                <FilterOverlay
+                    activeFilters={activeFilters}
+                    onToggleFilter={onToggleFilter}
+                    onClearFilters={onClearFilters}
+                />
+            )}
+
 
             {/* Live Stats */}
             <WaypointStats
