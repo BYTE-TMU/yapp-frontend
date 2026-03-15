@@ -7,7 +7,6 @@ import FollowingModal from './FollowingModal';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Camera,
   MapPin,
   Globe,
   Calendar,
@@ -22,9 +21,8 @@ import {
 import LoadingDots from '@/components/common/LoadingDots';
 
 import { API_BASE_URL } from '../../../services/config';
-import { Avatar, AvatarImage, AvatarFallback, AvatarBadge } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { getProfilePictureUrl, getDefaultProfilePicture } from '@/utils/profileUtils';
+import UserAvatar from '@/components/badges/UserAvatar';
 
 const Profile = () => {
   const { userId } = useParams(); // Get userId from URL
@@ -382,25 +380,12 @@ const Profile = () => {
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-6">
               {/* Profile Picture */}
               <div className="relative">
-                <Avatar size="lg" className="!size-32 !border-4 !border-border !overflow-visible">
-                  <AvatarImage
-                    src={getProfilePictureUrl(profile.profile_picture)}
-                    alt={profile.username}
-                    className="rounded-full overflow-hidden"
-                  />
-                  <AvatarFallback className="rounded-full">{getDefaultProfilePicture()}</AvatarFallback>
-
-                  {/* AvatarBadge with Camera Button for own profile */}
-                  {isOwnProfile && !uploadingImage && (
-                    <AvatarBadge
-                      onClick={openFilePicker}
-                      className="cursor-pointer !size-8 hover:opacity-90 transition-opacity"
-                      aria-label="Change profile picture"
-                    >
-                      <Camera className="!w-4 !h-4" />
-                    </AvatarBadge>
-                  )}
-                </Avatar>
+                <UserAvatar
+                  user={profile}
+                  size="lg"
+                  showCameraBadge={isOwnProfile && !uploadingImage}
+                  onCameraBadgeClick={openFilePicker}
+                />
 
                 {uploadingImage && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center z-20">
