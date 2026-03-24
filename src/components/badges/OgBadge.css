@@ -1,0 +1,62 @@
+/* ── OG Badge ───────────────────────────────────────────────────────────── */
+.og-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f9c124 0%, #f97316 100%);
+  box-shadow: 0 0 0 1.5px rgba(249, 115, 22, 0.35);
+  cursor: default;
+  user-select: none;
+  /* subtle shimmer animation */
+  animation: og-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes og-shimmer {
+  0%, 100% { box-shadow: 0 0 0 1.5px rgba(249, 115, 22, 0.35); }
+  50%       { box-shadow: 0 0 8px 2px  rgba(249, 193, 36, 0.55); }
+}
+
+.og-badge__icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+/* ── Tooltip ────────────────────────────────────────────────────────────── */
+.og-badge__tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  background: rgba(15, 15, 15, 0.92);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 9px;
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 50;
+}
+
+/* small caret */
+.og-badge__tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(15, 15, 15, 0.92);
+}
+
+.og-badge:hover .og-badge__tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

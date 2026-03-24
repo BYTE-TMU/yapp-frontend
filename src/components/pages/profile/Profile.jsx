@@ -23,6 +23,7 @@ import LoadingDots from '@/components/common/LoadingDots';
 
 import { API_BASE_URL } from '../../../services/config';
 import UserAvatar from '@/components/badges/UserAvatar';
+import OgBadge from '@/components/badges/OgBadge';
 import { Button } from '@/components/ui/button';
 
 const Profile = () => {
@@ -415,9 +416,7 @@ const Profile = () => {
                   <div className="text-center md:text-left">
                     <h1 className="text-2xl font-bold flex items-center gap-2 justify-center md:justify-start text-foreground">
                       <span>@{profile.username}</span>
-                      {profile.is_verified && (
-                        <Check className="w-5 h-5 text-blue-400" />
-                      )}
+                      {profile.is_og && <OgBadge />}
                     </h1>
                     {profile.full_name && (
                       <p className="text-lg text-muted-foreground">
