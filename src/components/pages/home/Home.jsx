@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Flame } from 'lucide-react';
 import PostItem from './posts/PostItem';
 import EventItem from './events/EventItem';
 import EventItemModal from './events/EventItemModal';
@@ -16,7 +17,7 @@ function Home() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
-  const [feedType, setFeedType] = useState('recent'); // 'recent' or 'following'
+  const [feedType, setFeedType] = useState('recent'); // 'recent', 'following', or 'trending'
   const [refreshing, setRefreshing] = useState(false); // For smooth feed type changes
   const mainContentRef = useRef(null);
 
@@ -56,7 +57,6 @@ function Home() {
 
     const userData = getUserData();
     setCurrentUser(userData);
-    console.log('Home - currentUser loaded:', userData); // Debug log
   }, []);
 
   const fetchPosts = async (
@@ -77,9 +77,10 @@ function Home() {
       const currentFeedType = feedTypeOverride || feedType;
       let url = `${API_BASE_URL}/posts/feed?page=${pageNum}&limit=20`;
 
-      // For following feed, add filter parameter and include auth token
       if (currentFeedType === 'following') {
         url = `${API_BASE_URL}/posts/following-feed?page=${pageNum}&limit=20`;
+      } else if (currentFeedType === 'trending') {
+        url = `${API_BASE_URL}/posts/trending?page=${pageNum}&limit=20`;
       }
 
       const headers = {};
@@ -129,9 +130,9 @@ function Home() {
     if (scrollTop + clientHeight >= scrollHeight - 1000) {
       const nextPage = page + 1;
       setPage(nextPage);
-      fetchPosts(nextPage, false);
+      fetchPosts(nextPage, false, feedType);
     }
-  }, [loadingMore, hasMore, page]);
+  }, [loadingMore, hasMore, page, feedType]);
 
   useEffect(() => {
     fetchPosts(1, true);
@@ -228,6 +229,18 @@ function Home() {
                   >
                     Following
                   </button>
+                  <span className="text-muted-foreground">|</span>
+                  <button
+                    onClick={() => handleFeedTypeChange('trending')}
+                    className={`flex items-center gap-1 transition-colors ${
+                      feedType === 'trending'
+                        ? 'text-primary font-semibold'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <Flame className="w-3.5 h-3.5" />
+                    Trending
+                  </button>
                 </div>
               </div>
             </div>
@@ -248,9 +261,19 @@ function Home() {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {posts.map((post) => (
-                    <PostItem key={post._id} post={post} />
-                  ))}
+                  {posts.map((post, index) =>
+                    feedType === 'trending' ? (
+                      <div key={post._id} className="relative">
+                        <div className="absolute -top-2 -left-2 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md shadow-primary/30">
+                          <Flame className="w-3 h-3" />
+                          <span>#{index + 1}</span>
+                        </div>
+                        <PostItem post={post} />
+                      </div>
+                    ) : (
+                      <PostItem key={post._id} post={post} />
+                    ),
+                  )}
                 </div>
               )}
 
