@@ -66,6 +66,7 @@ function Home() {
     isRefreshingFeed = false,
   ) => {
     try {
+      setError('');
       if (isRefreshingFeed) {
         setRefreshing(true);
       } else if (pageNum === 1) {
