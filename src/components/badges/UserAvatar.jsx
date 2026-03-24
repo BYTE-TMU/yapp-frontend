@@ -29,8 +29,18 @@ function UserAvatar({ user, size, className, redirectOnClick }) {
   const navigate = useNavigate();
   const handleProfilePhotoClick = (e) => {
     e.stopPropagation();
-    navigate(`/profile/${user.user_id}`);
+    if (user?.user_id) navigate(`/profile/${user.user_id}`);
   };
+
+  // Guard against null/undefined user to prevent TypeError on user.profile_picture
+  if (!user) {
+    return (
+      <Avatar className={cn(avatarVariants({ size }), className)}>
+        <AvatarFallback>{getDefaultProfilePicture()}</AvatarFallback>
+      </Avatar>
+    );
+  }
+
   if (redirectOnClick) {
     return (
       <Avatar
