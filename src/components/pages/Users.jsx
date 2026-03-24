@@ -17,7 +17,11 @@ function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { isDarkMode } = useTheme();
+  const { theme } = useTheme();
+  const isDarkMode =
+    theme === 'dark' ||
+    (theme === 'system' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   // Recommendations state
   const [recommendations, setRecommendations] = useState([]);
@@ -132,7 +136,7 @@ function Users() {
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString();
 
   // ─── Theme tokens ───────────────────────────────────────────────────────────
-  const cardBg = isDarkMode ? '#171717' : '#ffffff';
+  const cardBg = isDarkMode ? '#262626' : '#ffffff';
   const skeletonBg = isDarkMode ? '#1c1c1c' : '#f3f4f6';
   const skeletonEl = isDarkMode ? '#374151' : '#d1d5db';
   const borderColor = isDarkMode
@@ -157,7 +161,10 @@ function Users() {
             placeholder="Search for users..."
             autoComplete="off"
             className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none transition-colors placeholder:text-muted-foreground focus:border-primary`}
-            style={{ backgroundColor: isDarkMode ? '#171717' : '#ffffff' }}
+            style={{
+              backgroundColor: isDarkMode ? '#262626' : '#f3f4f6',
+              color: isDarkMode ? '#f3f4f6' : '#111827',
+            }}
           />
         </div>
       </div>
