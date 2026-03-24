@@ -18,6 +18,7 @@ function Home() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [feedType, setFeedType] = useState('recent'); // 'recent', 'following', or 'trending'
+  const [trendingPeriod, setTrendingPeriod] = useState('week'); // 'today', 'week', 'month'
   const [refreshing, setRefreshing] = useState(false); // For smooth feed type changes
   const mainContentRef = useRef(null);
 
@@ -64,6 +65,7 @@ function Home() {
     reset = false,
     feedTypeOverride = null,
     isRefreshingFeed = false,
+    periodOverride = null,
   ) => {
     try {
       setError('');
@@ -81,7 +83,8 @@ function Home() {
       if (currentFeedType === 'following') {
         url = `${API_BASE_URL}/posts/following-feed?page=${pageNum}&limit=20`;
       } else if (currentFeedType === 'trending') {
-        url = `${API_BASE_URL}/posts/trending?page=${pageNum}&limit=20`;
+        const period = periodOverride || trendingPeriod;
+        url = `${API_BASE_URL}/posts/trending?page=1&limit=3&period=${period}`;
       }
 
       const headers = {};
@@ -103,7 +106,8 @@ function Home() {
         }
 
         // check if there are more posts to load
-        setHasMore(data.posts.length === 20);
+        // Trending on Home is a fixed top-3 snapshot — no pagination
+        setHasMore(currentFeedType !== 'trending' && data.posts.length === 20);
       } else {
         setError(data.error || 'Failed to fetch posts');
       }
@@ -121,7 +125,8 @@ function Home() {
 
   // Updated scroll handler to use main content container instead of document
   const handleScroll = useCallback(() => {
-    if (loadingMore || !hasMore || !mainContentRef.current) return;
+    // No infinite scroll for trending — it's a fixed top-3 snapshot
+    if (feedType === 'trending' || loadingMore || !hasMore || !mainContentRef.current) return;
 
     const container = mainContentRef.current;
     const scrollTop = container.scrollTop;
@@ -145,7 +150,14 @@ function Home() {
     setFeedType(newFeedType);
     setPage(1);
     setHasMore(true);
-    fetchPosts(1, true, newFeedType, true); // Pass true for isRefreshingFeed
+    fetchPosts(1, true, newFeedType, true);
+  };
+
+  const handleTrendingPeriodChange = (newPeriod) => {
+    if (newPeriod === trendingPeriod) return;
+    setTrendingPeriod(newPeriod);
+    setPage(1);
+    fetchPosts(1, true, 'trending', true, newPeriod);
   };
 
   useEffect(() => {
@@ -245,6 +257,24 @@ function Home() {
                 </div>
               </div>
             </div>
+
+            {feedType === 'trending' && (
+              <div className="flex items-center gap-2 mb-4">
+                {['today', 'week', 'month'].map((period) => (
+                  <button
+                    key={period}
+                    onClick={() => handleTrendingPeriodChange(period)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                      trendingPeriod === period
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-card border border-border text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {period === 'today' ? 'Today' : period === 'week' ? 'This Week' : 'This Month'}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {error && (
               <div className="mb-6 p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive">

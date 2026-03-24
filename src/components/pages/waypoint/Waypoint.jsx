@@ -1135,12 +1135,12 @@ function Waypoint() {
 
   return (
     <div
-      className="flex flex-col h-screen overflow-hidden font-bold"
+      className="flex flex-col h-[calc(100dvh-8rem)] md:h-screen overflow-hidden font-bold mt-16 md:mt-0"
       style={{
         fontFamily: 'Albert Sans',
       }}
     >
-      <div className="flex-1 min-h-0 flex flex-col px-1 pt-2 md:px-6 md:pt-4 pb-20 md:pb-6">
+      <div className="flex-1 min-h-0 flex flex-col px-1 pt-2 md:px-6 md:pt-4 md:pb-6">
         {/* Animated Background */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-primary/20 to-orange-400/20 rounded-full blur-3xl animate-pulse"></div>

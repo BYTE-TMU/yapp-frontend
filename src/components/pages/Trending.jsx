@@ -11,9 +11,10 @@ function Trending() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [trendingPeriod, setTrendingPeriod] = useState('week');
   const mainContentRef = useRef(null);
 
-  const fetchTrendingPosts = async (pageNum = 1, reset = false) => {
+  const fetchTrendingPosts = async (pageNum = 1, reset = false, periodOverride = null) => {
     try {
       if (pageNum === 1) {
         setLoading(true);
@@ -21,8 +22,9 @@ function Trending() {
         setLoadingMore(true);
       }
 
+      const period = periodOverride || trendingPeriod;
       const response = await fetch(
-        `${API_BASE_URL}/posts/trending?page=${pageNum}&limit=20`,
+        `${API_BASE_URL}/posts/trending?page=${pageNum}&limit=20&period=${period}`,
       );
       const data = await response.json();
 
@@ -99,7 +101,29 @@ function Trending() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Trending</h1>
-            <p className="text-sm text-muted-foreground">Top posts from the last 7 days</p>
+            <p className="text-sm text-muted-foreground">Top posts by likes</p>
+          </div>
+          <div className="flex items-center gap-2 ml-auto">
+            {['today', 'week', 'month'].map((period) => (
+              <button
+                key={period}
+                onClick={() => {
+                  if (period === trendingPeriod) return;
+                  setTrendingPeriod(period);
+                  setPage(1);
+                  setHasMore(true);
+                  setPosts([]);
+                  fetchTrendingPosts(1, true, period);
+                }}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                  trendingPeriod === period
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-card border border-border text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {period === 'today' ? 'Today' : period === 'week' ? 'This Week' : 'This Month'}
+              </button>
+            ))}
           </div>
         </div>
 
