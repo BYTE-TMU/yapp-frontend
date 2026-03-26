@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useTheme } from '../../../../../contexts/ThemeContext'; // Add this import
+import { useTheme } from '../../../../../contexts/ThemeContext';
 
 export default function WYRItem({
   question,
@@ -12,23 +12,23 @@ export default function WYRItem({
   const [votingOption, setVotingOption] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [clickedButton, setClickedButton] = useState(null);
-  const { isDarkMode } = useTheme(); // Add this hook
+  const { isDarkMode } = useTheme();
 
   // Start from 50% to avoid both bars growing from the left
-  const [animatedPercentageA, setAnimatedPercentageA] = useState(50);
-  const [animatedPercentageB, setAnimatedPercentageB] = useState(50);
+  const [animatedPercentageFire, setAnimatedPercentageFire] = useState(50);
+  const [animatedPercentageGarbage, setAnimatedPercentageGarbage] = useState(50);
 
-  const totalVotes = question.votes_a + question.votes_b;
-  const showResults = userVote; // userVote is now A, B, or null/undefined
+  const totalVotes = (question.votes_fire || 0) + (question.votes_garbage || 0);
+  const showResults = userVote; // userVote is now 'fire', 'garbage', or null/undefined
 
   console.log('🔍 WYRItem: Props received:', {
     questionId: question._id,
     userVote,
     showResults,
     totalVotes,
-    votesA: question.votes_a,
-    votesB: question.votes_b,
-    fullQuestion: question, // Let's see the full question object
+    votesFire: question.votes_fire,
+    votesGarbage: question.votes_garbage,
+    fullQuestion: question,
   });
 
   const getVotePercentage = (votes, total) => {
@@ -36,8 +36,8 @@ export default function WYRItem({
     return Math.round((votes / total) * 100);
   };
 
-  const percentageA = getVotePercentage(question.votes_a, totalVotes);
-  const percentageB = getVotePercentage(question.votes_b, totalVotes);
+  const percentageFire = getVotePercentage(question.votes_fire || 0, totalVotes);
+  const percentageGarbage = getVotePercentage(question.votes_garbage || 0, totalVotes);
 
   // Format the creation date
   const formatDate = (dateString) => {
@@ -56,7 +56,6 @@ export default function WYRItem({
 
   // Get creator display name
   const getCreatorName = () => {
-    // Backend now provides creator_name, so we can use it directly
     return question.creator_name || 'Anonymous';
   };
 
@@ -65,12 +64,12 @@ export default function WYRItem({
 
     // Animate from 50/50 to real percentages
     const timeout = setTimeout(() => {
-      setAnimatedPercentageA(percentageA);
-      setAnimatedPercentageB(percentageB);
-    }, 50); // short delay to let the 50/50 render first
+      setAnimatedPercentageFire(percentageFire);
+      setAnimatedPercentageGarbage(percentageGarbage);
+    }, 50);
 
     return () => clearTimeout(timeout);
-  }, [showResults, percentageA, percentageB]);
+  }, [showResults, percentageFire, percentageGarbage]);
 
   const handleVote = async (option) => {
     console.log('🔍 WYRItem: handleVote called', { option, userVote, voting });
@@ -79,7 +78,7 @@ export default function WYRItem({
       console.log(
         '🔍 WYRItem: Vote blocked - already voted or voting in progress',
       );
-      return; // userVote is now truthy if user has voted
+      return;
     }
 
     setClickedButton(option);
@@ -108,7 +107,7 @@ export default function WYRItem({
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
-          <h3 className={`text-lg font-bold mb-1`}>Would You Rather</h3>
+          <h3 className={`text-lg font-bold mb-1`}>{question.statement}</h3>
           <div
             className={`flex items-center gap-2 text-xs font-light md:text-sm text-muted-foreground`}
           >
@@ -122,89 +121,58 @@ export default function WYRItem({
           </div>
         </div>
         {canDelete && (
-          <>
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className={`transition-colors p-1 ml-2 text-muted-foreground hover:text-destructive`}
-              title="Delete this question"
-            >
-              🗑️
-            </button>
-            {showDeleteConfirm && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div
-                  className={`rounded-lg p-6 max-w-sm mx-4 border bg-background`}
-                >
-                  <h3 className={`text-lg font-bold mb-4`}>Delete Question</h3>
-                  <p className={`mb-6 text-muted-foreground`}>
-                    Are you sure you want to delete this question? This action
-                    cannot be undone.
-                  </p>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => {
-                        onDelete(question._id);
-                        setShowDeleteConfirm(false);
-                      }}
-                      className="flex-1 px-4 py-2 bg-destructive hover:bg-destructive/80 rounded-lg font-bold"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => setShowDeleteConfirm(false)}
-                      className={`flex-1 px-4 py-2 rounded-lg font-bold transition-colors bg-accent hover:bg-accent/80`}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className={`transition-colors p-1 ml-2 text-muted-foreground hover:text-destructive`}
+            title="Delete this hot take"
+          >
+            🗑️
+          </button>
         )}
       </div>
 
-      {/* Options Display */}
-      <div className="mb-6 space-y-3">
-        <div className="flex items-center gap-3">
-          <div
-            className={`w-7 h-7 rounded-full border flex items-center justify-center shrink-0 `}
-          >
-            <span className="text-white text-lg font-bold">1</span>
+      {showDeleteConfirm && (
+        <div className="mb-4 p-3 rounded-lg border border-destructive/50 bg-destructive/10">
+          <p className="text-sm text-muted-foreground mb-3">
+            Delete this hot take? This cannot be undone.
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                onDelete(question._id);
+                setShowDeleteConfirm(false);
+              }}
+              className="px-3 py-1.5 text-sm bg-destructive hover:bg-destructive/80 rounded-md font-medium text-destructive-foreground"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(false)}
+              className="px-3 py-1.5 text-sm rounded-md font-medium bg-accent hover:bg-accent/80"
+            >
+              Cancel
+            </button>
           </div>
-          <span className={`text-base wrap-break-word`}>
-            {question.option_a}
-          </span>
         </div>
-        <div className="flex items-center gap-3">
-          <div
-            className={`w-7 h-7 rounded-full border flex items-center justify-center shrink-0 `}
-          >
-            <span className="text-white text-lg font-bold">2</span>
-          </div>
-          <span className={`text-base wrap-break-word`}>
-            {question.option_b}
-          </span>
-        </div>
-      </div>
+      )}
 
       {!showResults ? (
         <div className="flex gap-3 mb-4">
-          {/* Vote A Button */}
+          {/* Vote Fire Button */}
           <button
             className={`flex-1 min-w-0 px-0 md:px-4 py-0 md:py-3 rounded-lg font-bold transition-all duration-300 ease-out transform hover:scale-105 shadow-md relative ${
               isDarkMode
                 ? 'bg-green-700 border-2 border-green-900 text-green-100 hover:bg-green-600 hover:border-green-800'
                 : 'bg-green-600 border-2 border-green-700 text-white hover:bg-green-500 hover:border-green-600'
             } ${
-              voting && votingOption === 'A' ? 'opacity-75' : ''
-            } ${clickedButton === 'A' ? 'scale-95' : ''}`}
+              voting && votingOption === 'fire' ? 'opacity-75' : ''
+            } ${clickedButton === 'fire' ? 'scale-95' : ''}`}
             disabled={voting}
-            onClick={() => handleVote('A')}
+            onClick={() => handleVote('fire')}
           >
             <div className="text-center">
-              <div className="text-md md:text-xl font-bold">1</div>
-              {voting && votingOption === 'A' && (
+              <div className="text-md md:text-xl">🔥</div>
+              {voting && votingOption === 'fire' && (
                 <div
                   className={`absolute inset-0 flex items-center justify-center bg-opacity-50 rounded-lg ${
                     isDarkMode ? 'bg-green-800' : 'bg-green-700'
@@ -220,21 +188,21 @@ export default function WYRItem({
             </div>
           </button>
 
-          {/* Vote B Button */}
+          {/* Vote Garbage Button */}
           <button
             className={`flex-1 min-w-0 px-0 md:px-4 py-0 md:py-3 rounded-lg font-bold transition-all duration-300 ease-out transform hover:scale-105 shadow-md relative ${
               isDarkMode
                 ? 'bg-red-700 border-2 border-red-900 text-red-100 hover:bg-red-600 hover:border-red-800'
                 : 'bg-red-600 border-2 border-red-700 text-white hover:bg-red-500 hover:border-red-600'
             } ${
-              voting && votingOption === 'B' ? 'opacity-75' : ''
-            } ${clickedButton === 'B' ? 'scale-95' : ''}`}
+              voting && votingOption === 'garbage' ? 'opacity-75' : ''
+            } ${clickedButton === 'garbage' ? 'scale-95' : ''}`}
             disabled={voting}
-            onClick={() => handleVote('B')}
+            onClick={() => handleVote('garbage')}
           >
             <div className="text-center">
-              <div className="text-xl font-bold">2</div>
-              {voting && votingOption === 'B' && (
+              <div className="text-xl">🗑️</div>
+              {voting && votingOption === 'garbage' && (
                 <div
                   className={`absolute inset-0 flex items-center justify-center bg-opacity-50 rounded-lg ${
                     isDarkMode ? 'bg-red-800' : 'bg-red-700'
@@ -253,68 +221,68 @@ export default function WYRItem({
       ) : (
         <div className="mb-4">
           <div className="flex h-16 rounded-lg overflow-hidden shadow-lg">
-            {/* Result A */}
-            {animatedPercentageA > 0 && (
+            {/* Result Fire */}
+            {animatedPercentageFire > 0 && (
               <div
                 className={`flex items-center justify-center text-white font-bold will-change-[width] transition-[width] duration-700 ease-in-out min-w-0 ${
                   isDarkMode ? 'bg-green-700' : 'bg-green-600'
                 } ${
-                  userVote === 'A'
+                  userVote === 'fire'
                     ? isDarkMode
                       ? 'ring-4 ring-green-400'
                       : 'ring-4 ring-green-300'
                     : ''
                 }`}
                 style={{
-                  width: `${Math.max(animatedPercentageA, 5)}%`,
+                  width: `${Math.max(animatedPercentageFire, 5)}%`,
                 }}
               >
                 <div className="text-center px-2 min-w-0">
                   <div className="text-base font-bold truncate">
-                    {animatedPercentageA}%
+                    {animatedPercentageFire}%
                   </div>
                   <div className="text-xs opacity-80 truncate">
-                    {question.votes_a}
+                    🔥 {question.votes_fire || 0}
                   </div>
-                  {userVote === 'A' && (
-                    <div className="text-xs mt-1 truncate">✓ Your choice</div>
+                  {userVote === 'fire' && (
+                    <div className="text-xs mt-1 truncate">✓ Your vote</div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Result B */}
-            {animatedPercentageB > 0 && (
+            {/* Result Garbage */}
+            {animatedPercentageGarbage > 0 && (
               <div
                 className={`flex items-center justify-center text-white font-bold will-change-[width] transition-[width] duration-700 ease-in-out min-w-0 ${
                   isDarkMode ? 'bg-red-700' : 'bg-red-600'
                 } ${
-                  userVote === 'B'
+                  userVote === 'garbage'
                     ? isDarkMode
                       ? 'ring-4 ring-red-400'
                       : 'ring-4 ring-red-300'
                     : ''
                 }`}
                 style={{
-                  width: `${Math.max(animatedPercentageB, 5)}%`,
+                  width: `${Math.max(animatedPercentageGarbage, 5)}%`,
                 }}
               >
                 <div className="text-center px-2 min-w-0">
                   <div className="text-base font-bold truncate">
-                    {animatedPercentageB}%
+                    {animatedPercentageGarbage}%
                   </div>
                   <div className="text-xs opacity-80 truncate">
-                    {question.votes_b}
+                    🗑️ {question.votes_garbage || 0}
                   </div>
-                  {userVote === 'B' && (
-                    <div className="text-xs mt-1 truncate">✓ Your choice</div>
+                  {userVote === 'garbage' && (
+                    <div className="text-xs mt-1 truncate">✓ Your vote</div>
                   )}
                 </div>
               </div>
             )}
 
             {/* Show message when both options have 0 votes */}
-            {animatedPercentageA === 0 && animatedPercentageB === 0 && (
+            {animatedPercentageFire === 0 && animatedPercentageGarbage === 0 && (
               <div
                 className={`w-full flex items-center justify-center font-medium ${
                   isDarkMode
