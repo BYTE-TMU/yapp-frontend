@@ -4,6 +4,8 @@ import Signup from './components/authentication/RegisterForm.jsx';
 import ForgotPassword from './components/authentication/ForgotPasswordForm.jsx';
 import ResetPassword from './components/authentication/ResetPasswordForm.jsx';
 import LandingPage from './components/pages/LandingPage.jsx';
+import PrivacyPolicy from './components/pages/PrivacyPolicy.jsx';
+import TermsAndConditions from './components/pages/TermsAndConditions.jsx';
 import Home from './components/pages/home/Home.jsx';
 import Create from './components/pages/create/Create.jsx';
 import Users from './components/pages/Users.jsx';
@@ -42,6 +44,8 @@ function AuthRoutes() {
           </PageTransition>
         }
       />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsAndConditions />} />
       <Route
         path="/login"
         element={

@@ -754,13 +754,13 @@ const LandingPage = () => {
                 &copy; {new Date().getFullYear()} Yapp. All rights reserved.
               </span>
               <Link
-                to="/login"
+                to="/privacy"
                 className="hover:text-gray-400 transition-colors"
               >
                 Privacy
               </Link>
               <Link
-                to="/login"
+                to="/terms"
                 className="hover:text-gray-400 transition-colors"
               >
                 Terms
