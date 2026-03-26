@@ -44,6 +44,14 @@ export default function WouldYouRather() {
   // Load questions on component mount
   useEffect(() => {
     fetchQuestions();
+
+    // Refresh WYR content every ~48 hours to avoid an ever-growing list.
+    const refreshIntervalMs = 48 * 60 * 60 * 1000;
+    const intervalId = setInterval(() => {
+      fetchQuestions();
+    }, refreshIntervalMs);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   const getAuthHeaders = () => {
