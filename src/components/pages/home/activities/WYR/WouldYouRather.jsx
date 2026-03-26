@@ -1,5 +1,5 @@
-// WouldYouRather.jsx - Updated to use server-side vote tracking
-import { useState, useEffect } from 'react';
+// WouldYouRather.jsx - Hot Takes: single-statement voting
+import { useState, useEffect, useMemo } from 'react';
 import WYRItem from './WYRItem';
 import { API_BASE_URL } from '../../../../../services/config';
 import { useTheme } from '../../../../../contexts/ThemeContext';
@@ -31,21 +31,30 @@ export default function WouldYouRather() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(null);
-  const { isDarkMode } = useTheme(); // Add this hook
+  const { isDarkMode } = useTheme();
 
   // Create question state
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newQuestion, setNewQuestion] = useState({
-    option_a: '',
-    option_b: '',
-  });
+  const [newStatement, setNewStatement] = useState('');
   const [creating, setCreating] = useState(false);
+
+  // Get current user ID from JWT token
+  const currentUserId = useMemo(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.sub || payload._id || payload.id || payload.user_id;
+    } catch (e) {
+      return null;
+    }
+  }, []);
 
   // Load questions on component mount
   useEffect(() => {
     fetchQuestions();
 
-    // Refresh WYR content every ~48 hours to avoid an ever-growing list.
+    // Refresh content every ~48 hours to avoid an ever-growing list.
     const refreshIntervalMs = 48 * 60 * 60 * 1000;
     const intervalId = setInterval(() => {
       fetchQuestions();
@@ -138,13 +147,11 @@ export default function WouldYouRather() {
 
       const updatedQuestion = await response.json();
       console.log('🔍 Frontend: Updated question received:', updatedQuestion);
-      // Update the question in the list with new vote counts and user vote
-      setQuestions((prev) => {
-        const updatedList = prev.map((q) =>
-          q._id === questionId ? updatedQuestion : q,
-        );
-        return reorderQuestions(updatedList);
-      });
+      // Update the question in-place without reordering — it stays where it is
+      // until the next page load/refresh
+      setQuestions((prev) =>
+        prev.map((q) => (q._id === questionId ? updatedQuestion : q)),
+      );
     } catch (err) {
       console.error('Error submitting vote:', err);
       setError(err.message || 'Failed to submit vote. Please try again.');
@@ -156,21 +163,18 @@ export default function WouldYouRather() {
     e.preventDefault();
 
     // Validation
-    if (!newQuestion.option_a.trim() || !newQuestion.option_b.trim()) {
-      setError('Both options are required.');
+    if (!newStatement.trim()) {
+      setError('Statement is required.');
       return;
     }
 
-    if (newQuestion.option_a.length < 2 || newQuestion.option_b.length < 2) {
-      setError('Options must be at least 2 characters long.');
+    if (newStatement.trim().length < 2) {
+      setError('Statement must be at least 2 characters long.');
       return;
     }
 
-    if (
-      newQuestion.option_a.length > 100 ||
-      newQuestion.option_b.length > 100
-    ) {
-      setError('Options cannot exceed 100 characters.');
+    if (newStatement.length > 200) {
+      setError('Statement cannot exceed 200 characters.');
       return;
     }
 
@@ -182,14 +186,13 @@ export default function WouldYouRather() {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
-          option_a: newQuestion.option_a.trim(),
-          option_b: newQuestion.option_b.trim(),
+          statement: newStatement.trim(),
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to create question');
+        throw new Error(errorData.error || 'Failed to create hot take');
       }
 
       const createdQuestion = await response.json();
@@ -198,24 +201,24 @@ export default function WouldYouRather() {
       setQuestions((prev) => [createdQuestion, ...prev]);
 
       // Reset form
-      setNewQuestion({ option_a: '', option_b: '' });
+      setNewStatement('');
       setShowCreateForm(false);
     } catch (err) {
-      console.error('Error creating question:', err);
-      setError(err.message || 'Failed to create question. Please try again.');
+      console.error('Error creating hot take:', err);
+      setError(err.message || 'Failed to create hot take. Please try again.');
     } finally {
       setCreating(false);
     }
   };
 
   const resetCreateForm = () => {
-    setNewQuestion({ option_a: '', option_b: '' });
+    setNewStatement('');
     setShowCreateForm(false);
     setError('');
   };
 
   const handleDeleteQuestion = async (questionId) => {
-    const confirmed = await showDeleteConfirmation('question');
+    const confirmed = await showDeleteConfirmation('hot take');
     if (!confirmed) {
       return;
     }
@@ -230,14 +233,14 @@ export default function WouldYouRather() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to delete question');
+        throw new Error(errorData.error || 'Failed to delete hot take');
       }
 
       // Remove the question from the list
       setQuestions((prev) => prev.filter((q) => q._id !== questionId));
     } catch (err) {
-      console.error('Error deleting question:', err);
-      setError(err.message || 'Failed to delete question. Please try again.');
+      console.error('Error deleting hot take:', err);
+      setError(err.message || 'Failed to delete hot take. Please try again.');
     } finally {
       setDeleting(null);
     }
@@ -251,7 +254,7 @@ export default function WouldYouRather() {
     return (
       <div className={`rounded-lg p-4 border `}>
         <div className="flex justify-between items-center mb-4">
-          <h3 className={`text-lg font-bold`}>Create Would You Rather</h3>
+          <h3 className={`text-lg font-bold`}>Create Hot Take</h3>
           <button
             onClick={resetCreateForm}
             className={`transition-colors text-muted-foreground hover:text-foreground`}
@@ -261,55 +264,23 @@ export default function WouldYouRather() {
         </div>
 
         <form onSubmit={handleCreateQuestion} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label
-                className={`block text-sm font-medium mb-2 text-muted-foreground`}
-              >
-                Option A *
-              </label>
-              <input
-                type="text"
-                value={newQuestion.option_a}
-                onChange={(e) =>
-                  setNewQuestion((prev) => ({
-                    ...prev,
-                    option_a: e.target.value,
-                  }))
-                }
-                placeholder="First option"
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 placeholder:text-muted-foreground bg-accent`}
-                maxLength={100}
-                disabled={creating}
-              />
-              <div className={`text-xs mt-1 text-muted-foreground`}>
-                {newQuestion.option_a.length}/100 characters
-              </div>
-            </div>
-
-            <div>
-              <label
-                className={`block text-sm font-medium mb-2 text-muted-foreground`}
-              >
-                Option B *
-              </label>
-              <input
-                type="text"
-                value={newQuestion.option_b}
-                onChange={(e) =>
-                  setNewQuestion((prev) => ({
-                    ...prev,
-                    option_b: e.target.value,
-                  }))
-                }
-                placeholder="Second option"
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 placeholder:text-muted-foreground bg-accent`}
-                maxLength={100}
-                disabled={creating}
-              />
-              <div className={`text-xs mt-1 text-muted-foreground`}>
-                {newQuestion.option_b.length}/100 characters
-              </div>
+          <div>
+            <label
+              className={`block text-sm font-medium mb-2 text-muted-foreground`}
+            >
+              Your hot take *
+            </label>
+            <textarea
+              value={newStatement}
+              onChange={(e) => setNewStatement(e.target.value)}
+              placeholder="Drop your hot take here..."
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 placeholder:text-muted-foreground bg-accent resize-none`}
+              maxLength={200}
+              rows={3}
+              disabled={creating}
+            />
+            <div className={`text-xs mt-1 text-muted-foreground`}>
+              {newStatement.length}/200 characters
             </div>
           </div>
 
@@ -322,14 +293,10 @@ export default function WouldYouRather() {
           <div className="flex gap-3 pt-2">
             <button
               type="submit"
-              disabled={
-                creating ||
-                !newQuestion.option_a.trim() ||
-                !newQuestion.option_b.trim()
-              }
+              disabled={creating || !newStatement.trim()}
               className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold transition-colors"
             >
-              {creating ? 'Creating...' : 'Create Question'}
+              {creating ? 'Creating...' : 'Create Hot Take'}
             </button>
             <button
               type="button"
@@ -379,7 +346,7 @@ export default function WouldYouRather() {
     <div className={`rounded-lg p-4 flex flex-col h-full dark:border`}>
       {/* Header with Create Button */}
       <div className="flex justify-between items-center mb-6 shrink-0">
-        <h2 className={`text-xl font-bold `}>Would You Rather</h2>
+        <h2 className={`text-xl font-bold `}>Hot Takes</h2>
         <Button
           variant="default"
           onClick={() => setShowCreateForm(true)}
@@ -401,27 +368,13 @@ export default function WouldYouRather() {
           style={{ backgroundColor: mainBgColor }}
         >
           <p className={`mb-4`}>
-            No questions found. Be the first to create one!
+            No hot takes yet. Be the first to create one!
           </p>
         </div>
       ) : (
         <div className="space-y-0 flex-1 overflow-y-auto">
           {questions.map((question) => {
-            // For testing without JWT, allow deletion for all questions
-            const canDelete = true;
-
-            // Uncomment this when you have JWT working:
-            // const token = localStorage.getItem('access_token');
-            // let currentUserId = null;
-            // if (token) {
-            //   try {
-            //     const payload = JSON.parse(atob(token.split('.')[1]));
-            //     currentUserId = payload.sub;
-            //   } catch (e) {
-            //     console.error('Error parsing token:', e);
-            //   }
-            // }
-            // const canDelete = question.created_by === currentUserId;
+            const canDelete = currentUserId && String(question.created_by) === String(currentUserId);
 
             return (
               <WYRItem
@@ -429,8 +382,8 @@ export default function WouldYouRather() {
                 question={question}
                 onVote={handleVote}
                 onDelete={handleDeleteQuestion}
-                userVote={question.user_vote} // Now comes from server
-                canDelete={canDelete} // Check if user created this question
+                userVote={question.user_vote}
+                canDelete={canDelete}
               />
             );
           })}
