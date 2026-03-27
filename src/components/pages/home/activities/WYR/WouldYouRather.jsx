@@ -364,8 +364,7 @@ export default function WouldYouRather() {
 
       {questions.length === 0 ? (
         <div
-          className={`text-center py-12 rounded-lg border flex-1 flex flex-col justify-center text-muted-foreground`}
-          style={{ backgroundColor: mainBgColor }}
+          className={`text-center py-12 rounded-lg border flex-1 flex flex-col justify-center text-muted-foreground bg-background`}
         >
           <p className={`mb-4`}>
             No hot takes yet. Be the first to create one!
