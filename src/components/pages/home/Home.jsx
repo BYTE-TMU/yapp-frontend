@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Flame } from 'lucide-react';
 import PostItem from './posts/PostItem';
 import EventItem from './events/EventItem';
 import EventItemModal from './events/EventItemModal';
