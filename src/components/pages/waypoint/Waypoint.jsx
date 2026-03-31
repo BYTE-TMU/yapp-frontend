@@ -4,7 +4,6 @@ import WaypointModal from './WaypointModal.jsx';
 import WaypointHeader from './WaypointHeader.jsx';
 import WaypointMap from './WaypointMap.jsx';
 import WaypointTutorial from './WaypointTutorial.jsx';
-import { useTheme } from '../../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../../services/config.js';
 import LoadingDots from '../../common/LoadingDots';
 import {
@@ -46,7 +45,6 @@ function Waypoint() {
   const [isNavigatingSaved, setIsNavigatingSaved] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false); // Prevent rapid navigation
   const [searchedLocation, setSearchedLocation] = useState(null); // Location from search bar
-  const { isDarkMode } = useTheme();
 
   // Filter state — all types shown by default
   const ALL_TYPES = ['food', 'study', 'group', 'social', 'event', 'other'];

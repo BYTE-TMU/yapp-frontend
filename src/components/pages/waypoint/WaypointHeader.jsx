@@ -31,8 +31,6 @@ function WaypointHeader({
   isNavigatingSaved = false,
   currentSavedIndex = -1,
   savedWaypointsCount = 0,
-  onPreviousSaved,
-  onNextSaved,
   onExitSavedNavigation,
   activeFilters,
   onToggleFilter,

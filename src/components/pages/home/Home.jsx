@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Flame, Sparkles, Calendar, FileText } from 'lucide-react';
 import PostItem from './posts/PostItem';
 import EventItem from './events/EventItem';
 import EventItemModal from './events/EventItemModal';
@@ -8,12 +7,6 @@ import RefreshAnimation from '@/components/common/RefreshAnimation';
 import LoadingDots from '@/components/common/LoadingDots';
 import { FeedSkeleton } from '@/components/common/Skeleton';
 import { API_BASE_URL } from '@/services/config';
-
-const MAIN_TABS = [
-  { id: 'foryou', label: 'For You', icon: Sparkles },
-  { id: 'events', label: 'Events', icon: Calendar },
-  { id: 'posts', label: 'Posts', icon: FileText },
-];
 
 function Home() {
   const [posts, setPosts] = useState([]);
@@ -27,7 +20,6 @@ function Home() {
   const [feedType, setFeedType] = useState('recent'); // 'recent', 'following', or 'trending'
   const [trendingPeriod, setTrendingPeriod] = useState('week'); // 'today', 'week', 'month'
   const [refreshing, setRefreshing] = useState(false); // For smooth feed type changes
-  const [mainTab, setMainTab] = useState('foryou'); // 'foryou', 'events', 'posts'
   const mainContentRef = useRef(null);
 
   // Get current user info
@@ -119,7 +111,7 @@ function Home() {
       } else {
         setError(data.error || 'Failed to fetch posts');
       }
-    } catch (err) {
+    } catch {
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);
@@ -181,11 +173,6 @@ function Home() {
     const nextPage = page + 1;
     setPage(nextPage);
     fetchPosts(nextPage, false);
-  };
-
-  const refreshPosts = () => {
-    setPage(1);
-    fetchPosts(1, true, null, true); // Use refresh animation for manual refresh too
   };
 
   if (loading && posts.length === 0) {
