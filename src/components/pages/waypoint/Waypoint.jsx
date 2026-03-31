@@ -427,7 +427,7 @@ function Waypoint() {
         throw new Error(errorData.error || 'Failed to create waypoint');
       }
 
-      const data = await response.json();
+      await response.json();
 
       // Refresh waypoints to show the new one
       fetchWaypoints();
@@ -459,7 +459,7 @@ function Waypoint() {
         throw new Error(errorData.error || 'Failed to join waypoint');
       }
 
-      const data = await response.json();
+      await response.json();
 
       // Refresh waypoints to update join count and status
       fetchWaypoints();
@@ -710,7 +710,7 @@ function Waypoint() {
         throw new Error(errorData.error || 'Failed to like waypoint');
       }
 
-      const data = await response.json();
+      await response.json();
 
       // Refresh waypoints to get updated state from backend
       fetchWaypoints();
@@ -744,7 +744,7 @@ function Waypoint() {
         throw new Error(errorData.error || 'Failed to bookmark waypoint');
       }
 
-      const data = await response.json();
+      await response.json();
 
       // Refresh waypoints to get the updated state from backend
       fetchWaypoints();
@@ -783,7 +783,7 @@ function Waypoint() {
         throw new Error(errorData.error || 'Failed to delete waypoint');
       }
 
-      const data = await response.json();
+      await response.json();
 
       // Refresh waypoints to remove the deleted one
       fetchWaypoints();
