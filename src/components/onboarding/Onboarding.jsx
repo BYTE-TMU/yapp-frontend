@@ -478,7 +478,7 @@ function Onboarding() {
     >
       <div className="w-full max-w-lg rounded-2xl shadow-xl p-8 bg-card border border-border">
         {/* Progress Steps */}
-        <div className="flex items-center justify-center mb-8">
+        <div className="flex items-center justify-center mb-4">
           {ONBOARDING_STEPS.map((step, index) => (
             <div key={step.id} className="flex items-center">
               <div
@@ -505,6 +505,17 @@ function Onboarding() {
               )}
             </div>
           ))}
+        </div>
+
+        {/* Step Counter Text */}
+        <div className="text-center mb-6">
+          <span className="text-sm font-medium text-muted-foreground">
+            Step {currentStep + 1} of {ONBOARDING_STEPS.length}
+          </span>
+          <span className="mx-2 text-muted-foreground">·</span>
+          <span className="text-sm font-semibold text-foreground">
+            {ONBOARDING_STEPS[currentStep].title}
+          </span>
         </div>
 
         {/* Step Content */}

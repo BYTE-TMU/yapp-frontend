@@ -3,6 +3,7 @@ import { reverseGeocode } from '../../../services/locationiqService';
 import WaypointModal from './WaypointModal.jsx';
 import WaypointHeader from './WaypointHeader.jsx';
 import WaypointMap from './WaypointMap.jsx';
+import WaypointTutorial from './WaypointTutorial.jsx';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { API_BASE_URL } from '../../../services/config.js';
 import LoadingDots from '../../common/LoadingDots';
@@ -1140,6 +1141,7 @@ function Waypoint() {
         fontFamily: 'Albert Sans',
       }}
     >
+      <WaypointTutorial />
       <div className="flex-1 min-h-0 flex flex-col px-1 pt-2 md:px-6 md:pt-4 md:pb-6">
         {/* Animated Background */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -1167,6 +1169,9 @@ function Waypoint() {
               setSavedWaypoints([]);
               setCurrentSavedIndex(-1);
             }}
+            activeFilters={activeFilters}
+            onToggleFilter={handleToggleFilter}
+            onClearFilters={handleClearFilters}
           />
 
           {/* Map Container */}

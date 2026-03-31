@@ -227,6 +227,134 @@
   z-index: 1;
 }
 
+/* Micro-interaction animations */
+@keyframes scale-in {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes subtle-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-subtle-bounce {
+  animation: subtle-bounce 0.3s ease-out;
+}
+
+/* Button hover effects */
+.btn-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-hover:active {
+  transform: translateY(0);
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.2s ease-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Interactive element focus states */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* Active waypoint pulse animation */
+@keyframes waypoint-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes waypoint-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 12px currentColor);
+  }
+}
+
+.waypoint-active .pulse-ring {
+  animation: waypoint-pulse 2s ease-out infinite;
+}
+
+.waypoint-active .marker-body {
+  animation: waypoint-glow 2s ease-in-out infinite;
+}
+
+/* Hover effect for waypoint markers */
+.custom-waypoint-marker:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -301,40 +429,121 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Accent colors for variety */
+  --accent-blue: oklch(0.6 0.2 250);
+  --accent-green: oklch(0.65 0.2 150);
+  --accent-purple: oklch(0.6 0.25 290);
+  --accent-pink: oklch(0.65 0.25 350);
+  --accent-teal: oklch(0.65 0.15 180);
+
+  /* Gradient definitions */
+  --gradient-primary: linear-gradient(135deg, #f97316, #fb923c);
+  --gradient-sunset: linear-gradient(135deg, #f97316, #f472b6);
+  --gradient-ocean: linear-gradient(135deg, #3b82f6, #06b6d4);
 }
 
 .dark {
-  --background: oklch(0.129 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.16 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.16 0 0);
-  --popover-foreground: oklch(0.985 0 0);
+  /* Refined backgrounds with subtle warmth */
+  --background: oklch(0.12 0.005 60);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.15 0.005 60);
+  --card-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.14 0.005 60);
+  --popover-foreground: oklch(0.95 0 0);
   --primary: #f97316;
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.22 0.005 60);
+  --secondary-foreground: oklch(0.92 0 0);
+  --muted: oklch(0.2 0.003 60);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: oklch(0.22 0.005 60);
+  --accent-foreground: oklch(0.92 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.373 0 0);
-  --input: oklch(0.373 0 0);
-  --ring: oklch(0.704 0.191 35.325);
+  --border: oklch(0.28 0.005 60);
+  --input: oklch(0.22 0.005 60);
+  --ring: oklch(0.75 0.2 35);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.129 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar: oklch(0.12 0.005 60);
+  --sidebar-foreground: oklch(0.95 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.373 0 0);
-  --sidebar-ring: oklch(0.704 0.191 35.325);
+  --sidebar-accent: oklch(0.22 0.005 60);
+  --sidebar-accent-foreground: oklch(0.95 0 0);
+  --sidebar-border: oklch(0.28 0.005 60);
+  --sidebar-ring: oklch(0.75 0.2 35);
+
+  /* Accent colors adjusted for dark mode */
+  --accent-blue: oklch(0.5 0.2 250);
+  --accent-green: oklch(0.55 0.2 150);
+  --accent-purple: oklch(0.5 0.25 290);
+  --accent-pink: oklch(0.55 0.25 350);
+  --accent-teal: oklch(0.55 0.15 180);
+}
+
+/* Dark mode specific enhancements */
+.dark body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark mode card shadows */
+.dark .card-shadow {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Dark mode glow effects */
+.dark .glow-primary {
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+}
+
+/* Utility classes for accent colors */
+.text-accent-blue {
+  color: var(--accent-blue);
+}
+.text-accent-green {
+  color: var(--accent-green);
+}
+.text-accent-purple {
+  color: var(--accent-purple);
+}
+.text-accent-pink {
+  color: var(--accent-pink);
+}
+.text-accent-teal {
+  color: var(--accent-teal);
+}
+
+.bg-accent-blue {
+  background-color: var(--accent-blue);
+}
+.bg-accent-green {
+  background-color: var(--accent-green);
+}
+.bg-accent-purple {
+  background-color: var(--accent-purple);
+}
+.bg-accent-pink {
+  background-color: var(--accent-pink);
+}
+.bg-accent-teal {
+  background-color: var(--accent-teal);
+}
+
+/* Gradient utilities */
+.gradient-primary {
+  background: var(--gradient-primary);
+}
+.gradient-sunset {
+  background: var(--gradient-sunset);
+}
+.gradient-ocean {
+  background: var(--gradient-ocean);
 }
 
 @layer components {

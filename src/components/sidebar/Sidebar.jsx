@@ -44,12 +44,12 @@ function Sidebar() {
         </Link>
       </div>
 
-      {/* Main Navigation - grows to fill available space */}
-      <ul className="flex-1 flex flex-col justify-evenly min-h-0">
+      {/* Main Navigation */}
+      <ul className="flex flex-col space-y-2">
         <li>
           <Link
             to="/home"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/home')
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-200 ${isActive('/home')
               ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
               : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
@@ -61,7 +61,7 @@ function Sidebar() {
         <li>
           <Link
             to="/users"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/users')
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-200 ${isActive('/users')
               ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
               : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
@@ -73,7 +73,7 @@ function Sidebar() {
         <li>
           <Link
             to="/messages"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/messages')
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-200 ${isActive('/messages')
               ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
               : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
@@ -85,7 +85,7 @@ function Sidebar() {
         <li>
           <Link
             to="/waypoint"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/waypoint')
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-200 ${isActive('/waypoint')
               ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
               : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
@@ -97,7 +97,7 @@ function Sidebar() {
         <li>
           <Link
             to="/profile"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/profile')
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-200 ${isActive('/profile')
               ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
               : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
@@ -109,7 +109,7 @@ function Sidebar() {
         <li>
           <Link
             to="/settings"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/settings')
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-200 ${isActive('/settings')
               ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
               : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
@@ -121,7 +121,7 @@ function Sidebar() {
         <li>
           <Link
             to="/feedback"
-            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-300 ease-in-out transform hover:scale-105 ${isActive('/feedback')
+            className={`flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg rounded-lg border transition-all duration-200 ${isActive('/feedback')
               ? 'bg-primary/20 border-primary/30 text-primary shadow-lg shadow-primary/25'
               : 'border-transparent text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md'
               }`}
@@ -132,11 +132,11 @@ function Sidebar() {
         </li>
       </ul>
 
-      {/* Create Button - positioned at bottom */}
-      <div className="mt-3 sm:mt-4 md:mt-6 pt-3 sm:pt-4 md:pt-6 flex-shrink-0 border-t border-border">
+      {/* Create Button */}
+      <div className="mt-4 pt-3 flex-shrink-0 border-t border-border">
         <Link
           to="/create"
-          className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 bg-primary hover:opacity-90 text-white text-sm sm:text-base md:text-lg rounded-full font-bold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg shadow-primary/30"
+          className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 bg-primary hover:opacity-90 text-white text-sm sm:text-base md:text-lg rounded-full font-bold transition-all duration-200 shadow-lg shadow-primary/30"
         >
           <Plus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex-shrink-0" />
           <span className="truncate">Create</span>

@@ -1,12 +1,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Flame } from 'lucide-react';
+import { Flame, Sparkles, Calendar, FileText } from 'lucide-react';
 import PostItem from './posts/PostItem';
 import EventItem from './events/EventItem';
 import EventItemModal from './events/EventItemModal';
 import HomepageActivities from './activities/HomepageActivities';
 import RefreshAnimation from '@/components/common/RefreshAnimation';
 import LoadingDots from '@/components/common/LoadingDots';
+import { FeedSkeleton } from '@/components/common/Skeleton';
 import { API_BASE_URL } from '@/services/config';
+
+const MAIN_TABS = [
+  { id: 'foryou', label: 'For You', icon: Sparkles },
+  { id: 'events', label: 'Events', icon: Calendar },
+  { id: 'posts', label: 'Posts', icon: FileText },
+];
 
 function Home() {
   const [posts, setPosts] = useState([]);
@@ -20,6 +27,7 @@ function Home() {
   const [feedType, setFeedType] = useState('recent'); // 'recent', 'following', or 'trending'
   const [trendingPeriod, setTrendingPeriod] = useState('week'); // 'today', 'week', 'month'
   const [refreshing, setRefreshing] = useState(false); // For smooth feed type changes
+  const [mainTab, setMainTab] = useState('foryou'); // 'foryou', 'events', 'posts'
   const mainContentRef = useRef(null);
 
   // Get current user info
@@ -182,12 +190,9 @@ function Home() {
 
   if (loading && posts.length === 0) {
     return (
-      <div className="h-screen overflow-hidden font-bold bg-background">
-        <div className="md:ml-64 h-full overflow-y-auto p-6 pb-20 md:pb-6 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <LoadingDots size={14} />
-            <p className="text-muted-foreground text-sm">Loading posts...</p>
-          </div>
+      <div className="">
+        <div className="page-container">
+          <FeedSkeleton />
         </div>
       </div>
     );

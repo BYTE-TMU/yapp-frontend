@@ -1,55 +1,70 @@
 import L from 'leaflet';
 
-// Custom icons for different waypoint types
-export const createCustomIcon = (type) => {
-    const getColor = (type) => {
-        switch (type) {
-            case 'food': return '#f59e0b';
-            case 'study': return '#3b82f6';
-            case 'group': return '#10b981';
-            case 'social': return '#8b5cf6';
-            case 'event': return '#ef4444';
-            default: return '#6b7280';
-        }
-    };
+// Type configuration with colors, emojis, and shadow colors
+const typeConfig = {
+    food: { color: '#f59e0b', colorLight: '#fbbf24', emoji: '🍕', shadowColor: 'rgba(245, 158, 11, 0.4)' },
+    study: { color: '#3b82f6', colorLight: '#60a5fa', emoji: '📚', shadowColor: 'rgba(59, 130, 246, 0.4)' },
+    group: { color: '#10b981', colorLight: '#34d399', emoji: '👥', shadowColor: 'rgba(16, 185, 129, 0.4)' },
+    social: { color: '#8b5cf6', colorLight: '#a78bfa', emoji: '🎉', shadowColor: 'rgba(139, 92, 246, 0.4)' },
+    event: { color: '#ef4444', colorLight: '#f87171', emoji: '📅', shadowColor: 'rgba(239, 68, 68, 0.4)' },
+    other: { color: '#6b7280', colorLight: '#9ca3af', emoji: '📍', shadowColor: 'rgba(107, 114, 128, 0.4)' }
+};
 
-    const getEmoji = (type) => {
-        switch (type) {
-            case 'food': return '🍕';
-            case 'study': return '📚';
-            case 'group': return '👥';
-            case 'social': return '🎉';
-            case 'event': return '📅';
-            default: return '📍';
-        }
-    };
+// Custom icons for different waypoint types
+export const createCustomIcon = (type, isActive = false) => {
+    const config = typeConfig[type] || typeConfig.other;
+    const scale = isActive ? 1.15 : 1;
+    const size = Math.round(32 * scale);
+    const fontSize = Math.round(15 * scale);
 
     return L.divIcon({
-        className: 'custom-waypoint-marker',
+        className: `custom-waypoint-marker ${isActive ? 'waypoint-active' : ''}`,
         html: `
             <div style="
-                background-color: ${getColor(type)};
-                width: 30px;
-                height: 30px;
-                border-radius: 50% 50% 50% 0;
-                border: 3px solid white;
-                transform: rotate(-45deg);
-                box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
+                position: relative;
+                width: ${size}px;
+                height: ${size + 8}px;
             ">
-                <span style="
-                    transform: rotate(45deg); 
-                    font-size: 14px;
-                    line-height: 1;
-                ">${getEmoji(type)}</span>
+                ${isActive ? `
+                    <div class="pulse-ring" style="
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        width: ${size + 16}px;
+                        height: ${size + 16}px;
+                        transform: translate(-50%, -50%);
+                        border-radius: 50%;
+                        background: ${config.shadowColor};
+                    "></div>
+                ` : ''}
+                <div class="marker-body" style="
+                    position: relative;
+                    z-index: 2;
+                    background: linear-gradient(135deg, ${config.color}, ${config.colorLight});
+                    width: ${size}px;
+                    height: ${size}px;
+                    border-radius: 50% 50% 50% 0;
+                    border: 3px solid white;
+                    transform: rotate(-45deg);
+                    box-shadow: 0 4px 12px ${config.shadowColor}, 0 2px 4px rgba(0,0,0,0.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: transform 0.2s ease;
+                ">
+                    <span style="
+                        transform: rotate(45deg);
+                        font-size: ${fontSize}px;
+                        line-height: 1;
+                        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+                    ">${config.emoji}</span>
+                </div>
             </div>
         `,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
+        iconSize: [size, size + 8],
+        iconAnchor: [size / 2, size + 4],
+        popupAnchor: [0, -size]
     });
 };
 

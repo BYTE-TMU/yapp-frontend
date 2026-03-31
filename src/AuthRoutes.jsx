@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Login from './components/authentication/LoginForm.jsx';
 import Signup from './components/authentication/RegisterForm.jsx';
@@ -19,6 +20,8 @@ import Waypoint from './components/pages/waypoint/Waypoint.jsx';
 import EventThread from './components/pages/home/events/EventThread.jsx';
 import Onboarding from './components/onboarding/Onboarding.jsx';
 import PageTransition from './components/common/PageTransition.jsx';
+import LoadingDots from './components/common/LoadingDots.jsx';
+import { API_BASE_URL } from './services/config.js';
 
 import AuthRoutesLayout from './components/layout/AuthRoutesLayout.jsx';
 
@@ -28,6 +31,54 @@ const PrivateRoute = ({ children }) => {
   if (!token) {
     console.log('no token');
     return <Navigate to="/login" />;
+  }
+
+  return children;
+};
+
+const OnboardingRoute = ({ children }) => {
+  const [checking, setChecking] = useState(true);
+  const [needsOnboarding, setNeedsOnboarding] = useState(true);
+
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setChecking(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/users/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.profile?.onboarding_completed) {
+            setNeedsOnboarding(false);
+          }
+        }
+      } catch (err) {
+        console.error('Error checking onboarding status:', err);
+      } finally {
+        setChecking(false);
+      }
+    };
+
+    checkOnboardingStatus();
+  }, []);
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoadingDots size={14} />
+      </div>
+    );
+  }
+
+  if (!needsOnboarding) {
+    return <Navigate to="/home" replace />;
   }
 
   return children;
@@ -82,9 +133,11 @@ function AuthRoutes() {
         path="/onboarding"
         element={
           <PrivateRoute>
-            <PageTransition>
-              <Onboarding />
-            </PageTransition>
+            <OnboardingRoute>
+              <PageTransition>
+                <Onboarding />
+              </PageTransition>
+            </OnboardingRoute>
           </PrivateRoute>
         }
       />

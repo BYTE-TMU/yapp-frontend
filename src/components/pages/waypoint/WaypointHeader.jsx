@@ -10,6 +10,15 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { cn } from '@/utils/cnUtils';
 import { Button } from '@/components/ui/button';
 
+const FILTER_PILLS = [
+  { id: 'food', emoji: '🍕', label: 'Food', color: '#f59e0b' },
+  { id: 'study', emoji: '📚', label: 'Study', color: '#3b82f6' },
+  { id: 'group', emoji: '👥', label: 'Groups', color: '#10b981' },
+  { id: 'social', emoji: '🎉', label: 'Social', color: '#8b5cf6' },
+  { id: 'event', emoji: '📅', label: 'Events', color: '#ef4444' },
+  { id: 'other', emoji: '📍', label: 'Other', color: '#6b7280' },
+];
+
 function WaypointHeader({
   placementMode,
   onTogglePlacementMode,
@@ -25,6 +34,9 @@ function WaypointHeader({
   onPreviousSaved,
   onNextSaved,
   onExitSavedNavigation,
+  activeFilters,
+  onToggleFilter,
+  onClearFilters,
 }) {
   const { isDarkMode } = useTheme();
 
@@ -110,6 +122,42 @@ function WaypointHeader({
           <span>📍 Enable placement mode to add waypoints · 🗺️ {waypointCount} active</span>
         )}
       </div>
+
+      {/* Filter Pills */}
+      {!isNavigatingSaved && activeFilters && onToggleFilter && (
+        <div className="hidden sm:flex flex-wrap gap-2 mt-3">
+          {FILTER_PILLS.map(({ id, emoji, label, color }) => {
+            const active = activeFilters.has(id);
+            return (
+              <button
+                key={id}
+                onClick={() => onToggleFilter(id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                  active
+                    ? 'text-foreground shadow-sm'
+                    : 'bg-muted/50 text-muted-foreground opacity-50'
+                }`}
+                style={{
+                  backgroundColor: active ? `${color}20` : undefined,
+                  border: `1px solid ${active ? color : 'transparent'}`,
+                }}
+              >
+                <span>{emoji}</span>
+                <span>{label}</span>
+              </button>
+            );
+          })}
+
+          {activeFilters.size < 6 && onClearFilters && (
+            <button
+              onClick={onClearFilters}
+              className="px-3 py-1.5 rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+            >
+              Show all
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Error Banner */}
       {error && (
