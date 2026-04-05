@@ -396,14 +396,8 @@ const LandingPage = () => {
                 to="/signup"
                 className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3.5 rounded-full font-semibold text-base transition-all hover:scale-[1.03] shadow-[0_4px_24px_-4px_rgba(249,115,22,0.5)] flex items-center gap-2"
               >
-                Get started
+                Explore your campus {' '}
                 <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/login"
-                className="bg-white/[0.08] hover:bg-white/[0.12] text-white px-8 py-3.5 rounded-full font-medium border border-white/[0.1] transition-all text-base backdrop-blur-none md:backdrop-blur-sm"
-              >
-                Sign in
               </Link>
             </div>
 
