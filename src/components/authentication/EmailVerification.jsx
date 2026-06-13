@@ -54,9 +54,9 @@ function EmailVerification({
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('Email verified successfully! Redirecting to login...');
+        setMessage('Email verified successfully! Redirecting...');
         setTimeout(() => {
-          onVerificationSuccess();
+          onVerificationSuccess(data.token);
         }, 2000);
       } else {
         setError(data.error || 'Verification failed');

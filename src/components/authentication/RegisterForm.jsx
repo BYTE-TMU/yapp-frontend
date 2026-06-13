@@ -59,9 +59,13 @@ function RegisterForm() {
     }
   };
 
-  const handleVerificationSuccess = () => {
-    // Redirect to login page or show success message
-    window.location.href = '/login';
+  const handleVerificationSuccess = (token) => {
+    if (token) {
+      localStorage.setItem('token', token);
+      window.location.href = '/onboarding';
+    } else {
+      window.location.href = '/login';
+    }
   };
 
   const handleBackToRegister = async () => {
