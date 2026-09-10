@@ -6,7 +6,12 @@ import EventItemModal from './events/EventItemModal';
 import HomepageActivities from './activities/HomepageActivities';
 import RefreshAnimation from '@/components/common/RefreshAnimation';
 import LoadingDots from '@/components/common/LoadingDots';
+import CyberSummitBanner from '@/components/pages/cyber-summit/CyberSummitBanner';
+import CyberSummitPromoModal from '@/components/pages/cyber-summit/CyberSummitPromoModal';
+import { isCyberSummitWindowOpen } from '@/components/pages/cyber-summit/constants';
 import { API_BASE_URL } from '@/services/config';
+
+const CYBER_SUMMIT_PROMO_SEEN_KEY = 'cyberSummitPromoSeen';
 
 function Home() {
   const [posts, setPosts] = useState([]);
@@ -17,6 +22,8 @@ function Home() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [cyberSummitEligible, setCyberSummitEligible] = useState(false);
+  const [showCyberSummitPromo, setShowCyberSummitPromo] = useState(false);
   const [feedType, setFeedType] = useState('recent'); // 'recent', 'following', or 'trending'
   const [trendingPeriod, setTrendingPeriod] = useState('week'); // 'today', 'week', 'month'
   const [refreshing, setRefreshing] = useState(false); // For smooth feed type changes
@@ -59,6 +66,37 @@ function Home() {
     const userData = getUserData();
     setCurrentUser(userData);
   }, []);
+
+  // Check TMU verification status for the Cyber Summit exclusive promo
+  useEffect(() => {
+    const checkCyberSummitEligibility = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const res = await fetch(`${API_BASE_URL}/users/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        const eligible =
+          data.profile?.is_verified === true && isCyberSummitWindowOpen();
+
+        setCyberSummitEligible(eligible);
+        if (eligible && !localStorage.getItem(CYBER_SUMMIT_PROMO_SEEN_KEY)) {
+          setShowCyberSummitPromo(true);
+        }
+      } catch (err) {
+        console.error('Failed to check Cyber Summit eligibility:', err);
+      }
+    };
+
+    checkCyberSummitEligibility();
+  }, []);
+
+  const closeCyberSummitPromo = () => {
+    setShowCyberSummitPromo(false);
+    localStorage.setItem(CYBER_SUMMIT_PROMO_SEEN_KEY, 'true');
+  };
 
   const fetchPosts = async (
     pageNum = 1,
@@ -196,6 +234,8 @@ function Home() {
   return (
     <div className="">
       <div ref={mainContentRef} className="page-container">
+        <CyberSummitBanner eligible={cyberSummitEligible} />
+
         {/* Events Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -346,6 +386,12 @@ function Home() {
       <EventItemModal
         isOpen={isEventModalOpen}
         onClose={() => setIsEventModalOpen(false)}
+      />
+
+      {/* Cyber Summit Promo Modal */}
+      <CyberSummitPromoModal
+        isOpen={showCyberSummitPromo}
+        onClose={closeCyberSummitPromo}
       />
     </div>
   );

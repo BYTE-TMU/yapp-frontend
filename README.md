@@ -6,8 +6,8 @@ React-based web application for the Yap social platform - a social network for T
 
 **New Engineer Onboarding:** Start here to understand the codebase
 
-1. **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture, design patterns, and technical decisions
-2. **[API_INTEGRATION.md](./API_INTEGRATION.md)** - Backend integration, endpoints, and authentication
+1. **[ARCHITECTURE.md](./SETUP%20GUIDE/ARCHITECTURE.md)** - System architecture, design patterns, and technical decisions
+2. **[API_INTEGRATION.md](./SETUP%20GUIDE/API_INTEGRATION.md)** - Backend integration, endpoints, and authentication
 3. **Component Documentation** - Detailed README files in each major folder:
    - [src/components/authentication/](./src/components/authentication/) - Authentication system
    - [src/components/messages/](./src/components/messages/) - Real-time messaging
@@ -109,19 +109,26 @@ To run the complete stack locally:
 │   ├── index.css       # Global styles (Tailwind)
 │   ├── components/
 │   │   ├── authentication/  # Login, Register, etc.
+│   │   ├── badges/          # Achievement/status badges
 │   │   ├── common/          # Shared UI components
 │   │   ├── header/          # Navigation header
+│   │   ├── layout/          # App layout shell
 │   │   ├── messages/        # Chat/messaging
+│   │   ├── onboarding/      # First-run onboarding flow
 │   │   ├── pages/           # Main page components
-│   │   └── sidebar/         # Navigation sidebar
+│   │   ├── sidebar/         # Navigation sidebar
+│   │   └── ui/              # Low-level UI primitives
 │   ├── contexts/
 │   │   └── ThemeContext.jsx # Theme provider
 │   ├── services/
 │   │   ├── config.js        # API configuration
+│   │   ├── locationiqService.js # LocationIQ geocoding
 │   │   └── messageService.js # WebSocket service
 │   └── utils/
-│       ├── dateTimeUtils.js  # Date formatting
-│       └── profileUtils.js   # Profile helpers
+│       ├── cnUtils.js         # Tailwind class merging
+│       ├── dateTimeUtils.js   # Date formatting
+│       ├── profileUtils.js    # Profile helpers
+│       └── toastNotifications.js # Toast notification helpers
 ```
 
 ## Environment Variables
@@ -142,6 +149,7 @@ To run the complete stack locally:
 - 📍 **Waypoint** - Location-based features
 - 👤 **Profiles** - User profiles and settings
 - 🌙 **Dark Mode** - Theme switching support
+- 🎟️ **Cyber Summit** - Limited-time TMU-exclusive ticket discount promo; see [src/components/pages/cyber-summit/README.md](./src/components/pages/cyber-summit/README.md) for details
 
 ## Deployment
 
@@ -177,8 +185,8 @@ npm run build
 ## Contributing
 
 For detailed development guidelines, coding standards, and best practices, refer to:
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Understand the system design first
-- **[API_INTEGRATION.md](./API_INTEGRATION.md)** - Learn API patterns
+- **[ARCHITECTURE.md](./SETUP%20GUIDE/ARCHITECTURE.md)** - Understand the system design first
+- **[API_INTEGRATION.md](./SETUP%20GUIDE/API_INTEGRATION.md)** - Learn API patterns
 - **Component READMEs** - Check folder-specific documentation
 
 ### Quick Contribution Steps

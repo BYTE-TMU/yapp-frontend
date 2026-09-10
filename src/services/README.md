@@ -12,19 +12,38 @@ This folder contains service classes and configuration files that handle externa
 
 **Functionality:**
 
-The config automatically determines the backend URL based on the environment:
+The config automatically determines the backend URL based on the environment, checked in this order:
 
 1. **Environment Variable (Highest Priority):**
    ```javascript
    VITE_API_URL=https://yap-backend.up.railway.app
    ```
+   If set, this value is used as-is and no further checks run.
 
-2. **Network IP Detection:**
-   - If accessing via network IP (not localhost), constructs URL using same hostname with port 5000
-   - Useful for mobile testing on local network
+2. **Production Domain Detection (Vercel / Custom Domain):**
+   - Checks `window.location.hostname` for `.vercel.app` or `yapp-mu.com`
+   - If matched, hardcodes the Railway backend URL: `https://web-production-b77b8.up.railway.app`
+   - This lets the frontend deployed on Vercel (including preview deployments under `*.vercel.app`) and the production custom domain both reach the Railway-hosted backend without needing `VITE_API_URL` set at build time
+   ```javascript
+   if (hostname.includes('.vercel.app') || hostname.includes('yapp-mu.com')) {
+     return 'https://web-production-b77b8.up.railway.app';
+   }
+   ```
 
-3. **Default Localhost:**
-   - Falls back to `http://localhost:5000` for local development
+3. **Local Network IP Detection:**
+   - If the hostname isn't `localhost`/`127.0.0.1` and matches a private-network IP pattern (`10.x.x.x`, `172.16-31.x.x`, `192.168.x.x`), constructs a URL using the same hostname with port `5001`
+   - Useful for mobile testing on local network (e.g. loading the dev server from a phone on the same Wi-Fi)
+   ```javascript
+   const isLocalIP = /^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.)/.test(hostname);
+   if (isLocalIP) {
+     return `${window.location.protocol}//${hostname}:5001`;
+   }
+   ```
+
+4. **Default Localhost:**
+   - Falls back to `http://localhost:5001` for local development (the Flask backend's default port)
+
+Every branch logs which path was taken (`console.log`) to make it easy to confirm which backend URL was resolved in the browser console.
 
 **Exports:**
 ```javascript
@@ -46,6 +65,71 @@ const response = await fetch(`${API_BASE_URL}/posts`);
 
 **Why Separate SOCKET_URL:**
 While currently using the same URL, Socket.IO could be hosted separately in the future for scalability.
+
+---
+
+### locationiqService.js (55 lines)
+
+**Purpose:** Thin client for geocoding requests, proxied through the backend so the LocationIQ API key never reaches the browser
+
+Both functions call backend routes under `/waypoint/geocode/...` rather than LocationIQ directly — the backend holds the API key and caches responses server-side.
+
+#### Functions
+
+**reverseGeocode(lat, lng)**
+- **Purpose:** Convert coordinates into a human-readable address
+- **Parameters:**
+  - `lat` - Latitude (number)
+  - `lng` - Longitude (number)
+- **Calls:** `GET ${API_BASE_URL}/waypoint/geocode/reverse?lat=${lat}&lng=${lng}` with `credentials: 'include'`
+- **Returns:** `Promise<string|null>` — the formatted address string, or `null` on failure/error
+- **Caching:** Backend caches results for 1 hour
+- **Example:**
+  ```javascript
+  import { reverseGeocode } from '../../services/locationiqService';
+
+  const address = await reverseGeocode(43.6577, -79.3788);
+  // Returns: "350 Victoria St, Toronto, ON" (or null on failure)
+  ```
+
+**searchAddress(query)**
+- **Purpose:** Forward geocode / autocomplete an address as the user types
+- **Parameters:**
+  - `query` - Search string (strings under 2 characters after trimming short-circuit to an empty result without a network call)
+- **Calls:** `GET ${API_BASE_URL}/waypoint/geocode/search?q=${encodeURIComponent(query.trim())}` with `credentials: 'include'`
+- **Returns:** `Promise<{ error: boolean, results: Array }>` — `error: true` on a failed request or thrown exception, `results` defaults to `[]` if the response has none
+- **Caching:** Backend caches results for 5 minutes
+- **Example:**
+  ```javascript
+  import { searchAddress } from '../../services/locationiqService';
+
+  const { error, results } = await searchAddress('Yonge and Dundas');
+  if (!error) {
+    // results: array of matching address suggestions
+  }
+  ```
+
+#### Usage in a Search Input
+
+```javascript
+import { searchAddress } from '../../services/locationiqService';
+
+function AddressAutocomplete() {
+  const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+
+  const handleChange = async (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    const { error, results } = await searchAddress(value);
+    if (!error) setSuggestions(results);
+  };
+
+  return (
+    <input value={query} onChange={handleChange} placeholder="Search address..." />
+  );
+}
+```
 
 ---
 
@@ -588,4 +672,5 @@ const handleNewMessage = (message) => {
 
 - [API_INTEGRATION.md](/API_INTEGRATION.md) - Socket.IO event details
 - [src/components/messages/](/src/components/messages/) - Message components
+- [src/components/pages/waypoint/](/src/components/pages/waypoint/) - Uses locationiqService for address search/reverse geocoding
 - [ARCHITECTURE.md](/ARCHITECTURE.md) - Real-time architecture overview

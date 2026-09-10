@@ -24,3 +24,9 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+#MD files
+BACKEND_IMPROVEMENTS.md
+FRONTEND_IMPROVEMENTS.md 
+YAPP_IMPROVEMENT_PLAN.txt 
+yapp-user-feedback-implementation.md 

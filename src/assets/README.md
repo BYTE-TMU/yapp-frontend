@@ -8,15 +8,25 @@ This folder contains static assets including images, logos, and icons used throu
 
 ```
 assets/
-├── icons/          # Icon files (currently empty)
-├── images/         # General images (currently empty)
-├── Yapp web icon.png
+├── icons/                    # Currently empty (placeholder none.txt only)
+├── images/                   # Currently empty (placeholder none.txt only)
 ├── Yapp White logo.png
-├── yapp-high-resolution-logo-grayscale-transparent.png
-├── yapp-high-resolution-logo-grayscale.png
-├── yapp-high-resolution-logo-transparent.png
-└── yapp_light_mode.png
+├── Yapp web icon.png
+├── light_mode_logo2.png
+├── image0.jpg
+├── image1.jpg
+├── image2.jpg
+├── image (6).png
+├── Blobs_slowly_drifting_202602212145_b8gyk.mp4
+├── Make_it_feel_202602212226_rbw0t.mp4
+├── loopingani.mp4
+├── byte_black.png
+├── byte_white.png
+├── byte_icon_black.png
+└── byte_icon_white.png
 ```
+
+Both `icons/` and `images/` currently contain only a placeholder `none.txt` file — verified empty of real assets as of this writing.
 
 ## Available Assets
 
@@ -24,32 +34,66 @@ assets/
 
 **Yapp White logo.png**
 - **Usage:** Dark mode/dark backgrounds
-- **Description:** White version of Yap logo
+- **Description:** White version of the Yapp logo
 - **Recommended for:** Sidebar, header in dark mode
 
-**yapp_light_mode.png**
-- **Usage:** Light mode/light backgrounds  
-- **Description:** Dark/colored version for light backgrounds
+**light_mode_logo2.png**
+- **Usage:** Light mode/light backgrounds
+- **Description:** Dark/colored version of the logo for light backgrounds
 - **Recommended for:** Sidebar, header in light mode
-
-**yapp-high-resolution-logo-transparent.png**
-- **Usage:** High-resolution needs
-- **Description:** Full-color logo with transparent background
-- **Recommended for:** Marketing materials, large displays
-
-**yapp-high-resolution-logo-grayscale-transparent.png**
-- **Usage:** Grayscale contexts
-- **Description:** Black/gray logo with transparent background
-- **Recommended for:** Print materials, monochrome contexts
-
-**yapp-high-resolution-logo-grayscale.png**
-- **Usage:** Grayscale with background
-- **Description:** Grayscale logo with solid background
 
 **Yapp web icon.png**
 - **Usage:** Favicon, app icons
 - **Description:** Small icon version for browser tabs
 - **Recommended for:** index.html favicon link
+
+### Cyber Summit — TMU Exclusive (BYTE branding)
+
+Four logo/icon assets used by the Cyber Summit "TMU Exclusive" feature, which promotes the BYTE-branded partner attribution. Consumed by `src/components/pages/cyber-summit/ByteIcon.jsx` and `ByteAttribution.jsx`, both of which import directly via the `@/assets/...` alias and swap between the black/white variant based on the current theme.
+
+**byte_black.png**
+- **Usage:** Light backgrounds
+- **Description:** Full BYTE wordmark/logo, black variant
+- **Used by:** `ByteAttribution.jsx`
+
+**byte_white.png**
+- **Usage:** Dark backgrounds
+- **Description:** Full BYTE wordmark/logo, white variant
+- **Used by:** `ByteAttribution.jsx`
+
+**byte_icon_black.png**
+- **Usage:** Light backgrounds, compact spaces
+- **Description:** BYTE icon-only mark (no wordmark), black variant
+- **Used by:** `ByteIcon.jsx`
+
+**byte_icon_white.png**
+- **Usage:** Dark backgrounds, compact spaces
+- **Description:** BYTE icon-only mark (no wordmark), white variant
+- **Used by:** `ByteIcon.jsx`
+
+### Photos
+
+**image0.jpg, image1.jpg, image2.jpg**
+- **Usage:** General app photography (e.g. onboarding, marketing, or feature imagery)
+- **Description:** JPEG photo assets
+
+**image (6).png**
+- **Usage:** General app imagery
+- **Description:** PNG image asset (note the literal space and parentheses in the filename — quote or escape the path when referencing it outside of an `import` statement)
+
+### Videos
+
+**Blobs_slowly_drifting_202602212145_b8gyk.mp4**
+- **Usage:** Background/decorative animation
+- **Description:** Looping abstract blob animation clip
+
+**Make_it_feel_202602212226_rbw0t.mp4**
+- **Usage:** Background/decorative animation
+- **Description:** Motion/animation clip
+
+**loopingani.mp4**
+- **Usage:** Background/decorative animation
+- **Description:** Looping animation clip
 
 ## Usage Patterns
 
@@ -59,7 +103,7 @@ Vite processes assets through ES modules:
 
 ```javascript
 // Import at the top of your component
-import LogoLight from '../../assets/yapp_light_mode.png';
+import LogoLight from '../../assets/light_mode_logo2.png';
 import LogoDark from '../../assets/Yapp White logo.png';
 
 function Logo() {
@@ -73,7 +117,7 @@ Using ThemeContext to switch logos:
 
 ```javascript
 import { useTheme } from '../../contexts/ThemeContext';
-import LogoLight from '../../assets/yapp_light_mode.png';
+import LogoLight from '../../assets/light_mode_logo2.png';
 import LogoDark from '../../assets/Yapp White logo.png';
 
 function Logo() {
@@ -86,6 +130,19 @@ function Logo() {
       className="h-8 w-auto"
     />
   );
+}
+```
+
+### Cyber Summit BYTE Attribution (Theme-Aware)
+
+```javascript
+import byteBlack from '@/assets/byte_black.png';
+import byteWhite from '@/assets/byte_white.png';
+import { useTheme } from '../../contexts/ThemeContext';
+
+function ByteAttribution() {
+  const { isDarkMode } = useTheme();
+  return <img src={isDarkMode ? byteWhite : byteBlack} alt="BYTE" />;
 }
 ```
 
@@ -388,7 +445,7 @@ function Image({ path }) {
 
 ```javascript
 import { useTheme } from '../../contexts/ThemeContext';
-import LogoLight from '../../assets/yapp_light_mode.png';
+import LogoLight from '../../assets/light_mode_logo2.png';
 import LogoDark from '../../assets/Yapp White logo.png';
 
 function YapLogo({ size = 'md', className = '' }) {
@@ -427,4 +484,5 @@ export default YapLogo;
 
 - [src/contexts/ThemeContext.jsx](/src/contexts/) - Theme-based asset switching
 - [src/components/sidebar/](/src/components/sidebar/) - Logo usage in navigation
+- [src/components/pages/cyber-summit/](/src/components/pages/cyber-summit/) - BYTE-branded asset usage (`byte_*.png`) for the Cyber Summit TMU Exclusive feature
 - [ARCHITECTURE.md](/ARCHITECTURE.md) - Build and deployment process

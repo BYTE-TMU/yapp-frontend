@@ -282,6 +282,144 @@ function ProfileImage({ user, size = 'md' }) {
 }
 ```
 
+---
+
+### cnUtils.js (7 lines)
+
+**Purpose:** Merge Tailwind CSS class names safely, resolving conflicting utility classes
+
+Combines [`clsx`](https://github.com/lukeed/clsx) (conditional class name construction) with [`tailwind-merge`](https://github.com/dcastil/tailwind-merge) (dedupes conflicting Tailwind classes, keeping the last one) into a single helper.
+
+#### Functions
+
+**cn(...inputs)**
+- **Purpose:** Combine conditional/dynamic class name inputs into one deduped class string
+- **Parameters:**
+  - `...inputs` - Any number of strings, arrays, or objects accepted by `clsx` (falsy values ignored)
+- **Returns:** A single merged class name string with conflicting Tailwind utilities resolved
+- **Example:**
+  ```javascript
+  cn('px-2 py-1', condition && 'bg-red-500', 'px-4')
+  // Returns: "py-1 bg-red-500 px-4"
+  // (px-4 wins over px-2 since tailwind-merge resolves the conflict)
+  ```
+
+#### Usage Examples
+
+**In Components with Conditional Styling:**
+```javascript
+import { cn } from '../../utils/cnUtils';
+
+function Button({ variant, className }) {
+  return (
+    <button
+      className={cn(
+        'rounded-md px-4 py-2 font-medium',
+        variant === 'primary' && 'bg-blue-600 text-white',
+        variant === 'secondary' && 'bg-gray-200 text-gray-900',
+        className
+      )}
+    >
+      Click me
+    </button>
+  );
+}
+```
+
+**Merging Component Defaults with Caller Overrides:**
+```javascript
+import { cn } from '../../utils/cnUtils';
+
+function Card({ className, ...props }) {
+  return <div className={cn('rounded-lg border p-4 shadow-sm', className)} {...props} />;
+}
+```
+
+---
+
+### toastNotifications.js (304 lines)
+
+**Purpose:** Centralized toast notification helpers built on [`sonner`](https://sonner.emilkowal.ski/), so every user-facing toast message in the app is defined in one place for consistency and easy editing
+
+Rather than calling `toast.success(...)` / `toast.error(...)` inline throughout components, each distinct notification has its own named, exported function.
+
+#### Function Categories
+
+**Success Toasts** — confirm a completed action:
+- `showPostDeletedSuccess()`
+- `showEventDeletedSuccess()`
+- `showPasswordChangedSuccess()`
+- `showEventJoinedSuccess()` — includes a description pointing users to the "✅ Joined" waypoint status
+- `showEventLeftSuccess()`
+- `showWaypointDeletedSuccess()`
+
+**Error Toasts** — grouped by feature area, most accept an optional `errorMessage`/`message` override for the description:
+- Authentication: `showLoginRequired(action = 'perform this action')`
+- Posts: `showPostDeleteError(errorMessage)`, `showPostLikeError()`
+- Events: `showEventDeleteError(errorMessage)`, `showAttendanceUpdateError()`, `showEventLikeError()`, `showLocationNotAvailableError()`, `showLeaveEventError()`, `showPostMessageError()`
+- Waypoints: `showEventNotFoundError()`, `showWaypointError(message)`, `showCancelEventPermissionError()`, `showJoinEventError()`, `showCancelEventError()`
+- File Upload: `showMaxImagesError()`, `showInvalidFileTypeError(filename)`, `showFileSizeError(filename, maxSize = '10MB')`, `showImageUploadError()`
+- Messages: `showOfflineError()`, `showSendMessageError()`, `showMessageImageFileTypeError()`, `showMessageImageSizeError()`
+- Network: `showNetworkError()`
+
+**Warning Toasts:**
+- `showNoSavedWaypoints()`
+- `showNotEventWaypoint()`
+- `showAlreadyCheckedIn(username)`
+- `showCameraDenied()`
+
+**Check-In Toasts:**
+- `showCheckInSuccess(username)`
+- `showCheckInError(message)`
+- `showTicketError()`
+- `showAttendeeApproved(username)`
+- `showAttendeeWaitlisted(username)`
+
+**Confirmation Dialogs** — render an inline toast with Confirm/Cancel actions and return a `Promise<boolean>` that resolves based on the user's choice (or `false` on dismiss/auto-close). Each uses `duration: Infinity` so the toast doesn't disappear before the user responds:
+- `showDeleteConfirmation(itemType = 'item')`
+- `showEventLeaveConfirmation()`
+- `showEventMatchConfirmation(eventTitle)`
+
+**Custom Toast:**
+- `showCustomToast(type, message, options = {})` — dispatches to `toast.success` / `toast.error` / `toast.warning` / `toast.info` / default `toast` based on `type`, for one-off toasts that don't warrant a dedicated named function
+
+#### Usage Examples
+
+**Simple Success/Error:**
+```javascript
+import { showPostDeletedSuccess, showPostDeleteError } from '../../utils/toastNotifications';
+
+async function deletePost(postId) {
+  try {
+    await api.delete(`/posts/${postId}`);
+    showPostDeletedSuccess();
+  } catch (err) {
+    showPostDeleteError(err.message);
+  }
+}
+```
+
+**Confirmation Dialog (async/await):**
+```javascript
+import { showDeleteConfirmation } from '../../utils/toastNotifications';
+
+async function handleDeleteClick(post) {
+  const confirmed = await showDeleteConfirmation('post');
+  if (confirmed) {
+    await deletePost(post.id);
+  }
+}
+```
+
+**Custom One-Off Toast:**
+```javascript
+import { showCustomToast } from '../../utils/toastNotifications';
+
+showCustomToast('info', 'New feature available!', {
+  description: 'Check out the updated waypoint view.'
+});
+```
+
 ## Adding New Utilities
 
 ### Guidelines for New Utility Functions
@@ -440,4 +578,5 @@ const debouncedSearch = debounce(searchUsers, 300);
 
 - [src/components/messages/](/src/components/messages/) - Uses dateTimeUtils and profileUtils extensively
 - [src/components/pages/home/](/src/components/pages/home/) - Post time formatting
+- [src/components/ui/](/src/components/ui/) - Uses cnUtils for Tailwind class merging in shared UI primitives
 - [ARCHITECTURE.md](/ARCHITECTURE.md) - Overall code organization principles

@@ -17,6 +17,7 @@ import Feedback from './components/pages/Feedback.jsx';
 import CommentsPage from './components/pages/CommentsPage.jsx';
 import Waypoint from './components/pages/waypoint/Waypoint.jsx';
 import EventThread from './components/pages/home/events/EventThread.jsx';
+import CyberSummitExclusive from './components/pages/cyber-summit/CyberSummitExclusive.jsx';
 import Onboarding from './components/onboarding/Onboarding.jsx';
 import PageTransition from './components/common/PageTransition.jsx';
 
@@ -205,6 +206,16 @@ function AuthRoutes() {
             <PrivateRoute>
               <PageTransition>
                 <EventThread />
+              </PageTransition>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/cyber-summit/tmu-exclusive"
+          element={
+            <PrivateRoute>
+              <PageTransition>
+                <CyberSummitExclusive />
               </PageTransition>
             </PrivateRoute>
           }
