@@ -158,7 +158,7 @@ function Users() {
             type="text"
             value={searchQuery}
             onChange={handleInputChange}
-            placeholder="Search for users..."
+            placeholder="Search by username or TMU email..."
             autoComplete="off"
             className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none transition-colors placeholder:text-muted-foreground focus:border-primary`}
             style={{
