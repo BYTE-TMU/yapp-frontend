@@ -59,7 +59,11 @@ function EmailVerification({
           onVerificationSuccess(data.token);
         }, 2000);
       } else {
-        setError(data.error || 'Verification failed');
+        setError(
+          typeof data.error === 'string'
+            ? data.error
+            : data.error?.message || 'Verification failed',
+        );
       }
     } catch {
       setError('Network error. Please try again.');
@@ -90,7 +94,11 @@ function EmailVerification({
         setCanResend(false);
         setCountdown(60);
       } else {
-        setError(data.error || 'Failed to resend code');
+        setError(
+          typeof data.error === 'string'
+            ? data.error
+            : data.error?.message || 'Failed to resend code',
+        );
       }
     } catch {
       setError('Network error. Please try again.');

@@ -30,7 +30,11 @@ function ForgotPasswordForm() {
           navigate('/reset-password', { state: { email } });
         }, 1500);
       } else {
-        setError(data.error || 'Failed to send reset code.');
+        setError(
+          typeof data.error === 'string'
+            ? data.error
+            : data.error?.message || 'Failed to send reset code.',
+        );
       }
     } catch {
       setError('Network error. Please try again.');

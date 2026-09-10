@@ -38,7 +38,11 @@ function ResetPasswordForm() {
         setMessage('Code verified! Now set your new password.');
         setStep(2);
       } else {
-        setError(data.error || 'Invalid code. Please try again.');
+        setError(
+          typeof data.error === 'string'
+            ? data.error
+            : data.error?.message || 'Invalid code. Please try again.',
+        );
       }
     } catch {
       setError('Network error. Please try again.');
@@ -86,7 +90,11 @@ function ResetPasswordForm() {
           navigate('/login');
         }, 2000);
       } else {
-        setError(data.error || 'Failed to reset password.');
+        setError(
+          typeof data.error === 'string'
+            ? data.error
+            : data.error?.message || 'Failed to reset password.',
+        );
       }
     } catch {
       setError('Network error. Please try again.');
@@ -115,7 +123,11 @@ function ResetPasswordForm() {
       if (response.ok) {
         setMessage('New reset code sent to your email!');
       } else {
-        setError(data.error || 'Failed to resend code.');
+        setError(
+          typeof data.error === 'string'
+            ? data.error
+            : data.error?.message || 'Failed to resend code.',
+        );
       }
     } catch {
       setError('Network error. Please try again.');

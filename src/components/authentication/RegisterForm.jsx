@@ -50,7 +50,11 @@ function RegisterForm() {
         setRegisteredUsername(data.username || form.username);
         setShowVerification(true);
       } else {
-        setError(data.error || 'Registration failed.');
+        setError(
+          typeof data.error === 'string'
+            ? data.error
+            : data.error?.message || 'Registration failed.',
+        );
       }
     } catch {
       setError('Network error. Please try again.');
